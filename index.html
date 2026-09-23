@@ -12,6 +12,7 @@
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
+<div class="timer" id="timer" aria-hidden="true">1:00</div>
 <main class="stage">
   <!-- the words live on the page; every word can be dragged. The card sits on top and covers them. -->
   <div class="under">
@@ -73,6 +74,7 @@
     </svg>
   </div>
 </main>
+<div class="doom" id="doom" role="alert" hidden><p>dang<br>you<br>stupid</p></div>
 <script>
 (function(){
   /* ---- the card ---- */
@@ -220,6 +222,17 @@
   layoutHoles();
   addEventListener("resize",relayout);
   if(document.fonts&&document.fonts.ready)document.fonts.ready.then(layoutHoles);
+
+  /* ---- one minute to reach WORK, or else ---- */
+  var LIMIT=60000,t0=Date.now(),timerEl=document.getElementById("timer"),doomEl=document.getElementById("doom"),iv=null;
+  function tick(){
+    var left=Math.max(0,LIMIT-(Date.now()-t0)),sec=Math.ceil(left/1000);
+    timerEl.textContent=Math.floor(sec/60)+":"+("0"+sec%60).slice(-2);
+    if(left<=0){clearInterval(iv);doomEl.hidden=false}
+  }
+  function startTimer(){clearInterval(iv);t0=Date.now();doomEl.hidden=true;tick();iv=setInterval(tick,200)}
+  startTimer();
+  addEventListener("pageshow",function(e){if(e.persisted)startTimer()});   // coming back with the Back button = fresh minute
 })();
 </script>
 </body>

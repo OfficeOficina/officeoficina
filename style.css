@@ -77,3 +77,11 @@ a:focus-visible,button:focus-visible,input:focus-visible,textarea:focus-visible{
 
 .contact h1{font-weight:400;font-size:inherit;margin:2rem 0 0}
 .home{cursor:url(cursor-move.png) 11 11,pointer;cursor:-webkit-image-set(url(cursor-move.png) 1x,url(cursor-move@2x.png) 2x) 11 11,pointer}
+
+/* one-minute timer + the black screen */
+.timer{position:fixed;z-index:6;top:calc(env(safe-area-inset-top,0px) + 10px);left:0;right:0;text-align:center;font-size:15px;line-height:1;
+  letter-spacing:.06em;color:#333;font-variant-numeric:tabular-nums;pointer-events:none}
+.doom{position:fixed;z-index:1000;inset:0;background:#000;color:#fff;display:flex;align-items:center;justify-content:center;text-align:center;
+  font-family:"Helvetica Neue",Helvetica,"FreeSans Web",Arial,sans-serif;cursor:default}
+.doom[hidden]{display:none}
+.doom p{margin:0;font-size:min(28vw,28vh);line-height:.95;letter-spacing:-.02em}
