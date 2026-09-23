@@ -63,3 +63,14 @@ a:focus-visible,button:focus-visible,input:focus-visible,textarea:focus-visible{
 .plug{visibility:hidden}
 .plug.on{visibility:visible}
 .fly{position:absolute;left:0;top:0;margin:0!important;transform-origin:50% 50%;z-index:5;pointer-events:none}
+
+/* the black disc, top right, opposite the logo */
+.disc{position:fixed;z-index:3;right:calc(var(--h)*.038);top:calc(var(--h)*.015);--d:calc(var(--h)*.059);
+  width:calc(var(--d)*1.075);height:var(--d);margin:0;padding:0;border:0;border-radius:50%;background:#000;cursor:pointer;
+  -webkit-tap-highlight-color:transparent;animation:spin 2.4s linear infinite;animation-play-state:paused}
+.disc.on{animation-play-state:running}
+.disc::after{content:"";position:absolute;inset:-6px;border-radius:50%}
+.disc:focus-visible{outline:1px solid #000;outline-offset:4px}
+@keyframes spin{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion:reduce){.disc{animation:none}}
+@media (max-width:700px){.disc{right:3.2vw;top:4vw}}
