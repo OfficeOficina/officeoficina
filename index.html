@@ -12,7 +12,6 @@
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
-<div class="timer" id="timer" aria-hidden="true">0:10</div>
 <main class="stage">
   <!-- the words live on the page; every word can be dragged. The card sits on top and covers them. -->
   <div class="under">
@@ -32,19 +31,6 @@
     <span class="w l">Lucas</span><span class="w r">Strzelec</span>
     <span class="w l">Maarten</span><span class="w r">Janssens</span>
   </div>
-
-  <div class="hole" id="holeA" aria-hidden="true"></div>
-  <div class="hole" id="holeB" aria-hidden="true"></div>
-  <a id="workLink" href="work.html" aria-label="Work" aria-disabled="true" tabindex="-1"><svg id="work" viewBox="0 0 250.05 75.59" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-    <defs>
-      <path id="wl" d="M63.93 65.8H53.4L43.88 21.42L34.6 65.8H24.07L8 8.94H20.4L29.22 51.52L38.03 8.94H49.57L58.78 51.6L67.28 8.94H79.68Z M107.36 8Q119.69 8 127.25 16.31Q134.82 24.61 134.82 38.19Q134.82 50.82 127.37 59.21Q119.92 67.59 107.44 67.59Q95.04 67.59 87.55 59.25Q80.06 50.9 80.06 37.8Q80.06 24.69 87.59 16.35Q95.12 8 107.36 8Z M172.09 56.05Q172.09 53.71 172.17 52.38Q172.25 51.06 172.25 50.04Q172.25 46.45 170.53 44.86Q168.82 43.26 164.99 43.26H151.58V65.8H139.88V8.94H170.38Q174.74 8.94 177.9 10.42Q181.06 11.9 182.66 14.32Q184.26 16.74 184.96 19.19Q185.66 21.65 185.66 24.3Q185.66 34.6 176.07 38.34Q178.18 39.2 179.19 39.71Q180.2 40.21 181.26 41.38Q182.31 42.55 182.66 43.49Q183.01 44.43 183.36 46.92Q183.71 49.42 183.79 51.84Q183.87 54.25 183.95 59.01Q183.95 62.29 186.44 63.69V65.8H173.89Q172.79 63.77 172.44 61.9Q172.09 60.03 172.09 56.05ZM173.96 25.94Q173.96 21.57 171.94 20.13Q169.91 18.69 165.7 18.69H151.58V33.51H165.7Q169.83 33.51 171.9 32.02Q173.96 30.54 173.96 25.94Z M203.59 46.77V65.8H191.89V8.94H203.59V33.9L225.82 8.94H239.63L216.93 33.43L242.05 65.8H228.09L209.44 40.68Z"/>
-      <mask id="wcut"><rect width="250.05" height="75.59" fill="#fff"/><use href="#wl" fill="#000"/></mask>
-      <mask id="wholes"><rect width="250.05" height="75.59" fill="#000"/><use href="#wl" fill="#fff"/></mask>
-    </defs>
-    <use href="#wl" fill="#eeeeee"/>
-    <g mask="url(#wholes)"><g filter="url(#emboss)"><rect width="250.05" height="75.59" fill="#fff" mask="url(#wcut)"/></g></g>
-    <circle id="socket" cx="107.44" cy="37.80" r="27.38" fill="none"/>
-  </svg></a>
 
   <div class="logo" aria-label="Office Oficina logo">
     <span class="m dot"></span><span class="m dot"></span>
@@ -74,7 +60,6 @@
     </svg>
   </div>
 </main>
-<div class="doom" id="doom" role="alert" hidden><p>dang<br>you<br>stupid</p></div>
 <script>
 (function(){
   /* ---- the card ---- */
@@ -120,119 +105,15 @@
       var ox=wx,oy=wy;
       wx=d.x+(e.clientX-d.px); wy=d.y+(e.clientY-d.py);
       w.style.transform="translate("+wx+"px,"+wy+"px)";
-      if(w.classList.contains("m")) hoverHole(w);
       var r=w.getBoundingClientRect();           // keep the word on screen
       if(r.right<16||r.left>innerWidth-16||r.bottom<16||r.top>innerHeight-16){
         wx=ox; wy=oy; w.style.transform="translate("+wx+"px,"+wy+"px)";
       }
     });
-    function up(){ var was=d; d=null; w.classList.remove("dragging"); if(was&&w.classList.contains("m")) dropCheck(w); }
+    function up(){ d=null; w.classList.remove("dragging"); }
     w.addEventListener("pointerup",up);
     w.addEventListener("pointercancel",up);
   });
-
-  /* ---- holes: drop a logo shape into the top hole; it comes out of the bottom hole and rolls into WORK ---- */
-  var holeA=document.getElementById("holeA"),holeB=document.getElementById("holeB"),
-      socketEl=document.getElementById("socket"),workEl=document.getElementById("work"),workLink=document.getElementById("workLink"),RED="#ee2a1e",
-      stage=document.querySelector(".stage"),TAU=Math.PI*2,socketBall=null,extras=[],still=window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  function ctr(el){var r=el.getBoundingClientRect();return{x:r.left+r.width/2,y:r.top+r.height/2,w:r.width,h:r.height}}
-  function geo(){
-    var s=ctr(socketEl),wr=workEl.getBoundingClientRect(),dot=document.querySelector(".logo .dot"),dw=dot.offsetWidth||1;
-    return{ox:s.x,oy:s.y,ow:s.w,wl:wr.left,S:s.w/dw,dh:dot.offsetHeight};
-  }
-  function layoutHoles(){var g=geo();holeB.style.top=(g.oy-holeB.offsetHeight/2)+"px"}
-  function inHole(el){var a=ctr(holeA),c=ctr(el);return Math.hypot(a.x-c.x,a.y-c.y)<a.w*.6}
-  function hoverHole(el){holeA.classList.toggle("over",inHole(el))}
-  function render(b){b.style.transform="translate("+(b.x-b.w/2)+"px,"+(b.y-b.h/2)+"px) rotate("+b.a+"rad) scale("+b.sc+")"}
-  function tween(ms,step,done){
-    if(still){step(1);if(done)done();return}
-    var t0=null;(function f(t){if(t0===null)t0=t;var p=Math.min(1,(t-t0)/ms);step(p);p<1?requestAnimationFrame(f):(done&&done())})(performance.now())
-  }
-  function setWorkActive(on){workLink.classList.toggle("on",on);workLink.tabIndex=on?0:-1;workLink.setAttribute("aria-disabled",on?"false":"true")}
-  function paint(b,c){if(b.classList.contains("tri"))b.style.color=c;else b.style.background=c}
-  function release(b){
-    if(socketBall===b){socketBall=null;setWorkActive(false)}
-    var i=extras.indexOf(b);if(i>-1)extras.splice(i,1);
-    b.slot=null;
-  }
-  function makeBall(piece){
-    var r=piece.getBoundingClientRect(),b=piece.cloneNode(true),tri=piece.classList.contains("tri");
-    b.className="ball "+(tri?"tri":"dot");
-    b.style.cssText="width:"+piece.offsetWidth+"px;height:"+piece.offsetHeight+"px";
-    b.w=piece.offsetWidth;b.h=piece.offsetHeight;b.x=r.left+r.width/2;b.y=r.top+r.height/2;b.a=0;b.sc=1;b.busy=false;
-    render(b);stage.appendChild(b);piece.style.visibility="hidden";ballDrag(b);return b;
-  }
-  function dropCheck(piece){if(inHole(piece)){holeA.classList.remove("over");var b=makeBall(piece);flight(b)}}
-  function ballDrag(b){
-    var d=null,lifted=false;
-    b.addEventListener("pointerdown",function(e){
-      if(b.busy)return;e.preventDefault();lifted=false;
-      d={px:e.clientX,py:e.clientY,x:b.x,y:b.y};b.setPointerCapture(e.pointerId);
-    });
-    b.addEventListener("pointermove",function(e){
-      if(!d)return;
-      if(!lifted){if(Math.hypot(e.clientX-d.px,e.clientY-d.py)<5)return;lifted=true;release(b);b.classList.add("dragging");b.style.zIndex=5}
-      b.x=Math.max(8,Math.min(innerWidth-8,d.x+e.clientX-d.px));b.y=Math.max(8,Math.min(innerHeight-8,d.y+e.clientY-d.py));
-      render(b);hoverHole(b);
-    });
-    function up(){
-      if(!d)return;var was=lifted;d=null;lifted=false;
-      if(!was){if(b.slot==="O")location.href="work.html";return}      // a click, not a drag
-      b.classList.remove("dragging");b.style.zIndex=4;holeA.classList.remove("over");if(inHole(b))flight(b);
-    }
-    b.addEventListener("pointerup",up);b.addEventListener("pointercancel",up);
-  }
-  /* 1. shrink into the top hole  2. pause  3. pop out of the bottom hole  4. roll to WORK */
-  function flight(b){
-    b.busy=true;release(b);
-    var A=ctr(holeA),x0=b.x,y0=b.y,s0=b.sc;
-    tween(340,function(p){var e=p*p;b.x=x0+(A.x-x0)*e;b.y=y0+(A.y-y0)*e;b.sc=s0*(1-e);render(b)},function(){
-      b.style.visibility="hidden";
-      setTimeout(function(){b.style.visibility="";emerge(b)},still?0:500);
-    });
-  }
-  function queueEdge(g,skip){var e=g.wl-10;extras.forEach(function(x){if(x!==skip)e=Math.min(e,x.tx-x.w*g.S/2-6)});return e}
-  function restY(b,g){return b.slot==="O"?g.oy:g.oy+(g.dh-b.h)*g.S/2}     // shapes rest on the same floor
-  function target(b,g){
-    var w=b.w*g.S;
-    if(!socketBall){socketBall=b;b.slot="O";b.tx=g.ox;return g.ox}
-    b.slot="Q";b.tx=queueEdge(g,b)-w/2;extras.push(b);
-    return b.tx;
-  }
-  function emerge(b){
-    var g=geo(),B=ctr(holeB),S=g.S,rr=Math.max(b.w,b.h)*S/2,tx=target(b,g),floor=restY(b,g),
-        x1=B.x+30,L=Math.max(0,tx-x1),T=Math.max(1.3,L/430)*1000,pop=b.h*S*.8;
-    b.y=floor;b.x=B.x;b.a=0;
-    tween(460,function(p){
-      var e=1-Math.pow(1-p,3);b.sc=S*e;b.x=B.x+30*p;b.y=floor-pop*4*p*(1-p)*(1-.3*p);render(b);
-    },function(){
-      var aEnd=L/rr,aTarget=Math.round(aEnd/TAU)*TAU;
-      tween(T,function(p){
-        var q=2*p-p*p;b.x=x1+L*q;b.y=floor;b.sc=S;
-        b.a=(L*q)/rr+(aTarget-aEnd)*Math.pow(p,4);render(b);
-      },function(){b.busy=false;b.x=tx;b.a=aTarget;render(b);if(b.slot==="O"){paint(b,"#000");setWorkActive(true)}else paint(b,RED)});
-    });
-  }
-  function relayout(){
-    layoutHoles();var g=geo();
-    if(socketBall&&!socketBall.busy){socketBall.sc=g.S;socketBall.x=socketBall.tx=g.ox;socketBall.y=restY(socketBall,g);render(socketBall)}
-    var edge=g.wl-10;
-    extras.forEach(function(b){var w=b.w*g.S;b.tx=edge-w/2;edge-=w+6;if(b.busy)return;b.sc=g.S;b.x=b.tx;b.y=restY(b,g);render(b)});
-  }
-  layoutHoles();
-  addEventListener("resize",relayout);
-  if(document.fonts&&document.fonts.ready)document.fonts.ready.then(layoutHoles);
-
-  /* ---- ten seconds to reach WORK, or else ---- */
-  var LIMIT=10000,t0=Date.now(),timerEl=document.getElementById("timer"),doomEl=document.getElementById("doom"),iv=null;
-  function tick(){
-    var left=Math.max(0,LIMIT-(Date.now()-t0)),sec=Math.ceil(left/1000);
-    timerEl.textContent=Math.floor(sec/60)+":"+("0"+sec%60).slice(-2);
-    if(left<=0){clearInterval(iv);doomEl.hidden=false}
-  }
-  function startTimer(){clearInterval(iv);t0=Date.now();doomEl.hidden=true;tick();iv=setInterval(tick,200)}
-  startTimer();
-  addEventListener("pageshow",function(e){if(e.persisted)startTimer()});   // coming back with the Back button = fresh ten seconds
 })();
 </script>
 </body>
