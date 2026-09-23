@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Contact — Office Oficina</title>
-<link rel="stylesheet" href="style.css?v=6">
+<link rel="stylesheet" href="style.css?v=7">
 </head>
 <body>
 <div class="contact">
@@ -22,7 +22,16 @@
 
   <!-- drawing pad: same size as the message form, draw inside the dashed line -->
   <div class="padwrap">
-    <button class="padtool on" id="padTool" type="button" aria-pressed="true" aria-label="Pencil"><img src="pencil.png" alt=""></button>
+    <div class="padtools" role="toolbar" aria-label="Drawing tools">
+      <button class="padtool on" id="padTool" type="button" aria-pressed="true" aria-label="Pencil"><img src="pencil.png" alt=""></button>
+      <div class="padcolors" role="group" aria-label="Colours">
+        <button class="padsw sel" type="button" data-c="#000000" style="--c:#000000" aria-label="Black"></button>
+        <button class="padsw" type="button" data-c="#ee2a1e" style="--c:#ee2a1e" aria-label="Red"></button>
+        <button class="padsw" type="button" data-c="#2447ff" style="--c:#2447ff" aria-label="Blue"></button>
+        <button class="padsw" type="button" data-c="#ffd400" style="--c:#ffd400" aria-label="Yellow"></button>
+      </div>
+      <div class="padsize"><input id="padSize" type="range" min="1" max="24" value="3" aria-label="Thickness"></div>
+    </div>
     <div class="pad" id="pad"><canvas id="padCanvas" aria-label="Drawing pad"></canvas></div>
   </div>
   <div class="padsend">
@@ -37,7 +46,8 @@
   var pad=document.getElementById("pad"),cv=document.getElementById("padCanvas"),ctx=cv.getContext("2d"),
       tool=document.getElementById("padTool"),fields=document.getElementById("fields"),
       send=document.getElementById("padSend"),status=document.getElementById("padStatus"),
-      strokes=[],cur=null,on=true,LW=2.6;                                 // LW = pencil thickness in px
+      strokes=[],cur=null,on=true,color="#000000",size=3,                 // size = pencil thickness in px
+      sizeEl=document.getElementById("padSize");
 
   function fit(){                                                        // pad = same size as the message form
     var h=fields.offsetHeight;if(h>60)pad.style.height=h+"px";
@@ -56,28 +66,50 @@
     g.stroke();
   }
   function redraw(){
-    ctx.clearRect(0,0,cv.width,cv.height);ctx.strokeStyle="#000";
-    var d=window.devicePixelRatio||1;strokes.forEach(function(s){strokePath(ctx,s,cv.width,cv.height,LW*d)});
+    ctx.clearRect(0,0,cv.width,cv.height);
+    var d=window.devicePixelRatio||1;strokes.forEach(function(s){ctx.strokeStyle=s.c;strokePath(ctx,s.p,cv.width,cv.height,s.w*d)});
   }
   function norm(e){var r=cv.getBoundingClientRect();return[Math.min(1,Math.max(0,(e.clientX-r.left)/r.width)),Math.min(1,Math.max(0,(e.clientY-r.top)/r.height))]}
   cv.addEventListener("pointerdown",function(e){
-    if(!on)return;e.preventDefault();cv.setPointerCapture(e.pointerId);cur=[norm(e)];status.textContent="";
+    if(!on)return;e.preventDefault();cv.setPointerCapture(e.pointerId);cur={p:[norm(e)],c:color,w:size};status.textContent="";
   });
   cv.addEventListener("pointermove",function(e){
-    if(!cur)return;cur.push(norm(e));redraw();ctx.strokeStyle="#000";
-    var d=window.devicePixelRatio||1;strokePath(ctx,cur,cv.width,cv.height,LW*d);
+    if(!cur)return;cur.p.push(norm(e));redraw();ctx.strokeStyle=cur.c;
+    var d=window.devicePixelRatio||1;strokePath(ctx,cur.p,cv.width,cv.height,cur.w*d);
   });
   function up(){if(!cur)return;strokes.push(cur);cur=null;redraw()}
   cv.addEventListener("pointerup",up);cv.addEventListener("pointercancel",up);
 
   tool.addEventListener("click",function(){                              // pencil on / off
-    on=!on;tool.classList.toggle("on",on);tool.setAttribute("aria-pressed",on?"true":"false");pad.classList.toggle("off",!on);
+    setOn(!on);
   });
+  function setOn(v){on=v;tool.classList.toggle("on",on);tool.setAttribute("aria-pressed",on?"true":"false");pad.classList.toggle("off",!on);dotCursor()}
+
+  function dotCursor(){                                                  // the cursor is a dot: pencil size, pencil colour
+    if(!on){pad.style.cursor="";return}
+    var d=Math.max(2,size),S=Math.ceil(d)+6,h=Math.round(S/2);
+    function make(k){
+      var c=document.createElement("canvas");c.width=c.height=S*k;var g=c.getContext("2d");g.scale(k,k);
+      g.beginPath();g.arc(S/2,S/2,d/2,0,Math.PI*2);g.fillStyle=color;g.fill();
+      g.lineWidth=1;g.strokeStyle="rgba(0,0,0,.5)";g.stroke();return c.toDataURL("image/png");
+    }
+    var u1=make(1),u2=make(2);
+    pad.style.cursor="url("+u1+") "+h+" "+h+", crosshair";
+    pad.style.cursor="-webkit-image-set(url("+u1+") 1x, url("+u2+") 2x) "+h+" "+h+", crosshair";   // sharper on retina; ignored where unsupported
+  }
+  [].forEach.call(document.querySelectorAll(".padsw"),function(b){
+    b.addEventListener("click",function(){
+      color=b.getAttribute("data-c");
+      [].forEach.call(document.querySelectorAll(".padsw"),function(o){o.classList.toggle("sel",o===b)});
+      setOn(true);
+    });
+  });
+  sizeEl.addEventListener("input",function(){size=+sizeEl.value;setOn(true)});
 
   function picture(cb){
     var W=1200,H=Math.round(W*cv.height/cv.width),c=document.createElement("canvas");c.width=W;c.height=H;
-    var g=c.getContext("2d");g.fillStyle="#fff";g.fillRect(0,0,W,H);g.strokeStyle="#000";
-    strokes.forEach(function(s){strokePath(g,s,W,H,LW*W/cv.getBoundingClientRect().width)});
+    var g=c.getContext("2d");g.fillStyle="#fff";g.fillRect(0,0,W,H);
+    strokes.forEach(function(s){g.strokeStyle=s.c;strokePath(g,s.p,W,H,s.w*W/cv.getBoundingClientRect().width)});
     c.toBlob(cb,"image/png");
   }
   send.addEventListener("click",function(){
@@ -95,7 +127,7 @@
     });
   });
 
-  fit();addEventListener("resize",fit);
+  dotCursor();fit();addEventListener("resize",fit);
   if(window.ResizeObserver)new ResizeObserver(fit).observe(fields);
   if(document.fonts&&document.fonts.ready)document.fonts.ready.then(fit);
 })();

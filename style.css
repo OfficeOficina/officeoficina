@@ -69,10 +69,22 @@ a:focus-visible,button:focus-visible,input:focus-visible,textarea:focus-visible{
 .pad{position:relative;box-sizing:border-box;width:100%;height:14rem;border:1px dashed #000;touch-action:none;cursor:crosshair;overflow:hidden}
 .pad.off{cursor:default}
 .pad canvas{position:absolute;left:0;top:0;width:100%;height:100%;display:block;touch-action:none}
-.contact button.padtool{position:absolute;left:100%;top:0;margin-left:1rem;width:40px;height:40px;padding:0;background:none;border-radius:50%;display:grid;place-items:center;opacity:.35}
+.padtools{position:absolute;left:100%;top:0;margin-left:1rem;display:flex;flex-direction:column;align-items:flex-start;gap:16px}
+.contact button.padtool{position:static;width:40px;height:40px;padding:0;background:none;border-radius:50%;display:grid;place-items:center;opacity:.35}
 .contact button.padtool.on{opacity:1;box-shadow:inset 0 0 0 1px #000}
 .padtool img{width:24px;height:24px;display:block}
+.padcolors{display:flex;align-items:center;gap:9px}
+.contact button.padsw{width:18px;height:18px;padding:0;border:0;border-radius:50%;background:var(--c);box-shadow:inset 0 0 0 1px rgba(0,0,0,.28);cursor:pointer}
+.contact button.padsw.sel{outline:2px solid #000;outline-offset:2px}
+.padsize{position:relative;width:96px;height:18px}
+.padsize::before{content:"";position:absolute;left:0;top:0;width:100%;height:100%;background:#cfcfcf;clip-path:polygon(0 47%,100% 6%,100% 94%,0 53%)}
+.padsize input{position:relative;display:block;width:100%;height:18px;margin:0;padding:0;border:0;background:transparent;-webkit-appearance:none;appearance:none;cursor:pointer}
+.padsize input::-webkit-slider-runnable-track{height:18px;background:transparent}
+.padsize input::-moz-range-track{height:18px;background:transparent}
+.padsize input::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;margin-top:2px;border-radius:50%;background:#000;border:0}
+.padsize input::-moz-range-thumb{width:14px;height:14px;border-radius:50%;background:#000;border:0}
+.padsize input:focus-visible,.padsw:focus-visible,.padtool:focus-visible{outline:1px solid #000;outline-offset:3px}
 .padsend{display:flex;align-items:center;gap:1rem;margin-top:1.25rem}
 .padsend span{font-size:.8em;color:#777}
 .contact button:disabled{opacity:.5;cursor:default}
-@media (max-width:700px){.contact button.padtool{position:static;margin:0 0 .6rem}}
+@media (max-width:700px){.padtools{position:static;margin:0 0 .8rem;flex-direction:row;flex-wrap:wrap;align-items:center;gap:14px}}
