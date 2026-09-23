@@ -9,7 +9,7 @@
 <meta property="og:description" content="OFFICE COLLABORATIVE is a COLLABORATIVE OFFICE of architecture.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://officeoficina.com">
-<link rel="stylesheet" href="style.css?v=10">
+<link rel="stylesheet" href="style.css?v=12">
 </head>
 <body>
 <main class="stage">
@@ -110,7 +110,7 @@
   Array.prototype.forEach.call(document.querySelectorAll(".w,.m"),function(w){
     var wx=0,wy=0,d=null;
     w.addEventListener("pointerdown",function(e){
-      e.preventDefault(); if(w.classList.contains("m")) hintOn(w);
+      e.preventDefault(); if(w.classList.contains("m")) hintOn(w,e.pointerType);
       d={px:e.clientX,py:e.clientY,x:wx,y:wy};
       w.setPointerCapture(e.pointerId); w.classList.add("dragging"); w.style.zIndex=++top;
     });
@@ -171,14 +171,14 @@
     },function(){sx=sy=sr=0;apply()});
   }
 
-  /* ---- press a logo shape: the hole(s) it fits into pulse grey once a second ---- */
-  var hls=[].slice.call(document.querySelectorAll(".hl")),hintTO=null;
-  function hintOn(piece){
-    clearTimeout(hintTO);var k=piece.classList.contains("tri")?"a":"o";
+  /* ---- press a logo shape: the hole(s) it fits into pulse grey once a second (mouse: while held; touch: +3 s) ---- */
+  var hls=[].slice.call(document.querySelectorAll(".hl")),hintTO=null,hintMouse=false;
+  function hintOn(piece,ptype){
+    clearTimeout(hintTO);hintMouse=(ptype==="mouse");var k=piece.classList.contains("tri")?"a":"o";
     hls.forEach(function(h,i){h.classList.toggle("on",h.getAttribute("data-k")===k&&!plugs[i].taken&&!plugs[i].classList.contains("on"))});
   }
   function hintOff(){clearTimeout(hintTO);hls.forEach(function(h){h.classList.remove("on")})}
-  function hintRelease(){clearTimeout(hintTO);hintTO=setTimeout(hintOff,3000)}     // keeps pulsing 3 seconds after you let go
+  function hintRelease(){clearTimeout(hintTO);if(hintMouse){hintOff();return}hintTO=setTimeout(hintOff,3000)}   // mouse: only while held. touch: keeps pulsing 3 s after you let go
 })();
 </script>
 </body>
