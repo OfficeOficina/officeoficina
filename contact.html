@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Contact — Office Oficina</title>
-<link rel="stylesheet" href="style.css?v=7">
+<link rel="stylesheet" href="style.css?v=8">
 </head>
 <body>
 <div class="contact">
@@ -23,7 +23,12 @@
   <!-- drawing pad: same size as the message form, draw inside the dashed line -->
   <div class="padwrap">
     <div class="padtools" role="toolbar" aria-label="Drawing tools">
-      <button class="padtool on" id="padTool" type="button" aria-pressed="true" aria-label="Pencil"><img src="pencil.png" alt=""></button>
+      <div class="padtop">
+        <button class="padtool on" id="padTool" type="button" aria-pressed="true" aria-label="Pencil"><img src="pencil.png" alt=""></button>
+        <button class="padundo" id="padUndo" type="button" aria-label="Go back (erase the last line)" title="Go back" disabled>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 14L4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 010 11H11"/></svg>
+        </button>
+      </div>
       <div class="padcolors" role="group" aria-label="Colours">
         <button class="padsw sel" type="button" data-c="#000000" style="--c:#000000" aria-label="Black"></button>
         <button class="padsw" type="button" data-c="#ee2a1e" style="--c:#ee2a1e" aria-label="Red"></button>
@@ -47,7 +52,7 @@
       tool=document.getElementById("padTool"),fields=document.getElementById("fields"),
       send=document.getElementById("padSend"),status=document.getElementById("padStatus"),
       strokes=[],cur=null,on=true,color="#000000",size=3,                 // size = pencil thickness in px
-      sizeEl=document.getElementById("padSize");
+      sizeEl=document.getElementById("padSize"),undo=document.getElementById("padUndo");
 
   function fit(){                                                        // pad = same size as the message form
     var h=fields.offsetHeight;if(h>60)pad.style.height=h+"px";
@@ -77,7 +82,9 @@
     if(!cur)return;cur.p.push(norm(e));redraw();ctx.strokeStyle=cur.c;
     var d=window.devicePixelRatio||1;strokePath(ctx,cur.p,cv.width,cv.height,cur.w*d);
   });
-  function up(){if(!cur)return;strokes.push(cur);cur=null;redraw()}
+  function up(){if(!cur)return;strokes.push(cur);cur=null;redraw();syncUndo()}
+  function syncUndo(){undo.disabled=!strokes.length}
+  undo.addEventListener("click",function(){strokes.pop();redraw();syncUndo();status.textContent=""});      // go back: erase the last line
   cv.addEventListener("pointerup",up);cv.addEventListener("pointercancel",up);
 
   tool.addEventListener("click",function(){                              // pencil on / off
@@ -122,7 +129,7 @@
       fd.append("_captcha","false");fd.append("_template","box");fd.append("_honey","");
       fd.append("message","Someone sent a drawing from the contact page. The picture is attached.");
       fetch(ENDPOINT,{method:"POST",body:fd,mode:"no-cors"}).then(function(){
-        strokes=[];redraw();status.textContent="sent, thank you";
+        strokes=[];redraw();syncUndo();status.textContent="sent, thank you";
       }).catch(function(){status.textContent="couldn't send, please try again"}).then(function(){send.disabled=false});
     });
   });
