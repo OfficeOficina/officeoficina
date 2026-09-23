@@ -191,7 +191,7 @@
   /* ---- pen: draw on the card only ---- */
   var ink=document.getElementById("ink"),ictx=ink.getContext("2d"),cardSvg=card.querySelector("svg"),
       penBtn=document.getElementById("penBtn"),sizeEl=document.getElementById("size"),hint=document.getElementById("penHint"),
-      ENDPOINT="https://formsubmit.co/YOUR_EMAIL_HERE";          // <-- where drawings are sent (see the steps I gave you)
+      ENDPOINT="https://formsubmit.co/lucasjstrzelec@gmail.com";          // <-- where drawings are sent (see the steps I gave you)
   ictx.setTransform(2,0,0,2,0,0);ictx.lineCap="round";ictx.lineJoin="round";
   function local(e){                                             // pointer position in the card's own 525 x 920 space, tilt included
     var pt=cardSvg.createSVGPoint(),m=cardSvg.getScreenCTM();pt.x=e.clientX;pt.y=e.clientY;
