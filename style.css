@@ -50,7 +50,7 @@ a:focus-visible,button:focus-visible,input:focus-visible,textarea:focus-visible{
   :root{--h:min(94vw,72vh)}
   .stage{padding-bottom:15vh;padding-bottom:15dvh}
   .under{top:42.5%}
-  .logo{left:3.2vw;top:4vw;--d:2.2vw}
+  .logo{left:3.2vw;top:4vw}
   .m::after{content:"";position:absolute;inset:-4px}
 }
 @supports (height:1dvh){@media (max-width:700px){:root{--h:min(94vw,72dvh)}}}
