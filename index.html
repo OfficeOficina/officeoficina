@@ -37,6 +37,21 @@
     <span class="m tri"><svg viewBox="0 0 39 37" preserveAspectRatio="none" aria-hidden="true"><path d="M0 0L39 14.5V22.5L0 37Z"/></svg></span>
   </div>
 
+  <div class="tools" id="tools" role="toolbar" aria-label="Drawing tools">
+    <button class="penbtn" id="penBtn" type="button" aria-pressed="false" aria-label="Pen">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true"><path d="M3.5 20.5l1.2-4.6L16.6 4a2 2 0 012.8 0l1.6 1.6a2 2 0 010 2.8L9.1 20.3z"/><path d="M14.5 6.1l3.4 3.4"/></svg>
+    </button>
+    <div class="swatches" role="group" aria-label="Colours">
+      <button class="sw sel" type="button" data-c="#000000" style="--c:#000000" aria-label="Black"></button>
+      <button class="sw" type="button" data-c="#ee2a1e" style="--c:#ee2a1e" aria-label="Red"></button>
+      <button class="sw" type="button" data-c="#2447ff" style="--c:#2447ff" aria-label="Blue"></button>
+      <button class="sw" type="button" data-c="#ffd400" style="--c:#ffd400" aria-label="Yellow"></button>
+      <button class="sw" type="button" data-c="#1fa34a" style="--c:#1fa34a" aria-label="Green"></button>
+    </div>
+    <div class="size"><input id="size" type="range" min="2" max="36" value="10" aria-label="Thickness"></div>
+  </div>
+  <p class="penhint" id="penHint" hidden></p>
+
   <div class="card" id="card" tabindex="0" role="group" aria-label="Business card. Drag it, or use the arrow keys, to move it and reveal the text underneath. Fit the three logo shapes into its letters to unlock it.">
     <svg viewBox="0 0 525 920" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
       <defs>
@@ -65,12 +80,13 @@
         <path class="plug" data-k="a" d="M253.62 28.43L306.43 28.43L286.77 -28.43L273.82 -28.43Z"/>
       </g>
     </svg>
+    <canvas class="ink" id="ink" width="1050" height="1840" aria-hidden="true"></canvas>
   </div>
 </main>
 <script>
 (function(){
   /* ---- the card ---- */
-  var card=document.getElementById("card"),x=0,y=0,tilt=1.8,drag=null,sx=0,sy=0,sr=0,unlocked=false;
+  var card=document.getElementById("card"),x=0,y=0,tilt=1.8,drag=null,sx=0,sy=0,sr=0,unlocked=false,penOn=false,color="#000000",size=10,hasInk=false,sending=false;
   function apply(){
     var lx=innerWidth/2,ly=innerHeight/2;
     x=Math.max(-lx,Math.min(lx,x)); y=Math.max(-ly,Math.min(ly,y));
@@ -78,22 +94,28 @@
   }
   apply();
   card.addEventListener("pointerdown",function(e){
+    if(sending) return;
     e.preventDefault(); card.focus({preventScroll:true});
+    if(penOn){                                            // pen on: this press starts a line
+      drag={pen:true,px:e.clientX,py:e.clientY,moved:false,s:{pts:[local(e)],color:color,w:size}};
+      card.setPointerCapture(e.pointerId); return;
+    }
     drag={px:e.clientX,py:e.clientY,x:x,y:y,moved:false};
     card.setPointerCapture(e.pointerId); card.classList.add("dragging");
   });
   card.addEventListener("pointermove",function(e){
     if(!drag) return;
     if(!drag.moved){ if(Math.hypot(e.clientX-drag.px,e.clientY-drag.py)<5) return; drag.moved=true; }   // a click never nudges the card
+    if(drag.pen){ addPoint(drag.s,local(e)); return; }
     x=drag.x+(e.clientX-drag.px); y=drag.y+(e.clientY-drag.py);
     apply();
   });
-  function end(){ var was=drag; drag=null; card.classList.remove("dragging"); if(was&&!was.moved&&unlocked) location.href="work.html"; }
+  function end(){ var was=drag; drag=null; card.classList.remove("dragging"); if(!was) return; if(was.pen&&was.moved) hasInk=true; if(!was.moved&&unlocked) sendAndGo(); }
   card.addEventListener("pointerup",end);
   card.addEventListener("pointercancel",end);
   card.addEventListener("keydown",function(e){
     var s=e.shiftKey?60:20,k=e.key;
-    if((k==="Enter"||k===" ")&&unlocked){e.preventDefault();location.href="work.html";return}
+    if((k==="Enter"||k===" ")&&unlocked){e.preventDefault();unlockAudio();sendAndGo();return}
     if(k==="ArrowLeft")x-=s; else if(k==="ArrowRight")x+=s;
     else if(k==="ArrowUp")y-=s; else if(k==="ArrowDown")y+=s; else return;
     e.preventDefault(); apply();
@@ -157,13 +179,96 @@
     });
   }
   function solved(){
-    unlocked=true;card.classList.add("open");
+    unlocked=true;card.classList.add("open");updateHint();
     card.setAttribute("aria-label","Business card. Click it to open Work.");
     tween(1000,function(p){                       // the little shutter
       var a=(1-p)*(1-p);
       sx=Math.sin(p*Math.PI*2*11)*7*a;sy=Math.sin(p*Math.PI*2*14+1)*3*a;sr=Math.sin(p*Math.PI*2*12)*.9*a;
       apply();
     },function(){sx=sy=sr=0;apply()});
+  }
+
+  /* ---- pen: draw on the card only ---- */
+  var ink=document.getElementById("ink"),ictx=ink.getContext("2d"),cardSvg=card.querySelector("svg"),
+      penBtn=document.getElementById("penBtn"),sizeEl=document.getElementById("size"),hint=document.getElementById("penHint"),
+      ENDPOINT="https://formsubmit.co/YOUR_EMAIL_HERE";          // <-- where drawings are sent (see the steps I gave you)
+  ictx.setTransform(2,0,0,2,0,0);ictx.lineCap="round";ictx.lineJoin="round";
+  function local(e){                                             // pointer position in the card's own 525 x 920 space, tilt included
+    var pt=cardSvg.createSVGPoint(),m=cardSvg.getScreenCTM();pt.x=e.clientX;pt.y=e.clientY;
+    return m?pt.matrixTransform(m.inverse()):{x:0,y:0};
+  }
+  function addPoint(st,p){
+    st.pts.push(p);var n=st.pts.length;
+    ictx.strokeStyle=st.color;ictx.lineWidth=st.w;ictx.beginPath();
+    if(n===2){ictx.moveTo(st.pts[0].x,st.pts[0].y);ictx.lineTo(p.x,p.y)}
+    else{
+      var a=st.pts[n-3],b=st.pts[n-2];
+      ictx.moveTo((a.x+b.x)/2,(a.y+b.y)/2);ictx.quadraticCurveTo(b.x,b.y,(b.x+p.x)/2,(b.y+p.y)/2);
+    }
+    ictx.stroke();
+  }
+  function updateHint(){hint.hidden=!penOn;hint.textContent=unlocked?"click the card to send your drawing to us":"draw on the card"}
+  function setPen(on){penOn=on;card.classList.toggle("pen",on);penBtn.classList.toggle("on",on);penBtn.setAttribute("aria-pressed",on?"true":"false");updateHint()}
+  penBtn.addEventListener("click",function(){setPen(!penOn)});
+  [].forEach.call(document.querySelectorAll(".sw"),function(b){
+    b.addEventListener("click",function(){
+      color=b.getAttribute("data-c");
+      [].forEach.call(document.querySelectorAll(".sw"),function(o){o.classList.toggle("sel",o===b)});
+      setPen(true);
+    });
+  });
+  sizeEl.addEventListener("input",function(){size=+sizeEl.value;setPen(true)});
+
+  /* ---- sounds (made in the browser, no files) ---- */
+  var AC=window.AudioContext||window.webkitAudioContext,ac=null;
+  function unlockAudio(){if(!AC)return;ac=ac||new AC();if(ac.state==="suspended"&&ac.resume)ac.resume()}
+  ["pointerdown","touchend","click","keydown"].forEach(function(ev){addEventListener(ev,unlockAudio,{passive:true})});
+  function noise(t,dur,f,q,g0,to){
+    var n=Math.floor(ac.sampleRate*dur),buf=ac.createBuffer(1,n,ac.sampleRate),d=buf.getChannelData(0),i;
+    for(i=0;i<n;i++)d[i]=Math.random()*2-1;
+    var src=ac.createBufferSource(),flt=ac.createBiquadFilter(),g=ac.createGain();
+    src.buffer=buf;flt.type="bandpass";flt.Q.value=q;flt.frequency.setValueAtTime(f,t);
+    if(to)flt.frequency.exponentialRampToValueAtTime(to,t+dur);
+    g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(g0,t+Math.min(.012,dur/4));g.gain.exponentialRampToValueAtTime(.001,t+dur);
+    src.connect(flt);flt.connect(g);g.connect(ac.destination);src.start(t);src.stop(t+dur);
+  }
+  function tone(t,f,dur,g0){
+    var o=ac.createOscillator(),g=ac.createGain();o.type="sine";o.frequency.value=f;
+    g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(g0,t+.01);g.gain.exponentialRampToValueAtTime(.001,t+dur);
+    o.connect(g);g.connect(ac.destination);o.start(t);o.stop(t+dur+.05);
+  }
+  function shutterSound(t){noise(t,.05,3200,1.1,.9);tone(t,140,.06,.5);noise(t+.075,.09,1500,.9,.8);tone(t+.075,90,.09,.4)}   // camera: ka-chk
+  function sentSound(t){noise(t,.5,500,1.4,.7,5000);tone(t+.42,1568,.35,.12);tone(t+.52,2093,.5,.1)}                       // mail: whoosh + ding
+
+  /* ---- the picture of the card, and sending it ---- */
+  function exportPNG(){
+    return new Promise(function(done){
+      var W=1050,H=1840,c=document.createElement("canvas");c.width=W;c.height=H;
+      var g=c.getContext("2d");g.fillStyle="#fff";g.fillRect(0,0,W,H);
+      g.save();g.setTransform(2,0,0,2,0,0);g.translate(265,460);g.rotate(Math.PI/2);
+      g.fillStyle="#e9e9e9";[].forEach.call(document.querySelectorAll("#letters path"),function(p){g.fill(new Path2D(p.getAttribute("d")))});
+      g.fillStyle="#000";[].forEach.call(document.querySelectorAll(".plug.on"),function(p){g.fill(new Path2D(p.getAttribute("d")))});
+      g.restore();g.drawImage(ink,0,0,W,H);
+      g.strokeStyle="#dcdcdc";g.lineWidth=3;g.strokeRect(1.5,1.5,W-3,H-3);
+      c.toBlob(done,"image/png");
+    });
+  }
+  function sendCard(blob){
+    if(!blob||/YOUR_/.test(ENDPOINT))return Promise.resolve();
+    var fd=new FormData();
+    fd.append("attachment",blob,"card.png");
+    fd.append("_subject","New drawing on the Office Oficina card");
+    fd.append("_captcha","false");fd.append("_template","box");fd.append("_honey","");
+    fd.append("message","Someone drew on the card at officeoficina.com. The picture is attached.");
+    return fetch(ENDPOINT,{method:"POST",body:fd,mode:"no-cors"}).catch(function(){});
+  }
+  function sendAndGo(){
+    if(sending)return;sending=true;
+    if(!hasInk){location.href="work.html";return}                      // nothing drawn: just go to Work
+    unlockAudio();
+    if(ac){var t=ac.currentTime+.03;shutterSound(t);sentSound(t+.5)}   // photo sound, then sent-mail sound
+    var min=new Promise(function(r){setTimeout(r,1900)}),up=exportPNG().then(sendCard);
+    Promise.race([Promise.all([min,up]),new Promise(function(r){setTimeout(r,5000)})]).then(function(){location.href="work.html"});
   }
 })();
 </script>
