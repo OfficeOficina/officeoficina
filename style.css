@@ -1,0 +1,56 @@
+@font-face{font-family:"FreeSans Web";src:url(freesans.woff) format("woff");font-weight:400;font-style:normal;font-display:swap}
+html{cursor:url(cursor.png) 11 11,default;cursor:-webkit-image-set(url(cursor.png) 1x,url(cursor@2x.png) 2x) 11 11,default}
+:root{--bg:#fafafa;--fg:#000;--h:min(90vh,940px,140vw)}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{background:var(--bg);color:var(--fg);font-family:"FreeSans Web","Helvetica Neue",Helvetica,Arial,sans-serif;font-size:20px;line-height:1.2}
+a{color:inherit;text-decoration:none}
+a:hover,a:focus-visible{text-decoration:underline;text-underline-offset:.15em}
+a:focus-visible,button:focus-visible,input:focus-visible,textarea:focus-visible{outline:2px solid currentColor;outline-offset:3px}
+.contact{max-width:34rem;padding:clamp(1rem,3vw,2.5rem)}
+.contact form{display:grid;gap:1.25rem;margin-top:2rem}
+.contact label{display:grid;gap:.35rem}
+.contact input,.contact textarea{font:inherit;color:inherit;background:transparent;border:0;border-bottom:1px solid currentColor;padding:.4rem 0;border-radius:0}
+.contact textarea{min-height:8rem;resize:vertical}
+.contact button{font:inherit;justify-self:start;background:var(--fg);color:var(--bg);border:0;padding:.6rem 1.2rem;cursor:pointer}
+/* home: die-cut card */
+.stage{height:100%;height:100dvh;display:grid;place-items:center;overflow:hidden;position:relative}
+.under{isolation:isolate;position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:max-content;max-width:100vw;align-content:start;
+  display:grid;grid-template-columns:auto auto;column-gap:.38em;
+  font-size:calc(var(--h)*.04);line-height:1.18;letter-spacing:.035em;color:#333;-webkit-text-stroke:.1px currentColor}
+.w{display:block;cursor:url(cursor-move.png) 11 11,grab;cursor:-webkit-image-set(url(cursor-move.png) 1x,url(cursor-move@2x.png) 2x) 11 11,grab;touch-action:none;user-select:none;-webkit-user-select:none;position:relative;white-space:nowrap}
+.w.l{justify-self:end;text-align:right}
+.w.r{justify-self:start}
+.w.dragging{cursor:url(cursor-move.png) 11 11,grabbing;cursor:-webkit-image-set(url(cursor-move.png) 1x,url(cursor-move@2x.png) 2x) 11 11,grabbing}
+.ic{display:block;margin:2.5em 0;color:#8f8f8f;-webkit-text-stroke:0;align-self:center}
+.ic.l{justify-self:end;margin-right:.03em;width:1.12em;height:.8em}
+.ic.r{justify-self:start;margin-left:.03em;width:1.05em;height:1em}
+.ic svg{width:100%;height:100%;display:block}
+.ic:hover,.ic:focus-visible{color:#333}
+.card{position:relative;z-index:1;will-change:transform;height:var(--h);aspect-ratio:525/920;touch-action:none;user-select:none;-webkit-user-select:none;
+  cursor:url(cursor-move.png) 11 11,grab;cursor:-webkit-image-set(url(cursor-move.png) 1x,url(cursor-move@2x.png) 2x) 11 11,grab}
+.card.dragging{cursor:url(cursor-move.png) 11 11,grabbing;cursor:-webkit-image-set(url(cursor-move.png) 1x,url(cursor-move@2x.png) 2x) 11 11,grabbing}
+.card svg{width:100%;height:100%;overflow:visible;display:block;pointer-events:none}
+.card:focus,.card:focus-visible{outline:none}
+
+/* logo: three movable shapes, sitting above the card */
+.logo{position:fixed;z-index:3;left:calc(var(--h)*.038);top:calc(var(--h)*.015);display:flex;align-items:flex-start;
+  --d:calc(var(--h)*.059)}
+.m{display:block;position:relative;cursor:url(cursor-move.png) 11 11,grab;cursor:-webkit-image-set(url(cursor-move.png) 1x,url(cursor-move@2x.png) 2x) 11 11,grab;touch-action:none;user-select:none;-webkit-user-select:none}
+.m.dragging{cursor:url(cursor-move.png) 11 11,grabbing;cursor:-webkit-image-set(url(cursor-move.png) 1x,url(cursor-move@2x.png) 2x) 11 11,grabbing}
+.dot{width:var(--d);height:calc(var(--d)*1.075);background:#000;border-radius:50%}
+.dot+.dot{margin-left:calc(var(--d)*.094)}
+.tri{width:calc(var(--d)*.70);height:calc(var(--d)*.736);margin-left:calc(var(--d)*.226);color:#000}
+.tri svg{display:block;width:100%;height:100%;fill:currentColor;pointer-events:none}
+
+.card,.w,.m{-webkit-touch-callout:none}
+
+/* phones (portrait): smaller card, sitting a little above centre, small logo, like the original mobile site */
+@media (max-width:700px){
+  :root{--h:min(94vw,72vh)}
+  .stage{padding-bottom:15vh;padding-bottom:15dvh}
+  .under{top:42.5%}
+  .logo{left:3.2vw;top:4vw;--d:2.2vw}
+  .m::after{content:"";position:absolute;inset:-10px}
+}
+@supports (height:1dvh){@media (max-width:700px){:root{--h:min(94vw,72dvh)}}}

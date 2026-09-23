@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Contact — Office Oficina</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="contact">
+  <p><a href="index.html">Office Oficina</a></p>
+  <!-- Replace YOUR_FORM_ID with your Formspree (formspree.io, free) form ID, or use Netlify Forms -->
+  <form action="https://formspree.io/f/mjykrako" method="POST">
+    <label>Name <input name="name" required autocomplete="name"></label>
+    <label>Email <input name="email" type="email" required autocomplete="email"></label>
+    <label>Message <textarea name="message" required></textarea></label>
+    <button type="submit">Send</button>
+  </form>
+</div>
+</body>
+</html>
