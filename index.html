@@ -37,8 +37,6 @@
     <span class="m tri"><svg viewBox="0 0 39 37" preserveAspectRatio="none" aria-hidden="true"><path d="M0 0L39 14.5V22.5L0 37Z"/></svg></span>
   </div>
 
-  <button class="disc" id="disc" type="button" aria-label="Play music" aria-pressed="false"></button>
-
   <div class="card" id="card" tabindex="0" role="group" aria-label="Business card. Drag it, or use the arrow keys, to move it and reveal the text underneath. Fit the three logo shapes into its letters to unlock it.">
     <svg viewBox="0 0 525 920" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
       <defs>
@@ -69,7 +67,6 @@
     </svg>
   </div>
 </main>
-<audio id="music" src="music.mp3" loop preload="none"></audio>
 <script>
 (function(){
   /* ---- the card ---- */
@@ -168,35 +165,6 @@
       apply();
     },function(){sx=sy=sr=0;apply()});
   }
-
-  /* ---- the black disc: click = it spins and the music plays; click again = it stops ---- */
-  var disc=document.getElementById("disc"),audio=document.getElementById("music"),playing=false,ac=null,synthTimer=null;
-  function synthStart(){                       // stand-in tune, only used if music.mp3 can't be loaded
-    if(synthTimer||!ac)return;
-    var scale=[0,3,5,7,10,12,15],i=2,n=0;
-    function note(){
-      var t=ac.currentTime,f=196*Math.pow(2,scale[i]/12),o=ac.createOscillator(),g=ac.createGain();
-      o.type="sine";o.frequency.value=f;
-      g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(.16,t+.03);g.gain.exponentialRampToValueAtTime(.001,t+1.1);
-      o.connect(g);g.connect(ac.destination);o.start(t);o.stop(t+1.2);
-      i=Math.max(0,Math.min(scale.length-1,i+[-2,-1,1,1,2][Math.floor(Math.random()*5)]));n++;
-    }
-    note();synthTimer=setInterval(note,340);
-  }
-  function synthStop(){clearInterval(synthTimer);synthTimer=null}
-  function setPlaying(on){
-    playing=on;disc.classList.toggle("on",on);disc.setAttribute("aria-pressed",on?"true":"false");
-    disc.setAttribute("aria-label",on?"Stop music":"Play music");
-  }
-  disc.addEventListener("click",function(){
-    if(playing){setPlaying(false);audio.pause();synthStop();return}
-    setPlaying(true);
-    var AC=window.AudioContext||window.webkitAudioContext;                 // unlocked inside the click, for phones
-    if(AC){ac=ac||new AC();if(ac.resume)ac.resume()}
-    var pr=audio.play();
-    if(pr&&pr.catch)pr.catch(function(){if(playing)synthStart()});
-  });
-  audio.addEventListener("error",function(){if(playing)synthStart()});
 })();
 </script>
 </body>
