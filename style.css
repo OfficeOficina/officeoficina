@@ -76,3 +76,4 @@ a:focus-visible,button:focus-visible,input:focus-visible,textarea:focus-visible{
 @media (max-width:700px){#holeA{top:5vh;top:5dvh}#workLink{bottom:2.6vh;bottom:2.6dvh}}
 
 .contact h1{font-weight:400;font-size:inherit;margin:2rem 0 0}
+.home{cursor:url(cursor-move.png) 11 11,pointer;cursor:-webkit-image-set(url(cursor-move.png) 1x,url(cursor-move@2x.png) 2x) 11 11,pointer}
