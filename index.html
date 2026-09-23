@@ -12,7 +12,7 @@
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
-<div class="timer" id="timer" aria-hidden="true">1:00</div>
+<div class="timer" id="timer" aria-hidden="true">0:10</div>
 <main class="stage">
   <!-- the words live on the page; every word can be dragged. The card sits on top and covers them. -->
   <div class="under">
@@ -223,8 +223,8 @@
   addEventListener("resize",relayout);
   if(document.fonts&&document.fonts.ready)document.fonts.ready.then(layoutHoles);
 
-  /* ---- one minute to reach WORK, or else ---- */
-  var LIMIT=60000,t0=Date.now(),timerEl=document.getElementById("timer"),doomEl=document.getElementById("doom"),iv=null;
+  /* ---- ten seconds to reach WORK, or else ---- */
+  var LIMIT=10000,t0=Date.now(),timerEl=document.getElementById("timer"),doomEl=document.getElementById("doom"),iv=null;
   function tick(){
     var left=Math.max(0,LIMIT-(Date.now()-t0)),sec=Math.ceil(left/1000);
     timerEl.textContent=Math.floor(sec/60)+":"+("0"+sec%60).slice(-2);
@@ -232,7 +232,7 @@
   }
   function startTimer(){clearInterval(iv);t0=Date.now();doomEl.hidden=true;tick();iv=setInterval(tick,200)}
   startTimer();
-  addEventListener("pageshow",function(e){if(e.persisted)startTimer()});   // coming back with the Back button = fresh minute
+  addEventListener("pageshow",function(e){if(e.persisted)startTimer()});   // coming back with the Back button = fresh ten seconds
 })();
 </script>
 </body>
