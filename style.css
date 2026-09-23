@@ -61,10 +61,18 @@ a:focus-visible,button:focus-visible,input:focus-visible,textarea:focus-visible{
 .hole.over{background:#e6e6e6}
 #holeA{right:6vw;top:5vh}
 #holeB{left:6vw}
-#work{position:absolute;z-index:0;right:6vw;bottom:2.6vh;pointer-events:none;overflow:visible;
+#workLink{position:absolute;z-index:0;right:6vw;bottom:2.6vh;display:block;pointer-events:none;-webkit-tap-highlight-color:transparent}
+#workLink.on{pointer-events:auto;cursor:pointer}
+#work{display:block;overflow:visible;
   width:calc(var(--em)*3.2057);height:calc(var(--em)*0.9691)}
 .ball{position:absolute;left:0;top:0;margin:0!important;transform-origin:50% 50%;z-index:4;touch-action:none;user-select:none;-webkit-user-select:none;
   cursor:url(cursor-move.png) 11 11,grab;cursor:-webkit-image-set(url(cursor-move.png) 1x,url(cursor-move@2x.png) 2x) 11 11,grab}
 .ball.dragging{cursor:url(cursor-move.png) 11 11,grabbing;cursor:-webkit-image-set(url(cursor-move.png) 1x,url(cursor-move@2x.png) 2x) 11 11,grabbing}
 .ball.tri{margin-left:0}
-@media (max-width:700px){#holeA{top:5vh;top:5dvh}#work{bottom:2.6vh;bottom:2.6dvh}}
+.ball{transition:background-color .35s,color .35s}
+#work>use{transition:fill .2s}
+#workLink.on:hover #work>use,#workLink.on:focus-visible #work>use{fill:#d9d9d9}
+#workLink:focus-visible{outline:none}
+@media (max-width:700px){#holeA{top:5vh;top:5dvh}#workLink{bottom:2.6vh;bottom:2.6dvh}}
+
+.contact h1{font-weight:400;font-size:inherit;margin:2rem 0 0}
