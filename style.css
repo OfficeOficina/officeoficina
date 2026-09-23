@@ -93,8 +93,11 @@ a:focus-visible,button:focus-visible,input:focus-visible,textarea:focus-visible{
 .contact button:disabled{opacity:.5;cursor:default}
 @media (max-width:700px){.padtools{position:static;margin:0 0 .8rem;flex-direction:row;flex-wrap:wrap;align-items:center;gap:14px}}
 
-/* hole hint: the inside edge of the hole pulses grey once a second (5px line, only the inner half shows) */
-.hl{fill:none;stroke:#777;stroke-width:5px;stroke-linejoin:round;vector-effect:non-scaling-stroke;opacity:0;pointer-events:none}
+/* hole hint: the whole hole glows softly grey once a second */
+.hl{fill:#808080;stroke:none;opacity:0;pointer-events:none}
 .hl.on{animation:holePulse 1s ease-in-out infinite}
-@keyframes holePulse{0%,100%{opacity:0}50%{opacity:.85}}
-@media (prefers-reduced-motion:reduce){.hl.on{animation:none;opacity:.6}}
+@keyframes holePulse{0%,100%{opacity:0}50%{opacity:.42}}
+@media (prefers-reduced-motion:reduce){.hl.on{animation:none;opacity:.4}}
+
+.sendrow{display:flex;align-items:center;gap:1rem}
+.sendrow span{font-size:.8em;color:#777}
