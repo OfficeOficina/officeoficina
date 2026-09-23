@@ -34,13 +34,13 @@ a:focus-visible,button:focus-visible,input:focus-visible,textarea:focus-visible{
 .card:focus,.card:focus-visible{outline:none}
 
 /* logo: three movable shapes, sitting above the card */
-.logo{position:fixed;z-index:3;left:calc(var(--h)*.038);top:calc(var(--h)*.015);display:flex;align-items:flex-start;
+.logo{position:fixed;z-index:3;left:calc(var(--h)*.038);top:calc(var(--h)*.015);display:flex;flex-direction:column;align-items:flex-end;
   --d:calc(var(--h)*.059)}
 .m{display:block;position:relative;cursor:url(cursor-move.png) 11 11,grab;cursor:-webkit-image-set(url(cursor-move.png) 1x,url(cursor-move@2x.png) 2x) 11 11,grab;touch-action:none;user-select:none;-webkit-user-select:none}
 .m.dragging{cursor:url(cursor-move.png) 11 11,grabbing;cursor:-webkit-image-set(url(cursor-move.png) 1x,url(cursor-move@2x.png) 2x) 11 11,grabbing}
-.dot{width:var(--d);height:calc(var(--d)*1.075);background:#000;border-radius:50%}
-.dot+.dot{margin-left:calc(var(--d)*.094)}
-.tri{width:calc(var(--d)*.70);height:calc(var(--d)*.736);margin-left:calc(var(--d)*.226);color:#000}
+.dot{width:calc(var(--d)*1.075);height:var(--d);background:#000;border-radius:50%}
+.dot+.dot{margin-top:calc(var(--d)*.094)}
+.tri{width:calc(var(--d)*.736);height:calc(var(--d)*.70);margin-top:calc(var(--d)*.226);color:#000}
 .tri svg{display:block;width:100%;height:100%;fill:currentColor;pointer-events:none}
 
 .card,.w,.m{-webkit-touch-callout:none}
@@ -57,3 +57,9 @@ a:focus-visible,button:focus-visible,input:focus-visible,textarea:focus-visible{
 
 .contact h1{font-weight:400;font-size:inherit;margin:2rem 0 0}
 .home{cursor:url(cursor-move.png) 11 11,pointer;cursor:-webkit-image-set(url(cursor-move.png) 1x,url(cursor-move@2x.png) 2x) 11 11,pointer}
+
+/* logo shapes fitted into the card */
+.card .plugs{position:absolute;left:0;top:0}
+.plug{visibility:hidden}
+.plug.on{visibility:visible}
+.fly{position:absolute;left:0;top:0;margin:0!important;transform-origin:50% 50%;z-index:5;pointer-events:none}

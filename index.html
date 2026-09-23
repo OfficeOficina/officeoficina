@@ -34,10 +34,10 @@
 
   <div class="logo" aria-label="Office Oficina logo">
     <span class="m dot"></span><span class="m dot"></span>
-    <span class="m tri"><svg viewBox="0 0 37 39" preserveAspectRatio="none" aria-hidden="true"><path d="M0 39L14.5 0H22.5L37 39Z"/></svg></span>
+    <span class="m tri"><svg viewBox="0 0 39 37" preserveAspectRatio="none" aria-hidden="true"><path d="M0 0L39 14.5V22.5L0 37Z"/></svg></span>
   </div>
 
-  <div class="card" id="card" tabindex="0" role="group" aria-label="Business card. Drag it, or use the arrow keys, to move it and reveal the text underneath.">
+  <div class="card" id="card" tabindex="0" role="group" aria-label="Business card. Drag it, or use the arrow keys, to move it and reveal the text underneath. Fit the three logo shapes into its letters to unlock it.">
     <svg viewBox="0 0 525 920" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
       <defs>
         <!-- the cut-out letters (solid O, Helvetica-style bold) -->
@@ -58,33 +58,42 @@
       <!-- the card -->
       <rect width="525" height="920" fill="#fff" mask="url(#cut)"/>
     </svg>
+    <svg class="plugs" viewBox="0 0 525 920" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <g transform="translate(265 460) rotate(90)" fill="#000">
+        <path class="plug" data-k="o" d="M-278.7 -29.37Q-266.38 -29.37 -258.81 -21.06Q-251.24 -12.75 -251.24 0.82Q-251.24 13.46 -258.69 21.84Q-266.14 30.23 -278.62 30.23Q-291.02 30.23 -298.51 21.88Q-306 13.53 -306 0.43Q-306 -12.68 -298.47 -21.02Q-290.95 -29.37 -278.7 -29.37Z"/>
+        <path class="plug" data-k="o" d="M35.44 -29.37Q47.76 -29.37 55.33 -21.06Q62.89 -12.75 62.89 0.82Q62.89 13.46 55.44 21.84Q47.99 30.23 35.51 30.23Q23.11 30.23 15.62 21.88Q8.14 13.53 8.14 0.43Q8.14 -12.68 15.66 -21.02Q23.19 -29.37 35.44 -29.37Z"/>
+        <path class="plug" data-k="a" d="M253.62 28.43L306.43 28.43L286.77 -28.43L273.82 -28.43Z"/>
+      </g>
+    </svg>
   </div>
 </main>
 <script>
 (function(){
   /* ---- the card ---- */
-  var card=document.getElementById("card"),x=0,y=0,tilt=1.8,drag=null;
+  var card=document.getElementById("card"),x=0,y=0,tilt=1.8,drag=null,sx=0,sy=0,sr=0,unlocked=false;
   function apply(){
     var lx=innerWidth/2,ly=innerHeight/2;
     x=Math.max(-lx,Math.min(lx,x)); y=Math.max(-ly,Math.min(ly,y));
-    card.style.transform="translate("+x+"px,"+y+"px) rotate("+tilt+"deg)";
+    card.style.transform="translate("+(x+sx)+"px,"+(y+sy)+"px) rotate("+(tilt+sr)+"deg)";
   }
   apply();
   card.addEventListener("pointerdown",function(e){
     e.preventDefault(); card.focus({preventScroll:true});
-    drag={px:e.clientX,py:e.clientY,x:x,y:y};
+    drag={px:e.clientX,py:e.clientY,x:x,y:y,moved:false};
     card.setPointerCapture(e.pointerId); card.classList.add("dragging");
   });
   card.addEventListener("pointermove",function(e){
     if(!drag) return;
+    if(!drag.moved){ if(Math.hypot(e.clientX-drag.px,e.clientY-drag.py)<5) return; drag.moved=true; }   // a click never nudges the card
     x=drag.x+(e.clientX-drag.px); y=drag.y+(e.clientY-drag.py);
     apply();
   });
-  function end(){ drag=null; card.classList.remove("dragging"); }
+  function end(){ var was=drag; drag=null; card.classList.remove("dragging"); if(was&&!was.moved&&unlocked) location.href="work.html"; }
   card.addEventListener("pointerup",end);
   card.addEventListener("pointercancel",end);
   card.addEventListener("keydown",function(e){
     var s=e.shiftKey?60:20,k=e.key;
+    if((k==="Enter"||k===" ")&&unlocked){e.preventDefault();location.href="work.html";return}
     if(k==="ArrowLeft")x-=s; else if(k==="ArrowRight")x+=s;
     else if(k==="ArrowUp")y-=s; else if(k==="ArrowDown")y+=s; else return;
     e.preventDefault(); apply();
@@ -110,10 +119,52 @@
         wx=ox; wy=oy; w.style.transform="translate("+wx+"px,"+wy+"px)";
       }
     });
-    function up(){ d=null; w.classList.remove("dragging"); }
+    function up(){ var was=d; d=null; w.classList.remove("dragging"); if(was&&w.classList.contains("m")) dropCheck(w); }
     w.addEventListener("pointerup",up);
     w.addEventListener("pointercancel",up);
   });
+
+  /* ---- the logo shapes fit into the card's letters: O into OFFICE's O, O into OFICINA's O, A into OFICINA's A ---- */
+  var stage=document.querySelector(".stage"),plugs=[].slice.call(document.querySelectorAll(".plug")),still=window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  function tween(ms,step,done){
+    if(still){step(1);if(done)done();return}
+    var t0=null;(function f(t){if(t0===null)t0=t;var p=Math.min(1,(t-t0)/ms);step(p);p<1?requestAnimationFrame(f):(done&&done())})(performance.now())
+  }
+  function ctr(el){var r=el.getBoundingClientRect();return{x:r.left+r.width/2,y:r.top+r.height/2,w:r.width,h:r.height}}
+  function dropCheck(piece){
+    var isTri=piece.classList.contains("tri"),c=ctr(piece),best=null,bd=1e9;
+    plugs.forEach(function(p){
+      if(p.taken||(p.getAttribute("data-k")==="a")!==isTri) return;
+      var b=ctr(p),d=Math.hypot(b.x-c.x,b.y-c.y),lim=Math.max(48,Math.max(b.w,b.h)*.9);
+      if(d<lim&&d<bd){bd=d;best=p}
+    });
+    if(best) fit(piece,best);
+  }
+  function fit(piece,plug){
+    plug.taken=true;
+    var r=piece.getBoundingClientRect(),fly=piece.cloneNode(true),isTri=piece.classList.contains("tri"),
+        pw=piece.offsetWidth,ph=piece.offsetHeight,bb=plug.getBBox(),k=card.offsetWidth/525,
+        sc=(bb.height*k)/pw,x0=r.left+r.width/2,y0=r.top+r.height/2;
+    fly.className="fly "+(isTri?"tri":"dot");fly.style.cssText="width:"+pw+"px;height:"+ph+"px";
+    stage.appendChild(fly);piece.style.visibility="hidden";
+    tween(420,function(p){
+      var e=p<.5?4*p*p*p:1-Math.pow(-2*p+2,3)/2,t=ctr(plug),
+          cx=x0+(t.x-x0)*e,cy=y0+(t.y-y0)*e,s=1+(sc-1)*e;
+      fly.style.transform="translate("+(cx-pw/2)+"px,"+(cy-ph/2)+"px) rotate("+(tilt*e)+"deg) scale("+s+")";
+    },function(){
+      plug.classList.add("on");fly.remove();
+      if(plugs.every(function(p){return p.classList.contains("on")})) solved();
+    });
+  }
+  function solved(){
+    unlocked=true;card.classList.add("open");
+    card.setAttribute("aria-label","Business card. Click it to open Work.");
+    tween(1000,function(p){                       // the little shutter
+      var a=(1-p)*(1-p);
+      sx=Math.sin(p*Math.PI*2*11)*7*a;sy=Math.sin(p*Math.PI*2*14+1)*3*a;sr=Math.sin(p*Math.PI*2*12)*.9*a;
+      apply();
+    },function(){sx=sy=sr=0;apply()});
+  }
 })();
 </script>
 </body>
