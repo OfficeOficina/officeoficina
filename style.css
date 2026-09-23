@@ -92,3 +92,9 @@ a:focus-visible,button:focus-visible,input:focus-visible,textarea:focus-visible{
 .padsend span{font-size:.8em;color:#777}
 .contact button:disabled{opacity:.5;cursor:default}
 @media (max-width:700px){.padtools{position:static;margin:0 0 .8rem;flex-direction:row;flex-wrap:wrap;align-items:center;gap:14px}}
+
+/* hole hint: pulses blue every half second */
+.hl{fill:#2447ff;opacity:0;pointer-events:none}
+.hl.on{animation:holePulse .5s ease-in-out infinite}
+@keyframes holePulse{0%,100%{opacity:0}50%{opacity:.85}}
+@media (prefers-reduced-motion:reduce){.hl.on{animation:none;opacity:.6}}

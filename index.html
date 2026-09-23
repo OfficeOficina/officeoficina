@@ -9,7 +9,7 @@
 <meta property="og:description" content="OFFICE COLLABORATIVE is a COLLABORATIVE OFFICE of architecture.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://officeoficina.com">
-<link rel="stylesheet" href="style.css?v=8">
+<link rel="stylesheet" href="style.css?v=9">
 </head>
 <body>
 <main class="stage">
@@ -59,6 +59,11 @@
       <rect width="525" height="920" fill="#fff" mask="url(#cut)"/>
     </svg>
     <svg class="plugs" viewBox="0 0 525 920" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <g class="hlg" transform="translate(265 460) rotate(90)">
+        <path class="hl" data-k="o" d="M-278.7 -29.37Q-266.38 -29.37 -258.81 -21.06Q-251.24 -12.75 -251.24 0.82Q-251.24 13.46 -258.69 21.84Q-266.14 30.23 -278.62 30.23Q-291.02 30.23 -298.51 21.88Q-306 13.53 -306 0.43Q-306 -12.68 -298.47 -21.02Q-290.95 -29.37 -278.7 -29.37Z"/>
+        <path class="hl" data-k="o" d="M35.44 -29.37Q47.76 -29.37 55.33 -21.06Q62.89 -12.75 62.89 0.82Q62.89 13.46 55.44 21.84Q47.99 30.23 35.51 30.23Q23.11 30.23 15.62 21.88Q8.14 13.53 8.14 0.43Q8.14 -12.68 15.66 -21.02Q23.19 -29.37 35.44 -29.37Z"/>
+        <path class="hl" data-k="a" d="M290.67 16.97H269.38L265.55 28.43H253.62L273.82 -28.43H286.77L306.43 28.43H294.41ZM287.47 7.21 280.06 -15.01 272.65 7.21Z"/>
+      </g>
       <g transform="translate(265 460) rotate(90)" fill="#000">
         <path class="plug" data-k="o" d="M-278.7 -29.37Q-266.38 -29.37 -258.81 -21.06Q-251.24 -12.75 -251.24 0.82Q-251.24 13.46 -258.69 21.84Q-266.14 30.23 -278.62 30.23Q-291.02 30.23 -298.51 21.88Q-306 13.53 -306 0.43Q-306 -12.68 -298.47 -21.02Q-290.95 -29.37 -278.7 -29.37Z"/>
         <path class="plug" data-k="o" d="M35.44 -29.37Q47.76 -29.37 55.33 -21.06Q62.89 -12.75 62.89 0.82Q62.89 13.46 55.44 21.84Q47.99 30.23 35.51 30.23Q23.11 30.23 15.62 21.88Q8.14 13.53 8.14 0.43Q8.14 -12.68 15.66 -21.02Q23.19 -29.37 35.44 -29.37Z"/>
@@ -105,7 +110,7 @@
   Array.prototype.forEach.call(document.querySelectorAll(".w,.m"),function(w){
     var wx=0,wy=0,d=null;
     w.addEventListener("pointerdown",function(e){
-      e.preventDefault();
+      e.preventDefault(); if(w.classList.contains("m")) hintOn(w);
       d={px:e.clientX,py:e.clientY,x:wx,y:wy};
       w.setPointerCapture(e.pointerId); w.classList.add("dragging"); w.style.zIndex=++top;
     });
@@ -119,7 +124,7 @@
         wx=ox; wy=oy; w.style.transform="translate("+wx+"px,"+wy+"px)";
       }
     });
-    function up(){ var was=d; d=null; w.classList.remove("dragging"); if(was&&w.classList.contains("m")) dropCheck(w); }
+    function up(){ var was=d; d=null; w.classList.remove("dragging"); if(was&&w.classList.contains("m")){ dropCheck(w); hintRelease(); } }
     w.addEventListener("pointerup",up);
     w.addEventListener("pointercancel",up);
   });
@@ -141,7 +146,7 @@
     if(best) fit(piece,best);
   }
   function fit(piece,plug){
-    plug.taken=true;
+    plug.taken=true;hintOff();
     var r=piece.getBoundingClientRect(),fly=piece.cloneNode(true),isTri=piece.classList.contains("tri"),
         pw=piece.offsetWidth,ph=piece.offsetHeight,bb=plug.getBBox(),k=card.offsetWidth/525,
         sc=(bb.height*k)/pw,x0=r.left+r.width/2,y0=r.top+r.height/2;
@@ -165,6 +170,15 @@
       apply();
     },function(){sx=sy=sr=0;apply()});
   }
+
+  /* ---- press a logo shape: the hole(s) it fits into pulse blue every half second ---- */
+  var hls=[].slice.call(document.querySelectorAll(".hl")),hintTO=null;
+  function hintOn(piece){
+    clearTimeout(hintTO);var k=piece.classList.contains("tri")?"a":"o";
+    hls.forEach(function(h,i){h.classList.toggle("on",h.getAttribute("data-k")===k&&!plugs[i].taken&&!plugs[i].classList.contains("on"))});
+  }
+  function hintOff(){clearTimeout(hintTO);hls.forEach(function(h){h.classList.remove("on")})}
+  function hintRelease(){clearTimeout(hintTO);hintTO=setTimeout(hintOff,3000)}     // keeps pulsing 3 seconds after you let go
 })();
 </script>
 </body>
