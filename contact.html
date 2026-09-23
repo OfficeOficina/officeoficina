@@ -4,18 +4,101 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Contact — Office Oficina</title>
-<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="style.css?v=6">
 </head>
 <body>
 <div class="contact">
   <p><a href="index.html">Office Oficina</a></p>
-  <!-- Replace YOUR_FORM_ID with your Formspree (formspree.io, free) form ID, or use Netlify Forms -->
-  <form action="https://formspree.io/f/mjykrako" method="POST">
-    <label>Name <input name="name" required autocomplete="name"></label>
-    <label>Email <input name="email" type="email" required autocomplete="email"></label>
-    <label>Message <textarea name="message" required></textarea></label>
+
+  <!-- Replace YOUR_FORM_ID with your Formspree (formspree.io) form ID -->
+  <form id="mailForm" action="https://formspree.io/f/YOUR_FORM_ID" method="POST">
+    <div class="fields" id="fields">
+      <label>Name <input name="name" required autocomplete="name"></label>
+      <label>Email <input name="email" type="email" required autocomplete="email"></label>
+      <label>Message <textarea name="message" required></textarea></label>
+    </div>
     <button type="submit">Send</button>
   </form>
+
+  <!-- drawing pad: same size as the message form, draw inside the dashed line -->
+  <div class="padwrap">
+    <button class="padtool on" id="padTool" type="button" aria-pressed="true" aria-label="Pencil"><img src="pencil.png" alt=""></button>
+    <div class="pad" id="pad"><canvas id="padCanvas" aria-label="Drawing pad"></canvas></div>
+  </div>
+  <div class="padsend">
+    <button type="button" id="padSend">Send</button>
+    <span id="padStatus" role="status"></span>
+  </div>
 </div>
+
+<script>
+(function(){
+  var ENDPOINT="https://formsubmit.co/lucasjstrzelec@gmail.com";       // where drawings are emailed
+  var pad=document.getElementById("pad"),cv=document.getElementById("padCanvas"),ctx=cv.getContext("2d"),
+      tool=document.getElementById("padTool"),fields=document.getElementById("fields"),
+      send=document.getElementById("padSend"),status=document.getElementById("padStatus"),
+      strokes=[],cur=null,on=true,LW=2.6;                                 // LW = pencil thickness in px
+
+  function fit(){                                                        // pad = same size as the message form
+    var h=fields.offsetHeight;if(h>60)pad.style.height=h+"px";
+    var r=cv.getBoundingClientRect(),d=window.devicePixelRatio||1;
+    cv.width=Math.max(1,Math.round(r.width*d));cv.height=Math.max(1,Math.round(r.height*d));redraw();
+  }
+  function strokePath(g,pts,w,h,lw){
+    g.lineWidth=lw;g.lineCap="round";g.lineJoin="round";g.beginPath();
+    var p=function(i){return[pts[i][0]*w,pts[i][1]*h]},a=p(0),i;
+    if(pts.length===1){g.moveTo(a[0],a[1]);g.lineTo(a[0]+.01,a[1])}
+    else{
+      g.moveTo(a[0],a[1]);
+      for(i=1;i<pts.length-1;i++){var b=p(i),c=p(i+1);g.quadraticCurveTo(b[0],b[1],(b[0]+c[0])/2,(b[1]+c[1])/2)}
+      var e=p(pts.length-1);g.lineTo(e[0],e[1]);
+    }
+    g.stroke();
+  }
+  function redraw(){
+    ctx.clearRect(0,0,cv.width,cv.height);ctx.strokeStyle="#000";
+    var d=window.devicePixelRatio||1;strokes.forEach(function(s){strokePath(ctx,s,cv.width,cv.height,LW*d)});
+  }
+  function norm(e){var r=cv.getBoundingClientRect();return[Math.min(1,Math.max(0,(e.clientX-r.left)/r.width)),Math.min(1,Math.max(0,(e.clientY-r.top)/r.height))]}
+  cv.addEventListener("pointerdown",function(e){
+    if(!on)return;e.preventDefault();cv.setPointerCapture(e.pointerId);cur=[norm(e)];status.textContent="";
+  });
+  cv.addEventListener("pointermove",function(e){
+    if(!cur)return;cur.push(norm(e));redraw();ctx.strokeStyle="#000";
+    var d=window.devicePixelRatio||1;strokePath(ctx,cur,cv.width,cv.height,LW*d);
+  });
+  function up(){if(!cur)return;strokes.push(cur);cur=null;redraw()}
+  cv.addEventListener("pointerup",up);cv.addEventListener("pointercancel",up);
+
+  tool.addEventListener("click",function(){                              // pencil on / off
+    on=!on;tool.classList.toggle("on",on);tool.setAttribute("aria-pressed",on?"true":"false");pad.classList.toggle("off",!on);
+  });
+
+  function picture(cb){
+    var W=1200,H=Math.round(W*cv.height/cv.width),c=document.createElement("canvas");c.width=W;c.height=H;
+    var g=c.getContext("2d");g.fillStyle="#fff";g.fillRect(0,0,W,H);g.strokeStyle="#000";
+    strokes.forEach(function(s){strokePath(g,s,W,H,LW*W/cv.getBoundingClientRect().width)});
+    c.toBlob(cb,"image/png");
+  }
+  send.addEventListener("click",function(){
+    if(!strokes.length){status.textContent="draw something first";return}
+    send.disabled=true;status.textContent="sending…";
+    picture(function(blob){
+      var fd=new FormData();
+      fd.append("attachment",blob,"drawing.png");
+      fd.append("_subject","New drawing from the Office Oficina contact page");
+      fd.append("_captcha","false");fd.append("_template","box");fd.append("_honey","");
+      fd.append("message","Someone sent a drawing from the contact page. The picture is attached.");
+      fetch(ENDPOINT,{method:"POST",body:fd,mode:"no-cors"}).then(function(){
+        strokes=[];redraw();status.textContent="sent, thank you";
+      }).catch(function(){status.textContent="couldn't send, please try again"}).then(function(){send.disabled=false});
+    });
+  });
+
+  fit();addEventListener("resize",fit);
+  if(window.ResizeObserver)new ResizeObserver(fit).observe(fields);
+  if(document.fonts&&document.fonts.ready)document.fonts.ready.then(fit);
+})();
+</script>
 </body>
 </html>
