@@ -109,3 +109,12 @@ a:focus-visible,button:focus-visible,input:focus-visible,textarea:focus-visible{
 .lt.a svg{width:.666em}
 .lt.filled svg{opacity:1;transform:none}
 @media (prefers-reduced-motion:reduce){.lt svg{transition:none}}
+
+/* rotate handle: tiny arrow in the card's top-left corner, only once the card is unlocked */
+.card .rot{position:absolute;left:7px;top:7px;width:26px;height:26px;margin:0;padding:0;border:0;background:none;color:#333;display:grid;place-items:center;
+  opacity:0;pointer-events:none;transition:opacity .4s ease .6s;touch-action:none;-webkit-tap-highlight-color:transparent;
+  cursor:url(cursor-move.png) 11 11,grab;cursor:-webkit-image-set(url(cursor-move.png) 1x,url(cursor-move@2x.png) 2x) 11 11,grab}
+.card .rot svg{width:14px;height:14px;display:block;pointer-events:none}
+.card.open .rot{opacity:1;pointer-events:auto}
+.card .rot:focus-visible{outline:1px solid #333;outline-offset:1px}
+@media (prefers-reduced-motion:reduce){.card .rot{transition:none}}
