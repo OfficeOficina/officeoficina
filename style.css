@@ -101,3 +101,11 @@ a:focus-visible,button:focus-visible,input:focus-visible,textarea:focus-visible{
 
 .sendrow{display:flex;align-items:center;gap:1rem}
 .sendrow span{font-size:.8em;color:#777}
+
+/* letters in the text behind the card that fill in when their shape fits */
+.lt{position:relative;display:inline-block;margin-right:-.035em}
+.lt svg{position:absolute;left:0;top:0;height:1.18em;overflow:visible;pointer-events:none;fill:currentColor;-webkit-text-stroke:0;opacity:0;transform:scale(.55);transform-origin:50% 45%;transition:opacity .35s ease,transform .35s ease}
+.lt.o svg{width:.784em}
+.lt.a svg{width:.666em}
+.lt.filled svg{opacity:1;transform:none}
+@media (prefers-reduced-motion:reduce){.lt svg{transition:none}}
