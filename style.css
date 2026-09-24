@@ -59,8 +59,8 @@ a:focus-visible,button:focus-visible,input:focus-visible,textarea:focus-visible{
 
 /* logo shapes fitted into the card */
 .card .plugs{position:absolute;left:0;top:0}
-.plug{visibility:hidden}
-.plug.on{visibility:visible}
+.plug{opacity:0;transition:opacity .2s}
+.plug.on{opacity:1}
 .fly{position:absolute;left:0;top:0;margin:0!important;transform-origin:50% 50%;z-index:5;pointer-events:none}
 
 /* contact: drawing pad */
