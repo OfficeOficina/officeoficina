@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>About — Office Oficina</title>
+<link rel="stylesheet" href="style.css?v=24">
+</head>
+<body>
+<div class="aboutpage">
+  <p style="margin:0"><a class="home" href="index.html">Office Oficina</a></p>
+
+  <div class="books" id="books"></div>
+
+  <div class="controls">
+    <button type="button" id="mix">Mix</button>
+    <button type="button" id="reset">Reset</button>
+  </div>
+  <p class="hint">click a strip to turn the page</p>
+</div>
+
+<script>
+/* ==================================================================
+   PHOTOS
+   Each shot is ONE full-length photo, head to feet. The page cuts it
+   into three strips (head / body / legs) by itself, so shoot every
+   photo the same way: tripod, same distance and height, standing on
+   the same mark, feet at the bottom, plain wall. Tall frame, about
+   2:5 (e.g. 800 x 2000 px).
+   Put them in an  about/  folder next to this page and list them here.
+   who: 0 = Lucas, 1 = Maarten
+   ================================================================== */
+var SHOTS = [
+  // {src:"about/lucas-1.jpg",   who:0},
+  // {src:"about/lucas-2.jpg",   who:0},
+  // {src:"about/maarten-1.jpg", who:1},
+  // {src:"about/maarten-2.jpg", who:1},
+];
+var PEOPLE = [["Lucas","Strzelec"],["Maarten","Janssens"]];
+
+(function(){
+  /* stand-in figures until real photos are added above */
+  function stand(i,who){
+    var c=["#000","#555","#000","#555","#000","#555"][i%6],w=who?"#f2f2f2":"#fff",n=Math.floor(i/2)+1;
+    var s="<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 500' preserveAspectRatio='none'><rect width='200' height='500' fill='"+w+"'/>"+
+      "<circle cx='100' cy='88' r='"+(34+(n%3)*4)+"' fill='"+c+"'/>"+
+      "<rect x='"+(58-(n%2)*8)+"' y='180' width='"+(84+(n%2)*16)+"' height='140' rx='8' fill='"+c+"'/>"+
+      "<rect x='72' y='345' width='22' height='140' fill='"+c+"'/><rect x='106' y='345' width='22' height='140' fill='"+c+"'/>"+
+      "<text x='100' y='95' font-family='Arial' font-size='15' fill='"+w+"' text-anchor='middle'>"+PEOPLE[who][0][0]+n+"</text></svg>";
+    return "data:image/svg+xml;utf8,"+encodeURIComponent(s);
+  }
+  var shots=SHOTS.length?SHOTS:[0,1,2,3,4,5].map(function(i){return{src:stand(i,i%2),who:i%2}});
+  var N=shots.length,booksEl=document.getElementById("books");
+  function first(who){var i=0;for(;i<N;i++)if(shots[i].who===who)return i;return 0}
+  var state=[0,1].map(function(b){return[first(b),first(b),first(b)]});
+  shots.forEach(function(s){new Image().src=s.src});
+
+  var strips=[],names=[];
+  [0,1].forEach(function(b){
+    var fig=document.createElement("div");fig.className="fig";
+    var book=document.createElement("div");book.className="book";
+    strips[b]=[0,1,2].map(function(p){
+      var st=document.createElement("div");st.className="strip";st.setAttribute("data-part",p);
+      st.tabIndex=0;st.setAttribute("role","button");st.setAttribute("aria-label",["Head","Body","Legs"][p]+", turn the page");
+      var f=document.createElement("div");f.className="face";f.style.backgroundImage='url("'+shots[state[b][p]].src+'")';
+      st.appendChild(f);
+      st.addEventListener("click",function(e){go(b,p,e.shiftKey?-1:1)});
+      st.addEventListener("keydown",function(e){
+        if(e.key==="Enter"||e.key===" "||e.key==="ArrowRight"){e.preventDefault();go(b,p,1)}
+        else if(e.key==="ArrowLeft"){e.preventDefault();go(b,p,-1)}
+      });
+      var x0=null;
+      st.addEventListener("touchstart",function(e){x0=e.touches[0].clientX},{passive:true});
+      st.addEventListener("touchend",function(e){
+        if(x0===null)return;var dx=e.changedTouches[0].clientX-x0;x0=null;
+        if(Math.abs(dx)>30){e.preventDefault();go(b,p,dx<0?1:-1)}
+      });
+      book.appendChild(st);return st;
+    });
+    var nm=document.createElement("div");nm.className="name";names[b]=nm;
+    fig.appendChild(book);fig.appendChild(nm);booksEl.appendChild(fig);
+  });
+
+  /* the name follows the pieces: first name from the head, surname from the legs */
+  function label(b){names[b].textContent=PEOPLE[shots[state[b][0]].who][0]+" "+PEOPLE[shots[state[b][2]].who][1]}
+
+  function set(b,p,next,dir){
+    var st=strips[b][p];if(st.querySelector(".turning"))return;
+    var base=st.querySelector(".face"),oldS=base.style.backgroundImage,newS='url("'+shots[next].src+'")';
+    state[b][p]=next;label(b);
+    if(oldS===newS)return;
+    var leaf=document.createElement("div");leaf.className="face turning"+(dir<0?" back":"");
+    if(dir>0){leaf.style.backgroundImage=oldS;base.style.backgroundImage=newS}
+    else leaf.style.backgroundImage=newS;
+    st.appendChild(leaf);
+    leaf.addEventListener("animationend",function(){if(dir<0)base.style.backgroundImage=newS;leaf.remove()},{once:true});
+  }
+  function go(b,p,dir){set(b,p,(state[b][p]+dir+N)%N,dir)}
+
+  document.getElementById("mix").addEventListener("click",function(){
+    [0,1].forEach(function(b){[0,1,2].forEach(function(p){
+      var n;do{n=Math.floor(Math.random()*N)}while(N>1&&n===state[b][p]);
+      setTimeout(function(){set(b,p,n,1)},(b*3+p)*70);
+    })});
+  });
+  document.getElementById("reset").addEventListener("click",function(){
+    [0,1].forEach(function(b){[0,1,2].forEach(function(p){
+      setTimeout(function(){set(b,p,first(b),-1)},(b*3+p)*70);
+    })});
+  });
+  label(0);label(1);
+})();
+</script>
+</body>
+</html>

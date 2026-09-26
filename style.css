@@ -118,3 +118,35 @@ a:focus-visible,button:focus-visible,input:focus-visible,textarea:focus-visible{
 .card.open .rot{opacity:1;pointer-events:auto}
 .card .rot:focus-visible{outline:1px solid #333;outline-offset:1px}
 @media (prefers-reduced-motion:reduce){.card .rot{transition:none}}
+
+/* home: our names pulse grey on hover; clicking them opens About */
+.w.nm.pulse{animation:namePulse 1.6s ease-in-out infinite}
+@keyframes namePulse{0%,100%{color:#333}50%{color:#9a9a9a}}
+.w.nm:focus-visible{outline:none}
+@media (prefers-reduced-motion:reduce){.w.nm.pulse{animation:none;color:#8a8a8a}}
+
+/* about: split-page flip book (Lucas / Maarten, head · body · legs) */
+.aboutpage{min-height:100%;min-height:100dvh;display:flex;flex-direction:column;padding:clamp(1rem,3vw,2.5rem)}
+.aboutpage .books{flex:1;display:flex;justify-content:center;align-items:center;gap:clamp(1.5rem,6vw,5rem);padding:2rem 0 1rem}
+.aboutpage .fig{display:flex;flex-direction:column;align-items:center}
+.aboutpage .book{box-sizing:content-box;position:relative;width:min(clamp(120px,26vw,250px),calc((100vh - 15rem)*.4));aspect-ratio:2/5;display:grid;grid-template-rows:1fr 1fr 1fr;gap:2px;padding-left:16px}
+@supports (height:1dvh){.aboutpage .book{width:min(clamp(120px,26vw,250px),calc((100dvh - 15rem)*.4))}}
+.aboutpage .book::before{content:"";position:absolute;left:0;top:0;bottom:0;width:12px;background:radial-gradient(circle at 70% 50%,transparent 2.6px,#333 3px,#333 3.9px,transparent 4.3px) 0 0/12px 9px repeat-y}
+.aboutpage .strip{position:relative;perspective:1400px;background:#fff;touch-action:pan-y;
+  cursor:url(cursor-move.png) 11 11,pointer;cursor:-webkit-image-set(url(cursor-move.png) 1x,url(cursor-move@2x.png) 2x) 11 11,pointer}
+.aboutpage .strip:focus-visible{outline:1px solid #000;outline-offset:2px}
+.aboutpage .face{position:absolute;inset:0;background-repeat:no-repeat;background-size:100% 300%;transform-origin:left center;backface-visibility:hidden;-webkit-backface-visibility:hidden}
+.aboutpage .strip[data-part="0"] .face{background-position:center 0%}
+.aboutpage .strip[data-part="1"] .face{background-position:center 50%}
+.aboutpage .strip[data-part="2"] .face{background-position:center 100%}
+.aboutpage .face.turning{z-index:2;animation:pageTurn .55s cubic-bezier(.45,.05,.3,1) forwards;box-shadow:4px 0 12px rgba(0,0,0,.12)}
+.aboutpage .face.turning.back{animation-name:pageBack}
+@keyframes pageTurn{to{transform:rotateY(-180deg)}}
+@keyframes pageBack{from{transform:rotateY(-180deg)}to{transform:none}}
+@media (prefers-reduced-motion:reduce){.aboutpage .face.turning{animation-duration:1ms}}
+.aboutpage .name{margin-top:.8rem;font-size:.8em;white-space:nowrap}
+.aboutpage .controls{display:flex;justify-content:center;gap:1rem}
+.aboutpage button{font:inherit;background:var(--fg);color:var(--bg);border:0;padding:.6rem 1.2rem;
+  cursor:url(cursor-move.png) 11 11,pointer;cursor:-webkit-image-set(url(cursor-move.png) 1x,url(cursor-move@2x.png) 2x) 11 11,pointer}
+.aboutpage .hint{text-align:center;font-size:.7em;color:#777;margin:1rem 0 0}
+@media (max-width:700px){.aboutpage{font-size:17px}}
