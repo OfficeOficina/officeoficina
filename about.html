@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>About — Office Oficina</title>
-<link rel="stylesheet" href="style.css?v=26">
+<link rel="stylesheet" href="style.css?v=27">
 </head>
 <body>
 <div class="aboutpage">
@@ -36,16 +36,16 @@ var PHOTOS = [
   // "about/maarten-2.jpg",
 ];
 
-/* flat colour blocks that turn up in place of a head, body or legs */
-var BLOCKS = ["#8cc63f", "#f26522", "#1c1414"];
+/* flat black / white blocks that turn up in place of a head, body or legs */
+var BLOCKS = ["#000", "#fff", "#000"];
 
-/* colours printed on the back of every strip (what you see on the left page) */
-var BACKS = ["#8cc63f", "#f26522", "#1c1414", "#2447ff", "#ffd400", "#ee2a1e"];
+/* colour of the back of every strip of every strip (what you see on the left page) */
+var BACKS = ["#000", "#fff"];
 
 (function(){
   /* grey stand-in figures until real photos are added above */
   function stand(i){
-    var who=i%2,n=Math.floor(i/2),ink=["#1a1a1a","#4a4a4a","#2e2e2e","#666"][n%4],bg="#f3efe6";
+    var who=i%2,n=Math.floor(i/2),ink="#000",bg="#fff";
     var hr=30+(n%3)*5,bw=78+((n+who)%3)*14,lg=who?26:22,lx=who?5:0;
     var s="<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 500' preserveAspectRatio='none'><rect width='200' height='500' fill='"+bg+"'/>"+
       "<ellipse cx='100' cy='92' rx='"+(hr-4+who*3)+"' ry='"+hr+"' fill='"+ink+"'/>"+
@@ -70,7 +70,7 @@ var BACKS = ["#8cc63f", "#f26522", "#1c1414", "#2447ff", "#ffd400", "#ee2a1e"];
     return out;
   });
   var N=stacks[0].length,cur=[0,0,0],busy=[false,false,false];
-  function back(p,i){i=((i%N)+N)%N;return BACKS[(i+p*2)%BACKS.length]}
+  function back(p,i){i=((i%N)+N)%N;return BACKS[(i+p)%BACKS.length]}
   function paint(el,page){
     if(page.img){el.style.backgroundColor="";el.style.backgroundImage='url("'+page.img+'")'}
     else{el.style.backgroundImage="none";el.style.backgroundColor=page.col}

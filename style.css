@@ -119,29 +119,21 @@ a:focus-visible,button:focus-visible,input:focus-visible,textarea:focus-visible{
 .card .rot:focus-visible{outline:1px solid #333;outline-offset:1px}
 @media (prefers-reduced-motion:reduce){.card .rot{transition:none}}
 
-/* home: mail and Instagram in one row, centred on the text */
-.icrow{grid-column:1/-1;justify-self:center;display:flex;align-items:center;gap:.4em;margin:2.5em 0}
-.icrow .ic{margin:0}
-.icrow .ic:nth-child(1){width:1.12em;height:.8em}
-.icrow .ic:nth-child(2){width:1.05em;height:1em}
-
 /* home: our names throb black to white on hover; clicking them opens About */
 .w.nm.pulse{animation:namePulse .7s ease-in-out infinite}
 @keyframes namePulse{0%,100%{color:#000}50%{color:#fff}}
 .w.nm:focus-visible{outline:none}
 @media (prefers-reduced-motion:reduce){.w.nm.pulse{animation:none;color:#999}}
 
-/* about: one spiral-bound split-page book, like Bob Gill's. Right page = head / body / legs,
-   left page = the coloured backs of the strips you've turned */
+/* about: split-page book, black and white. Right page = head / body / legs,
+   left page = the backs of the strips you've turned. Thin black lines between everything. */
 .aboutpage{min-height:100%;min-height:100dvh;display:flex;flex-direction:column;padding:clamp(1rem,3vw,2.5rem);
-  --p:min(40vw,calc((100vh - 13rem)*.4),300px);--sp:18px}
+  --p:min(40vw,calc((100vh - 13rem)*.4),300px);--sp:1px}
 @supports (height:1dvh){.aboutpage{--p:min(40vw,calc((100dvh - 13rem)*.4),300px)}}
 .aboutpage .stagewrap{flex:1;display:grid;place-items:center;padding:1.5rem 0 1rem}
 .aboutpage .spread{position:relative;display:grid;grid-template-columns:var(--p) var(--p);grid-template-rows:repeat(3,calc(var(--p)*2.5/3 - 2px));
-  column-gap:var(--sp);row-gap:3px;padding:10px;background:#8a8580;box-shadow:0 10px 30px rgba(0,0,0,.12)}
-.aboutpage .spread::after{content:"";position:absolute;top:6px;bottom:6px;left:calc(10px + var(--p));width:var(--sp);pointer-events:none;z-index:6;
-  background:radial-gradient(ellipse 7px 3px at 50% 50%,transparent 45%,#2a2a2a 52%,#2a2a2a 78%,transparent 86%) 0 0/var(--sp) 8px repeat-y}
-.aboutpage .cell{position:relative;background:#f3efe6;
+  gap:1px;background:#000}
+.aboutpage .cell{position:relative;background:#fff;
   cursor:url(cursor-move.png) 11 11,pointer;cursor:-webkit-image-set(url(cursor-move.png) 1x,url(cursor-move@2x.png) 2x) 11 11,pointer}
 .aboutpage .cell.rp{perspective:2200px;perspective-origin:calc(var(--sp)/-2) 50%;z-index:2}
 .aboutpage .cell.rp:has(.leaf){z-index:4}
@@ -162,4 +154,4 @@ a:focus-visible,button:focus-visible,input:focus-visible,textarea:focus-visible{
 .aboutpage button{font:inherit;background:var(--fg);color:var(--bg);border:0;padding:.6rem 1.2rem;
   cursor:url(cursor-move.png) 11 11,pointer;cursor:-webkit-image-set(url(cursor-move.png) 1x,url(cursor-move@2x.png) 2x) 11 11,pointer}
 .aboutpage .hint{text-align:center;font-size:.7em;color:#777;margin:1rem 0 0}
-@media (max-width:700px){.aboutpage{font-size:17px;--sp:14px}}
+@media (max-width:700px){.aboutpage{font-size:17px}}
