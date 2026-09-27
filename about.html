@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>About — Office Oficina</title>
-<link rel="stylesheet" href="style.css?v=27">
+<link rel="stylesheet" href="style.css?v=28">
 </head>
 <body>
 <div class="aboutpage">
@@ -14,9 +14,7 @@
 
   <div class="controls">
     <button type="button" id="mix">Mix</button>
-    <button type="button" id="reset">Reset</button>
   </div>
-  <p class="hint">click the right page to turn a strip, the left page to turn it back</p>
 </div>
 
 <script>
@@ -128,9 +126,6 @@ var BACKS = ["#000", "#fff"];
       var t;do{t=Math.floor(Math.random()*N)}while(N>1&&t===cur[p]);
       setTimeout(function(){turnTo(p,t,1)},p*90);
     });
-  });
-  document.getElementById("reset").addEventListener("click",function(){
-    [0,1,2].forEach(function(p){setTimeout(function(){turnTo(p,0,-1)},p*90)});
   });
 })();
 </script>

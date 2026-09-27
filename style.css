@@ -120,7 +120,7 @@ a:focus-visible,button:focus-visible,input:focus-visible,textarea:focus-visible{
 @media (prefers-reduced-motion:reduce){.card .rot{transition:none}}
 
 /* home: our names throb black to white on hover; clicking them opens About */
-.w.nm.pulse{animation:namePulse .7s ease-in-out infinite}
+.w.nm.pulse{animation:namePulse 1s ease-in-out infinite}   /* same timing as the hole hint */
 @keyframes namePulse{0%,100%{color:#000}50%{color:#fff}}
 .w.nm:focus-visible{outline:none}
 @media (prefers-reduced-motion:reduce){.w.nm.pulse{animation:none;color:#999}}
@@ -153,5 +153,4 @@ a:focus-visible,button:focus-visible,input:focus-visible,textarea:focus-visible{
 .aboutpage .controls{display:flex;justify-content:center;gap:1rem}
 .aboutpage button{font:inherit;background:var(--fg);color:var(--bg);border:0;padding:.6rem 1.2rem;
   cursor:url(cursor-move.png) 11 11,pointer;cursor:-webkit-image-set(url(cursor-move.png) 1x,url(cursor-move@2x.png) 2x) 11 11,pointer}
-.aboutpage .hint{text-align:center;font-size:.7em;color:#777;margin:1rem 0 0}
 @media (max-width:700px){.aboutpage{font-size:17px}}
