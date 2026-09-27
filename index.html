@@ -9,7 +9,7 @@
 <meta property="og:description" content="OFFICE COLLABORATIVE is a COLLABORATIVE OFFICE of architecture.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://officeoficina.com">
-<link rel="stylesheet" href="style.css?v=28">
+<link rel="stylesheet" href="style.css?v=29">
 </head>
 <body>
 <main class="stage">
@@ -28,8 +28,16 @@
     <a class="ic r" href="https://www.instagram.com/officeoficina/" rel="noopener" aria-label="Instagram">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="2" width="20" height="20" rx="6"/><circle cx="12" cy="12" r="4.6"/><circle cx="17.6" cy="6.4" r="1" fill="currentColor" stroke="none"/></svg>
     </a>
-    <span class="w l nm" data-who="0" tabindex="0" role="link" aria-label="About: Lucas Strzelec">Lucas</span><span class="w r nm" data-who="0" tabindex="-1" aria-hidden="true">Strzelec</span>
-    <span class="w l nm" data-who="1" tabindex="0" role="link" aria-label="About: Maarten Janssens">Maarten</span><span class="w r nm" data-who="1" tabindex="-1" aria-hidden="true">Janssens</span>
+    <span class="w r nm q" tabindex="0" role="button" aria-label="About us" aria-controls="about">?</span>
+  </div>
+
+  <!-- about: the flip book opens here, in place of the text; the card and the logo stay -->
+  <div class="aboutbook" id="about" aria-hidden="true">
+    <div class="spread" id="spread"></div>
+    <div class="bookctl">
+      <button type="button" id="mix">Mix</button>
+      <button type="button" class="x" id="closeAbout" aria-label="Close">&times;</button>
+    </div>
   </div>
 
   <div class="logo" aria-label="Office Oficina logo">
@@ -137,20 +145,20 @@
       }
     });
     function up(){ var was=d; d=null; w.classList.remove("dragging"); if(was&&w.classList.contains("m")){ dropCheck(w); hintRelease(); }
-      if(was&&!was.moved&&w.classList.contains("nm")) location.href="about.html"; }   // click a name: the flip book
+      if(was&&!was.moved&&w.classList.contains("nm")) openAbout(); }   // click the ?: the flip book
     w.addEventListener("pointerup",up);
     w.addEventListener("pointercancel",up);
   });
 
-  /* ---- our names: hover either word and both words of that name pulse grey; Enter opens About ---- */
+  /* ---- the ?: pulses on hover; click or Enter opens About ---- */
   Array.prototype.forEach.call(document.querySelectorAll(".nm"),function(n){
-    var pair=document.querySelectorAll('.nm[data-who="'+n.getAttribute("data-who")+'"]');
+    var pair=[n];
     function on(v){Array.prototype.forEach.call(pair,function(p){p.classList.toggle("pulse",v)})}
     n.addEventListener("pointerenter",function(){on(true)});
     n.addEventListener("pointerleave",function(){on(false)});
     n.addEventListener("focus",function(){on(true)});
     n.addEventListener("blur",function(){on(false)});
-    n.addEventListener("keydown",function(e){if(e.key==="Enter"){e.preventDefault();location.href="about.html"}});
+    n.addEventListener("keydown",function(e){if(e.key==="Enter"||e.key===" "){e.preventDefault();openAbout()}});
   });
 
   /* ---- the logo shapes fit into the card's letters: O into OFFICE's O, O into OFICINA's O, A into OFICINA's A ---- */
@@ -229,6 +237,125 @@
     var st=e.shiftKey?15:5,k=e.key;
     if(k==="ArrowRight"||k==="ArrowUp")rot+=st;else if(k==="ArrowLeft"||k==="ArrowDown")rot-=st;else return;
     e.preventDefault();apply();
+  });
+})();
+</script>
+<script>
+var PHOTOS = [
+  // "about/lucas-1.jpg",
+  // "about/lucas-2.jpg",
+  // "about/maarten-1.jpg",
+  // "about/maarten-2.jpg",
+];
+
+/* flat black / white blocks that turn up in place of a head, body or legs */
+var BLOCKS = ["#000", "#fff", "#000"];
+
+/* colour of the back of every strip of every strip (what you see on the left page) */
+var BACKS = ["#000", "#fff"];
+
+(function(){
+  /* grey stand-in figures until real photos are added above */
+  function stand(i){
+    var who=i%2,n=Math.floor(i/2),ink="#000",bg="#fff";
+    var hr=30+(n%3)*5,bw=78+((n+who)%3)*14,lg=who?26:22,lx=who?5:0;
+    var s="<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 500' preserveAspectRatio='none'><rect width='200' height='500' fill='"+bg+"'/>"+
+      "<ellipse cx='100' cy='92' rx='"+(hr-4+who*3)+"' ry='"+hr+"' fill='"+ink+"'/>"+
+      "<rect x='"+(100-bw/2)+"' y='178' width='"+bw+"' height='148' rx='"+(who?4:14)+"' fill='"+ink+"'/>"+
+      "<rect x='"+(72-lx)+"' y='340' width='"+lg+"' height='130' fill='"+ink+"'/><rect x='"+(106+lx-(lg-22))+"' y='340' width='"+lg+"' height='130' fill='"+ink+"'/>"+
+      "<rect x='"+(66-lx)+"' y='468' width='"+(lg+10)+"' height='12' rx='5' fill='"+ink+"'/><rect x='"+(100+lx-(lg-22))+"' y='468' width='"+(lg+10)+"' height='12' rx='5' fill='"+ink+"'/>"+
+      "<text x='100' y='98' font-family='Arial' font-size='15' fill='"+bg+"' text-anchor='middle'>"+(who?"M":"L")+(n+1)+"</text></svg>";
+    return "data:image/svg+xml;utf8,"+encodeURIComponent(s);
+  }
+  var photos=PHOTOS.length?PHOTOS:[0,1,2,3,4,5,6,7].map(stand);
+  photos.forEach(function(src){new Image().src=src});
+
+  /* each strip gets its own shuffled stack: all photos + the colour blocks.
+     Page 0 is always the first photo, so the book opens on a whole person. */
+  function rng(seed){return function(){seed=(seed*16807)%2147483647;return(seed-1)/2147483646}}
+  var stacks=[0,1,2].map(function(p){
+    var rest=photos.slice(1).map(function(s){return{img:s}}),r=rng(97+p*131);
+    for(var i=rest.length-1;i>0;i--){var j=Math.floor(r()*(i+1)),t=rest[i];rest[i]=rest[j];rest[j]=t}
+    var out=[{img:photos[0]}],gap=Math.max(2,Math.round(rest.length/BLOCKS.length)),b=0;   // colour blocks spread through the stack
+    rest.forEach(function(pg,k){out.push(pg);if((k+1+p)%gap===0&&b<BLOCKS.length)out.push({col:BLOCKS[(b++ +p)%BLOCKS.length]})});
+    while(b<BLOCKS.length)out.push({col:BLOCKS[(b++ +p)%BLOCKS.length]});
+    return out;
+  });
+  var N=stacks[0].length,cur=[0,0,0],busy=[false,false,false];
+  function back(p,i){i=((i%N)+N)%N;return BACKS[(i+p)%BACKS.length]}
+  function paint(el,page){
+    if(page.img){el.style.backgroundColor="";el.style.backgroundImage='url("'+page.img+'")'}
+    else{el.style.backgroundImage="none";el.style.backgroundColor=page.col}
+  }
+  function paintCol(el,c){el.style.backgroundImage="none";el.style.backgroundColor=c}
+
+  var spread=document.getElementById("spread"),L=[],R=[];
+  [0,1,2].forEach(function(p){
+    var l=document.createElement("div"),r=document.createElement("div");
+    l.className="cell lp";r.className="cell rp";
+    l.setAttribute("data-part",p);r.setAttribute("data-part",p);
+    l.style.gridColumn=1;r.style.gridColumn=2;l.style.gridRow=r.style.gridRow=p+1;
+    [l,r].forEach(function(c,k){
+      c.tabIndex=0;c.setAttribute("role","button");
+      c.setAttribute("aria-label",["Head","Body","Legs"][p]+(k?": next":": previous"));
+      var pg=document.createElement("div");pg.className="pg";c.appendChild(pg);
+      c.addEventListener("click",function(){step(p,k?1:-1)});
+      c.addEventListener("keydown",function(e){if(e.key==="Enter"||e.key===" "){e.preventDefault();step(p,k?1:-1)}});
+      var x0=null;
+      c.addEventListener("touchstart",function(e){x0=e.touches[0].clientX},{passive:true});
+      c.addEventListener("touchend",function(e){
+        if(x0===null)return;var dx=e.changedTouches[0].clientX-x0;x0=null;
+        if(Math.abs(dx)>30){e.preventDefault();step(p,dx<0?1:-1)}
+      });
+    });
+    spread.appendChild(l);spread.appendChild(r);
+    paintCol(l.firstChild,back(p,-1));paint(r.firstChild,stacks[p][0]);
+    L[p]=l;R[p]=r;
+  });
+
+  function leaf(p,front,backCol,dir){
+    var lf=document.createElement("div");lf.className="leaf "+(dir>0?"fwd":"rev");
+    var f=document.createElement("div");f.className="pg";paint(f,front);
+    var b=document.createElement("div");b.className="pg bk";paintCol(b,backCol);
+    lf.appendChild(f);lf.appendChild(b);R[p].appendChild(lf);return lf;
+  }
+  /* turn strip p to page "to": forward = the right page lifts over the spiral,
+     backward = the last page comes back from the left */
+  function turnTo(p,to,dir){
+    to=((to%N)+N)%N;if(busy[p]||to===cur[p])return;busy[p]=true;
+    var from=cur[p],rpg=R[p].firstChild,lpg=L[p].firstChild,lf;
+    if(dir>0){
+      lf=leaf(p,stacks[p][from],back(p,to-1),1);paint(rpg,stacks[p][to]);
+      lf.addEventListener("animationend",function(){paintCol(lpg,back(p,to-1));lf.remove();busy[p]=false},{once:true});
+    }else{
+      lf=leaf(p,stacks[p][to],back(p,to),-1);paintCol(lpg,back(p,to-1));
+      lf.addEventListener("animationend",function(){paint(rpg,stacks[p][to]);lf.remove();busy[p]=false},{once:true});
+    }
+    cur[p]=to;
+  }
+  function step(p,d){turnTo(p,cur[p]+d,d)}
+
+  /* open / close: the text fades out, the book fades in, same page (#about) */
+  var under=document.querySelector(".under"),book=document.getElementById("about"),q=document.querySelector(".q");
+  function show(on){
+    book.classList.toggle("on",on);under.classList.toggle("away",on);book.setAttribute("aria-hidden",on?"false":"true");
+  }
+  var pushed=false;
+  window.openAbout=function(){if(location.hash!=="#about"){pushed=true;location.hash="about"}else show(true)};
+  function sync(){show(location.hash==="#about")}
+  addEventListener("hashchange",function(){if(location.hash!=="#about")pushed=false;sync()});sync();
+  function close(){
+    if(location.hash==="#about"&&pushed){pushed=false;history.back()}
+    else{if(location.hash)history.replaceState(null,"",location.pathname+location.search);show(false)}
+  }
+  document.getElementById("closeAbout").addEventListener("click",close);
+  addEventListener("keydown",function(e){if(e.key==="Escape"&&book.classList.contains("on"))close()});
+
+  document.getElementById("mix").addEventListener("click",function(){
+    [0,1,2].forEach(function(p){
+      var t;do{t=Math.floor(Math.random()*N)}while(N>1&&t===cur[p]);
+      setTimeout(function(){turnTo(p,t,1)},p*90);
+    });
   });
 })();
 </script>
