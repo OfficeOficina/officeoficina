@@ -4,111 +4,134 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>About — Office Oficina</title>
-<link rel="stylesheet" href="style.css?v=25">
+<link rel="stylesheet" href="style.css?v=26">
 </head>
 <body>
 <div class="aboutpage">
   <p style="margin:0"><a class="home" href="index.html">Office Oficina</a></p>
 
-  <div class="books" id="books"></div>
+  <div class="stagewrap"><div class="spread" id="spread"></div></div>
 
   <div class="controls">
     <button type="button" id="mix">Mix</button>
     <button type="button" id="reset">Reset</button>
   </div>
-  <p class="hint">click a strip to turn the page</p>
+  <p class="hint">click the right page to turn a strip, the left page to turn it back</p>
 </div>
 
 <script>
 /* ==================================================================
    PHOTOS
-   Each shot is ONE full-length photo, head to feet. The page cuts it
-   into three strips (head / body / legs) by itself, so shoot every
-   photo the same way: tripod, same distance and height, standing on
-   the same mark, feet at the bottom, plain wall. Tall frame, about
-   2:5 (e.g. 800 x 2000 px).
-   Put them in an  about/  folder next to this page and list them here.
-   who: 0 = Lucas, 1 = Maarten
+   Each photo is ONE full-length shot, head to feet. The page cuts it
+   into head / body / legs by itself, so shoot them all the same way:
+   tripod, same distance and height, standing on the same floor mark,
+   feet near the bottom, plain wall. Tall frame, about 2:5
+   (e.g. 800 x 2000 px). The more photos, the more heads, bodies and
+   legs to mix. Put them in an  about/  folder next to this page.
    ================================================================== */
-var SHOTS = [
-  // {src:"about/lucas-1.jpg",   who:0},
-  // {src:"about/lucas-2.jpg",   who:0},
-  // {src:"about/maarten-1.jpg", who:1},
-  // {src:"about/maarten-2.jpg", who:1},
+var PHOTOS = [
+  // "about/lucas-1.jpg",
+  // "about/lucas-2.jpg",
+  // "about/maarten-1.jpg",
+  // "about/maarten-2.jpg",
 ];
-var PEOPLE = [["Lucas","Strzelec"],["Maarten","Janssens"]];
+
+/* flat colour blocks that turn up in place of a head, body or legs */
+var BLOCKS = ["#8cc63f", "#f26522", "#1c1414"];
+
+/* colours printed on the back of every strip (what you see on the left page) */
+var BACKS = ["#8cc63f", "#f26522", "#1c1414", "#2447ff", "#ffd400", "#ee2a1e"];
 
 (function(){
-  /* stand-in figures until real photos are added above */
-  function stand(i,who){
-    var c=["#000","#555","#000","#555","#000","#555"][i%6],w=who?"#f2f2f2":"#fff",n=Math.floor(i/2)+1;
-    var s="<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 500' preserveAspectRatio='none'><rect width='200' height='500' fill='"+w+"'/>"+
-      "<circle cx='100' cy='88' r='"+(34+(n%3)*4)+"' fill='"+c+"'/>"+
-      "<rect x='"+(58-(n%2)*8)+"' y='180' width='"+(84+(n%2)*16)+"' height='140' rx='8' fill='"+c+"'/>"+
-      "<rect x='72' y='345' width='22' height='140' fill='"+c+"'/><rect x='106' y='345' width='22' height='140' fill='"+c+"'/>"+
-      "<text x='100' y='95' font-family='Arial' font-size='15' fill='"+w+"' text-anchor='middle'>"+PEOPLE[who][0][0]+n+"</text></svg>";
+  /* grey stand-in figures until real photos are added above */
+  function stand(i){
+    var who=i%2,n=Math.floor(i/2),ink=["#1a1a1a","#4a4a4a","#2e2e2e","#666"][n%4],bg="#f3efe6";
+    var hr=30+(n%3)*5,bw=78+((n+who)%3)*14,lg=who?26:22,lx=who?5:0;
+    var s="<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 500' preserveAspectRatio='none'><rect width='200' height='500' fill='"+bg+"'/>"+
+      "<ellipse cx='100' cy='92' rx='"+(hr-4+who*3)+"' ry='"+hr+"' fill='"+ink+"'/>"+
+      "<rect x='"+(100-bw/2)+"' y='178' width='"+bw+"' height='148' rx='"+(who?4:14)+"' fill='"+ink+"'/>"+
+      "<rect x='"+(72-lx)+"' y='340' width='"+lg+"' height='130' fill='"+ink+"'/><rect x='"+(106+lx-(lg-22))+"' y='340' width='"+lg+"' height='130' fill='"+ink+"'/>"+
+      "<rect x='"+(66-lx)+"' y='468' width='"+(lg+10)+"' height='12' rx='5' fill='"+ink+"'/><rect x='"+(100+lx-(lg-22))+"' y='468' width='"+(lg+10)+"' height='12' rx='5' fill='"+ink+"'/>"+
+      "<text x='100' y='98' font-family='Arial' font-size='15' fill='"+bg+"' text-anchor='middle'>"+(who?"M":"L")+(n+1)+"</text></svg>";
     return "data:image/svg+xml;utf8,"+encodeURIComponent(s);
   }
-  var shots=SHOTS.length?SHOTS:[0,1,2,3,4,5].map(function(i){return{src:stand(i,i%2),who:i%2}});
-  var N=shots.length,booksEl=document.getElementById("books");
-  function first(who){var i=0;for(;i<N;i++)if(shots[i].who===who)return i;return 0}
-  var state=[0,1].map(function(b){return[first(b),first(b),first(b)]});
-  shots.forEach(function(s){new Image().src=s.src});
+  var photos=PHOTOS.length?PHOTOS:[0,1,2,3,4,5,6,7].map(stand);
+  photos.forEach(function(src){new Image().src=src});
 
-  var strips=[],names=[];
-  [0,1].forEach(function(b){
-    var fig=document.createElement("div");fig.className="fig";
-    var book=document.createElement("div");book.className="book";
-    strips[b]=[0,1,2].map(function(p){
-      var st=document.createElement("div");st.className="strip";st.setAttribute("data-part",p);
-      st.tabIndex=0;st.setAttribute("role","button");st.setAttribute("aria-label",["Head","Body","Legs"][p]+", turn the page");
-      var f=document.createElement("div");f.className="face";f.style.backgroundImage='url("'+shots[state[b][p]].src+'")';
-      st.appendChild(f);
-      st.addEventListener("click",function(e){go(b,p,e.shiftKey?-1:1)});
-      st.addEventListener("keydown",function(e){
-        if(e.key==="Enter"||e.key===" "||e.key==="ArrowRight"){e.preventDefault();go(b,p,1)}
-        else if(e.key==="ArrowLeft"){e.preventDefault();go(b,p,-1)}
-      });
+  /* each strip gets its own shuffled stack: all photos + the colour blocks.
+     Page 0 is always the first photo, so the book opens on a whole person. */
+  function rng(seed){return function(){seed=(seed*16807)%2147483647;return(seed-1)/2147483646}}
+  var stacks=[0,1,2].map(function(p){
+    var rest=photos.slice(1).map(function(s){return{img:s}}),r=rng(97+p*131);
+    for(var i=rest.length-1;i>0;i--){var j=Math.floor(r()*(i+1)),t=rest[i];rest[i]=rest[j];rest[j]=t}
+    var out=[{img:photos[0]}],gap=Math.max(2,Math.round(rest.length/BLOCKS.length)),b=0;   // colour blocks spread through the stack
+    rest.forEach(function(pg,k){out.push(pg);if((k+1+p)%gap===0&&b<BLOCKS.length)out.push({col:BLOCKS[(b++ +p)%BLOCKS.length]})});
+    while(b<BLOCKS.length)out.push({col:BLOCKS[(b++ +p)%BLOCKS.length]});
+    return out;
+  });
+  var N=stacks[0].length,cur=[0,0,0],busy=[false,false,false];
+  function back(p,i){i=((i%N)+N)%N;return BACKS[(i+p*2)%BACKS.length]}
+  function paint(el,page){
+    if(page.img){el.style.backgroundColor="";el.style.backgroundImage='url("'+page.img+'")'}
+    else{el.style.backgroundImage="none";el.style.backgroundColor=page.col}
+  }
+  function paintCol(el,c){el.style.backgroundImage="none";el.style.backgroundColor=c}
+
+  var spread=document.getElementById("spread"),L=[],R=[];
+  [0,1,2].forEach(function(p){
+    var l=document.createElement("div"),r=document.createElement("div");
+    l.className="cell lp";r.className="cell rp";
+    l.setAttribute("data-part",p);r.setAttribute("data-part",p);
+    l.style.gridColumn=1;r.style.gridColumn=2;l.style.gridRow=r.style.gridRow=p+1;
+    [l,r].forEach(function(c,k){
+      c.tabIndex=0;c.setAttribute("role","button");
+      c.setAttribute("aria-label",["Head","Body","Legs"][p]+(k?": next":": previous"));
+      var pg=document.createElement("div");pg.className="pg";c.appendChild(pg);
+      c.addEventListener("click",function(){step(p,k?1:-1)});
+      c.addEventListener("keydown",function(e){if(e.key==="Enter"||e.key===" "){e.preventDefault();step(p,k?1:-1)}});
       var x0=null;
-      st.addEventListener("touchstart",function(e){x0=e.touches[0].clientX},{passive:true});
-      st.addEventListener("touchend",function(e){
+      c.addEventListener("touchstart",function(e){x0=e.touches[0].clientX},{passive:true});
+      c.addEventListener("touchend",function(e){
         if(x0===null)return;var dx=e.changedTouches[0].clientX-x0;x0=null;
-        if(Math.abs(dx)>30){e.preventDefault();go(b,p,dx<0?1:-1)}
+        if(Math.abs(dx)>30){e.preventDefault();step(p,dx<0?1:-1)}
       });
-      book.appendChild(st);return st;
     });
-    var nm=document.createElement("div");nm.className="name";names[b]=nm;
-    fig.appendChild(book);fig.appendChild(nm);booksEl.appendChild(fig);
+    spread.appendChild(l);spread.appendChild(r);
+    paintCol(l.firstChild,back(p,-1));paint(r.firstChild,stacks[p][0]);
+    L[p]=l;R[p]=r;
   });
 
-  /* the name follows the pieces: first name from the head, surname from the legs */
-  function label(b){names[b].textContent=PEOPLE[shots[state[b][0]].who][0]+" "+PEOPLE[shots[state[b][2]].who][1]}
-
-  function set(b,p,next,dir){
-    var st=strips[b][p];if(st.querySelector(".turning"))return;
-    var base=st.querySelector(".face"),oldS=base.style.backgroundImage,newS='url("'+shots[next].src+'")';
-    state[b][p]=next;label(b);
-    if(oldS===newS)return;
-    var leaf=document.createElement("div");leaf.className="face turning"+(dir<0?" back":"");
-    if(dir>0){leaf.style.backgroundImage=oldS;base.style.backgroundImage=newS}
-    else leaf.style.backgroundImage=newS;
-    st.appendChild(leaf);
-    leaf.addEventListener("animationend",function(){if(dir<0)base.style.backgroundImage=newS;leaf.remove()},{once:true});
+  function leaf(p,front,backCol,dir){
+    var lf=document.createElement("div");lf.className="leaf "+(dir>0?"fwd":"rev");
+    var f=document.createElement("div");f.className="pg";paint(f,front);
+    var b=document.createElement("div");b.className="pg bk";paintCol(b,backCol);
+    lf.appendChild(f);lf.appendChild(b);R[p].appendChild(lf);return lf;
   }
-  function go(b,p,dir){set(b,p,(state[b][p]+dir+N)%N,dir)}
+  /* turn strip p to page "to": forward = the right page lifts over the spiral,
+     backward = the last page comes back from the left */
+  function turnTo(p,to,dir){
+    to=((to%N)+N)%N;if(busy[p]||to===cur[p])return;busy[p]=true;
+    var from=cur[p],rpg=R[p].firstChild,lpg=L[p].firstChild,lf;
+    if(dir>0){
+      lf=leaf(p,stacks[p][from],back(p,to-1),1);paint(rpg,stacks[p][to]);
+      lf.addEventListener("animationend",function(){paintCol(lpg,back(p,to-1));lf.remove();busy[p]=false},{once:true});
+    }else{
+      lf=leaf(p,stacks[p][to],back(p,to),-1);paintCol(lpg,back(p,to-1));
+      lf.addEventListener("animationend",function(){paint(rpg,stacks[p][to]);lf.remove();busy[p]=false},{once:true});
+    }
+    cur[p]=to;
+  }
+  function step(p,d){turnTo(p,cur[p]+d,d)}
 
   document.getElementById("mix").addEventListener("click",function(){
-    [0,1].forEach(function(b){[0,1,2].forEach(function(p){
-      var n;do{n=Math.floor(Math.random()*N)}while(N>1&&n===state[b][p]);
-      setTimeout(function(){set(b,p,n,1)},(b*3+p)*70);
-    })});
+    [0,1,2].forEach(function(p){
+      var t;do{t=Math.floor(Math.random()*N)}while(N>1&&t===cur[p]);
+      setTimeout(function(){turnTo(p,t,1)},p*90);
+    });
   });
   document.getElementById("reset").addEventListener("click",function(){
-    [0,1].forEach(function(b){[0,1,2].forEach(function(p){
-      setTimeout(function(){set(b,p,first(b),-1)},(b*3+p)*70);
-    })});
+    [0,1,2].forEach(function(p){setTimeout(function(){turnTo(p,0,-1)},p*90)});
   });
-  label(0);label(1);
 })();
 </script>
 </body>

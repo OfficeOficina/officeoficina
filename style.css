@@ -119,41 +119,47 @@ a:focus-visible,button:focus-visible,input:focus-visible,textarea:focus-visible{
 .card .rot:focus-visible{outline:1px solid #333;outline-offset:1px}
 @media (prefers-reduced-motion:reduce){.card .rot{transition:none}}
 
-/* home: mail, Instagram, ABOUT in one row, centred on the text */
+/* home: mail and Instagram in one row, centred on the text */
 .icrow{grid-column:1/-1;justify-self:center;display:flex;align-items:center;gap:.4em;margin:2.5em 0}
 .icrow .ic{margin:0}
 .icrow .ic:nth-child(1){width:1.12em;height:.8em}
 .icrow .ic:nth-child(2){width:1.05em;height:1em}
-.icrow .ic:nth-child(3){width:1.3em;height:1.3em}
 
-/* home: our names pulse grey on hover; clicking them opens About */
-.w.nm.pulse{animation:namePulse 1.6s ease-in-out infinite}
-@keyframes namePulse{0%,100%{color:#333}50%{color:#9a9a9a}}
+/* home: our names throb black to white on hover; clicking them opens About */
+.w.nm.pulse{animation:namePulse .7s ease-in-out infinite}
+@keyframes namePulse{0%,100%{color:#000}50%{color:#fff}}
 .w.nm:focus-visible{outline:none}
-@media (prefers-reduced-motion:reduce){.w.nm.pulse{animation:none;color:#8a8a8a}}
+@media (prefers-reduced-motion:reduce){.w.nm.pulse{animation:none;color:#999}}
 
-/* about: split-page flip book (Lucas / Maarten, head · body · legs) */
-.aboutpage{min-height:100%;min-height:100dvh;display:flex;flex-direction:column;padding:clamp(1rem,3vw,2.5rem)}
-.aboutpage .books{flex:1;display:flex;justify-content:center;align-items:center;gap:clamp(1.5rem,6vw,5rem);padding:2rem 0 1rem}
-.aboutpage .fig{display:flex;flex-direction:column;align-items:center}
-.aboutpage .book{box-sizing:content-box;position:relative;width:min(clamp(120px,26vw,250px),calc((100vh - 15rem)*.4));aspect-ratio:2/5;display:grid;grid-template-rows:1fr 1fr 1fr;gap:2px;padding-left:16px}
-@supports (height:1dvh){.aboutpage .book{width:min(clamp(120px,26vw,250px),calc((100dvh - 15rem)*.4))}}
-.aboutpage .book::before{content:"";position:absolute;left:0;top:0;bottom:0;width:12px;background:radial-gradient(circle at 70% 50%,transparent 2.6px,#333 3px,#333 3.9px,transparent 4.3px) 0 0/12px 9px repeat-y}
-.aboutpage .strip{position:relative;perspective:1400px;background:#fff;touch-action:pan-y;
+/* about: one spiral-bound split-page book, like Bob Gill's. Right page = head / body / legs,
+   left page = the coloured backs of the strips you've turned */
+.aboutpage{min-height:100%;min-height:100dvh;display:flex;flex-direction:column;padding:clamp(1rem,3vw,2.5rem);
+  --p:min(40vw,calc((100vh - 13rem)*.4),300px);--sp:18px}
+@supports (height:1dvh){.aboutpage{--p:min(40vw,calc((100dvh - 13rem)*.4),300px)}}
+.aboutpage .stagewrap{flex:1;display:grid;place-items:center;padding:1.5rem 0 1rem}
+.aboutpage .spread{position:relative;display:grid;grid-template-columns:var(--p) var(--p);grid-template-rows:repeat(3,calc(var(--p)*2.5/3 - 2px));
+  column-gap:var(--sp);row-gap:3px;padding:10px;background:#8a8580;box-shadow:0 10px 30px rgba(0,0,0,.12)}
+.aboutpage .spread::after{content:"";position:absolute;top:6px;bottom:6px;left:calc(10px + var(--p));width:var(--sp);pointer-events:none;z-index:6;
+  background:radial-gradient(ellipse 7px 3px at 50% 50%,transparent 45%,#2a2a2a 52%,#2a2a2a 78%,transparent 86%) 0 0/var(--sp) 8px repeat-y}
+.aboutpage .cell{position:relative;background:#f3efe6;
   cursor:url(cursor-move.png) 11 11,pointer;cursor:-webkit-image-set(url(cursor-move.png) 1x,url(cursor-move@2x.png) 2x) 11 11,pointer}
-.aboutpage .strip:focus-visible{outline:1px solid #000;outline-offset:2px}
-.aboutpage .face{position:absolute;inset:0;background-repeat:no-repeat;background-size:100% 300%;transform-origin:left center;backface-visibility:hidden;-webkit-backface-visibility:hidden}
-.aboutpage .strip[data-part="0"] .face{background-position:center 0%}
-.aboutpage .strip[data-part="1"] .face{background-position:center 50%}
-.aboutpage .strip[data-part="2"] .face{background-position:center 100%}
-.aboutpage .face.turning{z-index:2;animation:pageTurn .55s cubic-bezier(.45,.05,.3,1) forwards;box-shadow:4px 0 12px rgba(0,0,0,.12)}
-.aboutpage .face.turning.back{animation-name:pageBack}
-@keyframes pageTurn{to{transform:rotateY(-180deg)}}
-@keyframes pageBack{from{transform:rotateY(-180deg)}to{transform:none}}
-@media (prefers-reduced-motion:reduce){.aboutpage .face.turning{animation-duration:1ms}}
-.aboutpage .name{margin-top:.8rem;font-size:.8em;white-space:nowrap}
+.aboutpage .cell.rp{perspective:2200px;perspective-origin:calc(var(--sp)/-2) 50%;z-index:2}
+.aboutpage .cell.rp:has(.leaf){z-index:4}
+.aboutpage .cell:focus-visible{outline:1px solid #000;outline-offset:2px}
+.aboutpage .pg{position:absolute;inset:0;background-repeat:no-repeat;background-size:100% 300%}
+.aboutpage [data-part="0"] .pg{background-position:center 0%}
+.aboutpage [data-part="1"] .pg{background-position:center 50%}
+.aboutpage [data-part="2"] .pg{background-position:center 100%}
+.aboutpage .leaf{position:absolute;inset:0;transform-style:preserve-3d;transform-origin:calc(var(--sp)/-2) 50%;z-index:3}
+.aboutpage .leaf .pg{backface-visibility:hidden;-webkit-backface-visibility:hidden}
+.aboutpage .leaf .pg.bk{transform:rotateY(180deg)}
+.aboutpage .leaf.fwd{animation:leafFwd .6s cubic-bezier(.45,.05,.3,1) forwards}
+.aboutpage .leaf.rev{animation:leafRev .6s cubic-bezier(.45,.05,.3,1) forwards}
+@keyframes leafFwd{from{transform:rotateY(0)}to{transform:rotateY(-180deg)}}
+@keyframes leafRev{from{transform:rotateY(-180deg)}to{transform:rotateY(0)}}
+@media (prefers-reduced-motion:reduce){.aboutpage .leaf.fwd,.aboutpage .leaf.rev{animation-duration:1ms}}
 .aboutpage .controls{display:flex;justify-content:center;gap:1rem}
 .aboutpage button{font:inherit;background:var(--fg);color:var(--bg);border:0;padding:.6rem 1.2rem;
   cursor:url(cursor-move.png) 11 11,pointer;cursor:-webkit-image-set(url(cursor-move.png) 1x,url(cursor-move@2x.png) 2x) 11 11,pointer}
 .aboutpage .hint{text-align:center;font-size:.7em;color:#777;margin:1rem 0 0}
-@media (max-width:700px){.aboutpage{font-size:17px}}
+@media (max-width:700px){.aboutpage{font-size:17px;--sp:14px}}
