@@ -9,7 +9,7 @@
 <meta property="og:description" content="OFFICE COLLABORATIVE is a COLLABORATIVE OFFICE of architecture.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://officeoficina.com">
-<link rel="stylesheet" href="style.css?v=22">
+<link rel="stylesheet" href="style.css?v=25">
 </head>
 <body>
 <main class="stage">
@@ -22,14 +22,19 @@
     <span class="w l">based</span><span class="w r">in</span>
     <span class="w l">Austin TX</span><span class="w r">USA</span>
     <span class="w l">Mexico City</span><span class="w r">CDMX</span>
-    <a class="ic l" href="contact.html" aria-label="contact-form">
-      <svg viewBox="0 0 26 20" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"><rect x="1" y="1" width="24" height="18"/><path d="M1 1l12 10L25 1M1 19l9-9M25 19l-9-9"/></svg>
-    </a>
-    <a class="ic r" href="https://www.instagram.com/officeoficina/" rel="noopener" aria-label="Instagram">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="2" width="20" height="20" rx="6"/><circle cx="12" cy="12" r="4.6"/><circle cx="17.6" cy="6.4" r="1" fill="currentColor" stroke="none"/></svg>
-    </a>
-    <span class="w l">Lucas</span><span class="w r">Strzelec</span>
-    <span class="w l">Maarten</span><span class="w r">Janssens</span>
+    <span class="icrow">
+      <a class="ic" href="contact.html" aria-label="contact-form">
+        <svg viewBox="0 0 26 20" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"><rect x="1" y="1" width="24" height="18"/><path d="M1 1l12 10L25 1M1 19l9-9M25 19l-9-9"/></svg>
+      </a>
+      <a class="ic" href="https://www.instagram.com/officeoficina/" rel="noopener" aria-label="Instagram">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="2" width="20" height="20" rx="6"/><circle cx="12" cy="12" r="4.6"/><circle cx="17.6" cy="6.4" r="1" fill="currentColor" stroke="none"/></svg>
+      </a>
+      <a class="ic" href="about.html" aria-label="About">
+        <svg viewBox="0 0 40 40" fill="none"><circle cx="20" cy="20" r="18.8" stroke="currentColor" stroke-width="1.2"/><text x="20" y="23.1" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="8.6" letter-spacing=".3" fill="currentColor" stroke="none">ABOUT</text></svg>
+      </a>
+    </span>
+    <span class="w l nm" data-who="0" tabindex="0" role="link" aria-label="About: Lucas Strzelec">Lucas</span><span class="w r nm" data-who="0" tabindex="-1" aria-hidden="true">Strzelec</span>
+    <span class="w l nm" data-who="1" tabindex="0" role="link" aria-label="About: Maarten Janssens">Maarten</span><span class="w r nm" data-who="1" tabindex="-1" aria-hidden="true">Janssens</span>
   </div>
 
   <div class="logo" aria-label="Office Oficina logo">
@@ -122,11 +127,12 @@
     var wx=0,wy=0,d=null;
     w.addEventListener("pointerdown",function(e){
       e.preventDefault(); if(w.classList.contains("m")) hintOn(w,e.pointerType);
-      d={px:e.clientX,py:e.clientY,x:wx,y:wy};
+      d={px:e.clientX,py:e.clientY,x:wx,y:wy,moved:false};
       w.setPointerCapture(e.pointerId); w.classList.add("dragging"); w.style.zIndex=++top;
     });
     w.addEventListener("pointermove",function(e){
       if(!d) return;
+      if(!d.moved){ if(Math.hypot(e.clientX-d.px,e.clientY-d.py)<5) return; d.moved=true; }   // a click never nudges the word
       var ox=wx,oy=wy;
       wx=d.x+(e.clientX-d.px); wy=d.y+(e.clientY-d.py);
       w.style.transform="translate("+wx+"px,"+wy+"px)";
@@ -135,9 +141,21 @@
         wx=ox; wy=oy; w.style.transform="translate("+wx+"px,"+wy+"px)";
       }
     });
-    function up(){ var was=d; d=null; w.classList.remove("dragging"); if(was&&w.classList.contains("m")){ dropCheck(w); hintRelease(); } }
+    function up(){ var was=d; d=null; w.classList.remove("dragging"); if(was&&w.classList.contains("m")){ dropCheck(w); hintRelease(); }
+      if(was&&!was.moved&&w.classList.contains("nm")) location.href="about.html"; }   // click a name: the flip book
     w.addEventListener("pointerup",up);
     w.addEventListener("pointercancel",up);
+  });
+
+  /* ---- our names: hover either word and both words of that name pulse grey; Enter opens About ---- */
+  Array.prototype.forEach.call(document.querySelectorAll(".nm"),function(n){
+    var pair=document.querySelectorAll('.nm[data-who="'+n.getAttribute("data-who")+'"]');
+    function on(v){Array.prototype.forEach.call(pair,function(p){p.classList.toggle("pulse",v)})}
+    n.addEventListener("pointerenter",function(){on(true)});
+    n.addEventListener("pointerleave",function(){on(false)});
+    n.addEventListener("focus",function(){on(true)});
+    n.addEventListener("blur",function(){on(false)});
+    n.addEventListener("keydown",function(e){if(e.key==="Enter"){e.preventDefault();location.href="about.html"}});
   });
 
   /* ---- the logo shapes fit into the card's letters: O into OFFICE's O, O into OFICINA's O, A into OFICINA's A ---- */

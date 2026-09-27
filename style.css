@@ -119,6 +119,13 @@ a:focus-visible,button:focus-visible,input:focus-visible,textarea:focus-visible{
 .card .rot:focus-visible{outline:1px solid #333;outline-offset:1px}
 @media (prefers-reduced-motion:reduce){.card .rot{transition:none}}
 
+/* home: mail, Instagram, ABOUT in one row, centred on the text */
+.icrow{grid-column:1/-1;justify-self:center;display:flex;align-items:center;gap:.4em;margin:2.5em 0}
+.icrow .ic{margin:0}
+.icrow .ic:nth-child(1){width:1.12em;height:.8em}
+.icrow .ic:nth-child(2){width:1.05em;height:1em}
+.icrow .ic:nth-child(3){width:1.3em;height:1.3em}
+
 /* home: our names pulse grey on hover; clicking them opens About */
 .w.nm.pulse{animation:namePulse 1.6s ease-in-out infinite}
 @keyframes namePulse{0%,100%{color:#333}50%{color:#9a9a9a}}

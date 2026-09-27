@@ -4,243 +4,112 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>About — Office Oficina</title>
-<style>
-  /* ------------------------------------------------------------------
-     OFFICE OFICINA — ABOUT / split-page flip book
-     To use your own photos, edit the SHOTS list in the <script> below.
-     ------------------------------------------------------------------ */
-  :root {
-    --bg: #f4f1ea;          /* paper */
-    --ink: #111;
-    --page: #fbfaf6;
-    --wire: #555;
-  }
-  * { box-sizing: border-box; }
-  html, body { margin: 0; height: 100%; }
-  body {
-    background: var(--bg);
-    color: var(--ink);
-    font-family: Arial, Helvetica, sans-serif;
-    display: flex; flex-direction: column; align-items: center;
-    min-height: 100vh;
-    -webkit-user-select: none; user-select: none;
-  }
-
-  header {
-    width: 100%; display: flex; justify-content: space-between; align-items: center;
-    padding: 20px 24px;
-  }
-  .circle-btn {
-    display: inline-flex; align-items: center; justify-content: center;
-    width: 64px; height: 64px; border: 1.5px solid var(--ink); border-radius: 50%;
-    font-size: 12px; letter-spacing: .04em; color: var(--ink); text-decoration: none;
-    background: none; cursor: pointer; font-family: inherit;
-  }
-  .circle-btn:hover { background: var(--ink); color: var(--bg); }
-
-  main {
-    flex: 1; width: 100%; display: flex; flex-direction: column;
-    align-items: center; justify-content: center; gap: 28px; padding: 8px 16px 40px;
-  }
-
-  .books { display: flex; gap: clamp(16px, 5vw, 64px); }
-
-  /* one spiral-bound "book" per person */
-  .book {
-    position: relative;
-    width: min(clamp(130px, 28vw, 260px), calc((100vh - 240px) * 0.4 + 18px));
-    aspect-ratio: 2 / 5;              /* whole figure: head+body+legs */
-    display: grid; grid-template-rows: 1fr 1fr 1fr; gap: 3px;
-    padding-left: 18px;               /* room for the spiral */
-  }
-  /* spiral wire */
-  .book::before {
-    content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 14px;
-    background:
-      radial-gradient(circle at 70% 50%, transparent 3px, var(--wire) 3.5px, var(--wire) 4.5px, transparent 5px)
-      0 0 / 14px 10px repeat-y;
-  }
-
-  .strip {
-    position: relative; perspective: 1400px; cursor: pointer;
-    background: var(--page); overflow: visible;
-    box-shadow: 0 1px 0 rgba(0,0,0,.08);
-  }
-  .strip .face {
-    position: absolute; inset: 0;
-    background-repeat: no-repeat;
-    background-size: 100% 300%;       /* one photo, cut into thirds */
-    transform-origin: left center;
-    backface-visibility: hidden;
-  }
-  .strip[data-part="0"] .face { background-position: center 0%; }
-  .strip[data-part="1"] .face { background-position: center 50%; }
-  .strip[data-part="2"] .face { background-position: center 100%; }
-
-  .strip .face.turning {
-    z-index: 2;
-    animation: turn .55s cubic-bezier(.45,.05,.3,1) forwards;
-    box-shadow: 4px 0 12px rgba(0,0,0,.15);
-  }
-  .strip .face.turning.back { animation-name: turnBack; }
-  @keyframes turn     { to { transform: rotateY(-180deg); } }
-  @keyframes turnBack { from { transform: rotateY(-180deg); } to { transform: rotateY(0); } }
-
-  .caption { font-size: 12px; letter-spacing: .04em; text-align: center; margin-top: 10px; min-height: 1em; }
-
-  .controls { display: flex; gap: 14px; }
-  .hint { font-size: 11px; opacity: .55; text-align: center; max-width: 420px; line-height: 1.5; }
-
-  @media (prefers-reduced-motion: reduce) {
-    .strip .face.turning { animation-duration: 1ms; }
-  }
-</style>
+<link rel="stylesheet" href="style.css?v=25">
 </head>
 <body>
+<div class="aboutpage">
+  <p style="margin:0"><a class="home" href="index.html">Office Oficina</a></p>
 
-<header>
-  <!-- change href to your homepage file if it isn't index.html -->
-  <a class="circle-btn" href="index.html" aria-label="Back to home">BACK</a>
-  <span></span>
-</header>
-
-<main>
   <div class="books" id="books"></div>
 
   <div class="controls">
-    <button class="circle-btn" id="shuffle" type="button">MIX</button>
-    <button class="circle-btn" id="reset" type="button">RESET</button>
+    <button type="button" id="mix">Mix</button>
+    <button type="button" id="reset">Reset</button>
   </div>
-
-  <p class="hint">Click a strip to turn the page · shift-click (or swipe right) to go back</p>
-</main>
+  <p class="hint">click a strip to turn the page</p>
+</div>
 
 <script>
 /* ==================================================================
-   YOUR PHOTOS GO HERE
-   ------------------------------------------------------------------
-   Each shot is ONE full-length photo (head to feet). The page cuts it
-   into three strips automatically, so every photo must be framed the
-   same way: same camera height & distance, person standing in the same
-   spot, chin at roughly the same line, feet at the bottom, plain
-   background. Portrait, about 2:5 (e.g. 800 × 2000 px).
-
-   Put the files in an  images/about/  folder next to this page and
-   list them below. "who" is the starting column (0 = you, 1 = partner).
-   Every strip can show any shot, so heads/bodies/legs mix across both
-   of you.
+   PHOTOS
+   Each shot is ONE full-length photo, head to feet. The page cuts it
+   into three strips (head / body / legs) by itself, so shoot every
+   photo the same way: tripod, same distance and height, standing on
+   the same mark, feet at the bottom, plain wall. Tall frame, about
+   2:5 (e.g. 800 x 2000 px).
+   Put them in an  about/  folder next to this page and list them here.
+   who: 0 = Lucas, 1 = Maarten
    ================================================================== */
-const SHOTS = [
-  // { src: "images/about/lucas-1.jpg",   who: 0 },
-  // { src: "images/about/lucas-2.jpg",   who: 0 },
-  // { src: "images/about/partner-1.jpg", who: 1 },
-  // { src: "images/about/partner-2.jpg", who: 1 },
+var SHOTS = [
+  // {src:"about/lucas-1.jpg",   who:0},
+  // {src:"about/lucas-2.jpg",   who:0},
+  // {src:"about/maarten-1.jpg", who:1},
+  // {src:"about/maarten-2.jpg", who:1},
 ];
+var PEOPLE = [["Lucas","Strzelec"],["Maarten","Janssens"]];
 
-/* Placeholder figures, shown until you add real photos above. */
-function placeholder(i, who) {
-  const tones = ["#111", "#2b5d34", "#c9401f", "#1f3fa8", "#6b6b6b", "#8a5a2b"];
-  const c = tones[i % tones.length];
-  const bg = who === 0 ? "#fbfaf6" : "#f6f3ec";
-  const svg = `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 500'>
-    <rect width='200' height='500' fill='${bg}'/>
-    <circle cx='100' cy='88' r='${34 + (i % 3) * 4}' fill='${c}'/>
-    <rect x='${58 - (i % 2) * 8}' y='172' width='${84 + (i % 2) * 16}' height='150' rx='10' fill='${c}'/>
-    <rect x='70' y='335' width='24' height='150' fill='${c}'/>
-    <rect x='106' y='335' width='24' height='150' fill='${c}'/>
-    <text x='100' y='96' font-family='Arial' font-size='16' fill='${bg}' text-anchor='middle'>${who === 0 ? "A" : "B"}${Math.floor(i / 2) + 1}</text>
-  </svg>`;
-  return "data:image/svg+xml;utf8," + encodeURIComponent(svg);
-}
-const shots = SHOTS.length
-  ? SHOTS
-  : Array.from({ length: 6 }, (_, i) => ({ src: placeholder(i, i % 2), who: i % 2 }));
-
-/* ------------------------------------------------------------------ */
-const booksEl = document.getElementById("books");
-const N = shots.length;
-const firstFor = who => Math.max(0, shots.findIndex(s => s.who === who));
-const state = [0, 1].map(who => [0, 1, 2].map(() => firstFor(who)));
-
-// preload
-shots.forEach(s => { const im = new Image(); im.src = s.src; });
-
-const strips = [0, 1].map(b => {
-  const book = document.createElement("div");
-  book.className = "book";
-  const els = [0, 1, 2].map(p => {
-    const strip = document.createElement("div");
-    strip.className = "strip";
-    strip.dataset.part = p;
-    strip.setAttribute("role", "button");
-    strip.setAttribute("tabindex", "0");
-    strip.setAttribute("aria-label", ["Head", "Body", "Legs"][p] + " — turn page");
-    const face = document.createElement("div");
-    face.className = "face";
-    face.style.backgroundImage = `url("${shots[state[b][p]].src}")`;
-    strip.appendChild(face);
-
-    strip.addEventListener("click", e => turn(b, p, e.shiftKey ? -1 : 1));
-    strip.addEventListener("keydown", e => {
-      if (e.key === "Enter" || e.key === " " || e.key === "ArrowRight") { e.preventDefault(); turn(b, p, 1); }
-      if (e.key === "ArrowLeft") { e.preventDefault(); turn(b, p, -1); }
-    });
-    // swipe
-    let x0 = null;
-    strip.addEventListener("touchstart", e => { x0 = e.touches[0].clientX; }, { passive: true });
-    strip.addEventListener("touchend", e => {
-      if (x0 === null) return;
-      const dx = e.changedTouches[0].clientX - x0; x0 = null;
-      if (Math.abs(dx) > 30) { e.preventDefault(); turn(b, p, dx < 0 ? 1 : -1); }
-    });
-    book.appendChild(strip);
-    return strip;
-  });
-  const wrap = document.createElement("div");
-  wrap.appendChild(book);
-  booksEl.appendChild(wrap);
-  return els;
-});
-
-function setTo(b, p, next, dir) {
-  const strip = strips[b][p];
-  if (strip.querySelector(".turning")) return;       // mid-animation
-  const base = strip.querySelector(".face");
-  const oldSrc = base.style.backgroundImage;
-  const newSrc = `url("${shots[next].src}")`;
-  if (oldSrc === newSrc) { state[b][p] = next; return; }
-
-  const leaf = document.createElement("div");
-  leaf.className = "face turning" + (dir < 0 ? " back" : "");
-  if (dir > 0) {                  // old page lifts away, new one underneath
-    leaf.style.backgroundImage = oldSrc;
-    base.style.backgroundImage = newSrc;
-  } else {                        // previous page comes back over the top
-    leaf.style.backgroundImage = newSrc;
+(function(){
+  /* stand-in figures until real photos are added above */
+  function stand(i,who){
+    var c=["#000","#555","#000","#555","#000","#555"][i%6],w=who?"#f2f2f2":"#fff",n=Math.floor(i/2)+1;
+    var s="<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 500' preserveAspectRatio='none'><rect width='200' height='500' fill='"+w+"'/>"+
+      "<circle cx='100' cy='88' r='"+(34+(n%3)*4)+"' fill='"+c+"'/>"+
+      "<rect x='"+(58-(n%2)*8)+"' y='180' width='"+(84+(n%2)*16)+"' height='140' rx='8' fill='"+c+"'/>"+
+      "<rect x='72' y='345' width='22' height='140' fill='"+c+"'/><rect x='106' y='345' width='22' height='140' fill='"+c+"'/>"+
+      "<text x='100' y='95' font-family='Arial' font-size='15' fill='"+w+"' text-anchor='middle'>"+PEOPLE[who][0][0]+n+"</text></svg>";
+    return "data:image/svg+xml;utf8,"+encodeURIComponent(s);
   }
-  strip.appendChild(leaf);
-  leaf.addEventListener("animationend", () => {
-    if (dir < 0) base.style.backgroundImage = newSrc;
-    leaf.remove();
-  }, { once: true });
-  state[b][p] = next;
-}
+  var shots=SHOTS.length?SHOTS:[0,1,2,3,4,5].map(function(i){return{src:stand(i,i%2),who:i%2}});
+  var N=shots.length,booksEl=document.getElementById("books");
+  function first(who){var i=0;for(;i<N;i++)if(shots[i].who===who)return i;return 0}
+  var state=[0,1].map(function(b){return[first(b),first(b),first(b)]});
+  shots.forEach(function(s){new Image().src=s.src});
 
-function turn(b, p, dir) {
-  setTo(b, p, (state[b][p] + dir + N) % N, dir);
-}
+  var strips=[],names=[];
+  [0,1].forEach(function(b){
+    var fig=document.createElement("div");fig.className="fig";
+    var book=document.createElement("div");book.className="book";
+    strips[b]=[0,1,2].map(function(p){
+      var st=document.createElement("div");st.className="strip";st.setAttribute("data-part",p);
+      st.tabIndex=0;st.setAttribute("role","button");st.setAttribute("aria-label",["Head","Body","Legs"][p]+", turn the page");
+      var f=document.createElement("div");f.className="face";f.style.backgroundImage='url("'+shots[state[b][p]].src+'")';
+      st.appendChild(f);
+      st.addEventListener("click",function(e){go(b,p,e.shiftKey?-1:1)});
+      st.addEventListener("keydown",function(e){
+        if(e.key==="Enter"||e.key===" "||e.key==="ArrowRight"){e.preventDefault();go(b,p,1)}
+        else if(e.key==="ArrowLeft"){e.preventDefault();go(b,p,-1)}
+      });
+      var x0=null;
+      st.addEventListener("touchstart",function(e){x0=e.touches[0].clientX},{passive:true});
+      st.addEventListener("touchend",function(e){
+        if(x0===null)return;var dx=e.changedTouches[0].clientX-x0;x0=null;
+        if(Math.abs(dx)>30){e.preventDefault();go(b,p,dx<0?1:-1)}
+      });
+      book.appendChild(st);return st;
+    });
+    var nm=document.createElement("div");nm.className="name";names[b]=nm;
+    fig.appendChild(book);fig.appendChild(nm);booksEl.appendChild(fig);
+  });
 
-document.getElementById("shuffle").addEventListener("click", () => {
-  [0, 1].forEach(b => [0, 1, 2].forEach((p, k) => {
-    let next;
-    do { next = Math.floor(Math.random() * N); } while (N > 1 && next === state[b][p]);
-    setTimeout(() => setTo(b, p, next, 1), (b * 3 + k) * 70);
-  }));
-});
-document.getElementById("reset").addEventListener("click", () => {
-  [0, 1].forEach(b => [0, 1, 2].forEach((p, k) =>
-    setTimeout(() => setTo(b, p, firstFor(b), -1), (b * 3 + k) * 70)));
-});
+  /* the name follows the pieces: first name from the head, surname from the legs */
+  function label(b){names[b].textContent=PEOPLE[shots[state[b][0]].who][0]+" "+PEOPLE[shots[state[b][2]].who][1]}
+
+  function set(b,p,next,dir){
+    var st=strips[b][p];if(st.querySelector(".turning"))return;
+    var base=st.querySelector(".face"),oldS=base.style.backgroundImage,newS='url("'+shots[next].src+'")';
+    state[b][p]=next;label(b);
+    if(oldS===newS)return;
+    var leaf=document.createElement("div");leaf.className="face turning"+(dir<0?" back":"");
+    if(dir>0){leaf.style.backgroundImage=oldS;base.style.backgroundImage=newS}
+    else leaf.style.backgroundImage=newS;
+    st.appendChild(leaf);
+    leaf.addEventListener("animationend",function(){if(dir<0)base.style.backgroundImage=newS;leaf.remove()},{once:true});
+  }
+  function go(b,p,dir){set(b,p,(state[b][p]+dir+N)%N,dir)}
+
+  document.getElementById("mix").addEventListener("click",function(){
+    [0,1].forEach(function(b){[0,1,2].forEach(function(p){
+      var n;do{n=Math.floor(Math.random()*N)}while(N>1&&n===state[b][p]);
+      setTimeout(function(){set(b,p,n,1)},(b*3+p)*70);
+    })});
+  });
+  document.getElementById("reset").addEventListener("click",function(){
+    [0,1].forEach(function(b){[0,1,2].forEach(function(p){
+      setTimeout(function(){set(b,p,first(b),-1)},(b*3+p)*70);
+    })});
+  });
+  label(0);label(1);
+})();
 </script>
 </body>
 </html>
