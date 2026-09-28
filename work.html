@@ -9,7 +9,10 @@
   /* a record spinning in the middle of the page; the songs listed to its right */
   html,body{height:100%;overflow:hidden}
   .room{position:fixed;inset:0}
-  .record{position:absolute;left:50%;top:50%;width:min(62vw,62vh,520px);aspect-ratio:1;transform:translate(-50%,-50%);border-radius:50%;border:0;padding:0;
+  /* the book and the record sit side by side, centred together on the page */
+  .room{--R:min(36vw,58vh,470px);--B:calc(var(--R)*1.05*935/1210);--gap:clamp(1.5rem,4vw,4rem)}
+  .pair{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);display:flex;align-items:center;gap:var(--gap)}
+  .record{position:relative;flex:none;width:var(--R);aspect-ratio:1;border-radius:50%;border:0;padding:0;
     background:radial-gradient(circle,#fff 0 13.5%,#111 13.6% 14.2%,transparent 14.3%),repeating-radial-gradient(circle,#0b0b0b 0 2px,#1d1d1d 2.5px 3px),#111;
     box-shadow:0 10px 30px rgba(0,0,0,.18);
     cursor:pointer}
@@ -22,8 +25,17 @@
   .playing .record .disc{animation-play-state:running}
   @keyframes spin{to{transform:rotate(360deg)}}
   /* the songs, to the right of the record; the one playing is black */
-  .side{position:absolute;top:50%;left:calc(50% + min(31vw,31vh,260px) + clamp(1.5rem,4vw,4rem));transform:translateY(-50%);
-    display:grid;gap:1.6rem;max-width:calc(50vw - min(31vw,31vh,260px) - 5rem)}
+  .side{position:absolute;top:50%;left:calc(50% + (var(--R) + var(--B) + var(--gap))/2 + var(--gap));transform:translateY(-50%);
+    display:grid;gap:1.6rem;max-width:calc(50vw - (var(--R) + var(--B) + var(--gap))/2 - var(--gap) - 1rem)}
+  /* the book: one page at a time; click or swipe the right side for the next page, the left side to go back */
+  .book{position:relative;flex:none;width:var(--B);aspect-ratio:935/1210;perspective:2000px;touch-action:pan-y;user-select:none;-webkit-user-select:none;cursor:pointer}
+  .book .pg,.book .leaf{position:absolute;inset:0;background:#fff center/contain no-repeat;box-shadow:0 6px 22px rgba(0,0,0,.12),inset 1px 0 0 #ddd}
+  .book .leaf{transform-origin:0 50%;backface-visibility:hidden;-webkit-backface-visibility:hidden;z-index:2}
+  .book .leaf.fwd{animation:bFwd .6s cubic-bezier(.45,.05,.3,1) forwards}
+  .book .leaf.rev{animation:bRev .6s cubic-bezier(.45,.05,.3,1) forwards}
+  @keyframes bFwd{from{transform:rotateY(0)}to{transform:rotateY(-180deg)}}
+  @keyframes bRev{from{transform:rotateY(-180deg)}to{transform:rotateY(0)}}
+  .book .bcount{position:absolute;left:0;right:0;top:calc(100% + .8em);text-align:center;font-size:.75em;color:#999}
   .songs{list-style:none;margin:0;padding:0;display:grid;gap:.55em;font-size:.9em}
   .songs button{display:grid;grid-template-columns:auto 1fr;column-gap:.8em}
   .songs .by{grid-column:2;color:#999;font-size:.85em}
@@ -37,10 +49,10 @@
   .songs .on button{color:#000}
   .songs .n{font-variant-numeric:tabular-nums;min-width:1.4em}
   @media (max-width:700px){
-    .record{top:40%;width:min(78vw,52vh)}
     html,body{overflow:auto}
-    .room{position:static;min-height:100dvh}
-    .side{left:50%;top:calc(40% + min(39vw,26vh) + 2rem);transform:translateX(-50%);max-width:86vw;justify-items:center;padding-bottom:2rem}
+    .room{position:static;min-height:100dvh;--R:min(64vw,40vh);--B:min(72vw,calc(52vh*935/1210));padding:5.5rem 0 2rem;display:flex;flex-direction:column;align-items:center;gap:2.4rem}
+    .pair{position:static;transform:none;flex-direction:column;gap:3rem}
+    .side{position:static;transform:none;max-width:86vw;justify-items:center}
     .songs{font-size:.85em}
   }
   @media (prefers-reduced-motion:reduce){.record .disc{animation-duration:8s}}
@@ -52,9 +64,14 @@
   <span class="m tri"><svg viewBox="0 0 39 37" preserveAspectRatio="none" aria-hidden="true"><path d="M0 0L39 14.5V22.5L0 37Z"/></svg></span>
 </a>
 <main class="room" id="room">
-  <button class="record" id="record" type="button" aria-label="Pause">
-    <span class="disc"><span class="mark" aria-hidden="true"><i></i><i></i><b></b></span></span>
-  </button>
+  <div class="pair">
+    <div class="book" id="book" role="region" aria-label="Entrance to a Descent, by Dan Svizeny. Click or swipe to turn the pages." tabindex="0">
+      <div class="pg"></div><span class="bcount" aria-live="polite"></span>
+    </div>
+    <button class="record" id="record" type="button" aria-label="Pause">
+      <span class="disc"><span class="mark" aria-hidden="true"><i></i><i></i><b></b></span></span>
+    </button>
+  </div>
   <div class="side">
     <ol class="songs" id="songs" aria-label="Songs"></ol>
     <div class="sp" id="sp" hidden><div id="spp"></div></div>
@@ -174,6 +191,32 @@ var SONGS = [
     m.addEventListener("pointerup",up);m.addEventListener("pointercancel",function(){d=null;m.classList.remove("dragging")});
   });
   link.addEventListener("keydown",function(e){if(e.key==="Enter")location.href=link.getAttribute("href")});
+})();
+</script>
+<script>
+/* the book: the PDF's pages as pictures, turned one by one */
+(function(){
+  var N=49,DIR="books/entrance/p-",book=document.getElementById("book"),pg=book.querySelector(".pg"),cnt=book.querySelector(".bcount"),i=0,busy=false;
+  function src(k){return DIR+("0"+(k+1)).slice(-2)+".jpg"}
+  function pre(k){if(k>=0&&k<N)new Image().src=src(k)}
+  function show(){pg.style.backgroundImage='url("'+src(i)+'")';cnt.textContent=(i+1)+" / "+N;pre(i+1);pre(i+2);pre(i-1)}
+  function turn(d){
+    var to=i+d;if(busy||to<0||to>=N)return;busy=true;
+    var lf=document.createElement("div");lf.className="leaf "+(d>0?"fwd":"rev");
+    if(d>0){lf.style.backgroundImage='url("'+src(i)+'")';i=to;show()}          // the page lifts away, the next is underneath
+    else{lf.style.backgroundImage='url("'+src(to)+'")'}                          // the previous page comes back over
+    book.appendChild(lf);
+    lf.addEventListener("animationend",function(){if(d<0){i=to;show()}lf.remove();busy=false},{once:true});
+  }
+  var x0=null,y0=null,swiped=false;
+  book.addEventListener("pointerdown",function(e){x0=e.clientX;y0=e.clientY;swiped=false});
+  book.addEventListener("pointerup",function(e){
+    if(x0===null)return;var dx=e.clientX-x0,dy=e.clientY-y0;x0=null;
+    if(Math.abs(dx)>40&&Math.abs(dx)>Math.abs(dy)){swiped=true;turn(dx<0?1:-1);return}       // swipe left: next page, swipe right: back
+    var r=book.getBoundingClientRect();turn(e.clientX>r.left+r.width/2?1:-1);                  // click: right half next, left half back
+  });
+  book.addEventListener("keydown",function(e){if(e.key==="ArrowRight"){e.preventDefault();turn(1)}else if(e.key==="ArrowLeft"){e.preventDefault();turn(-1)}});
+  show();
 })();
 </script>
 </body>
