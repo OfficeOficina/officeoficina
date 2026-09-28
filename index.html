@@ -9,7 +9,7 @@
 <meta property="og:description" content="OFFICE COLLABORATIVE is a COLLABORATIVE OFFICE of architecture.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://officeoficina.com">
-<link rel="stylesheet" href="style.css?v=34">
+<link rel="stylesheet" href="style.css?v=35">
 </head>
 <body>
 <main class="stage">
@@ -37,52 +37,12 @@
     <span class="w nm ix" tabindex="0" role="button" aria-label="Index" aria-controls="index" aria-expanded="false">index</span>
   </div>
 
-  <!-- index: opened by "index". The icons go, the words stay until you scroll; then only the text scrolls up and away
-       and these four columns come up behind it: text, building, furniture, text. The two middle columns line up with
-       the two columns of words. Replace the placeholder titles with the real ones (and the # with a link). -->
+  <!-- index: opened by "index". The icons go, the words stay until you scroll; then only the text scrolls up and away,
+       the title line (text, building, furniture, text) locks at the top, and the projects scroll forever underneath.
+       The projects themselves are listed in the script near the bottom of this file (look for BUILDINGS and FURNITURE). -->
   <section class="index" id="index" aria-label="Index">
-    <div class="col">
-      <h2>Text</h2>
-      <ul>
-        <li><a href="#">Text title 01</a><span>Publication, year</span></li>
-        <li><a href="#">Text title 02</a><span>Publication, year</span></li>
-        <li><a href="#">Text title 03</a><span>Publication, year</span></li>
-        <li><a href="#">Text title 04</a><span>Publication, year</span></li>
-        <li><a href="#">Text title 05</a><span>Publication, year</span></li>
-      </ul>
-    </div>
-    <div class="col">
-      <h2>Building</h2>
-      <ul>
-        <li><a href="#">Building title 01</a><span>City, year</span></li>
-        <li><a href="#">Building title 02</a><span>City, year</span></li>
-        <li><a href="#">Building title 03</a><span>City, year</span></li>
-        <li><a href="#">Building title 04</a><span>City, year</span></li>
-        <li><a href="#">Building title 05</a><span>City, year</span></li>
-        <li><a href="#">Building title 06</a><span>City, year</span></li>
-      </ul>
-    </div>
-    <div class="col">
-      <h2>Furniture</h2>
-      <ul>
-        <li><a href="#">Furniture title 01</a><span>Material, year</span></li>
-        <li><a href="#">Furniture title 02</a><span>Material, year</span></li>
-        <li><a href="#">Furniture title 03</a><span>Material, year</span></li>
-        <li><a href="#">Furniture title 04</a><span>Material, year</span></li>
-        <li><a href="#">Furniture title 05</a><span>Material, year</span></li>
-        <li><a href="#">Furniture title 06</a><span>Material, year</span></li>
-      </ul>
-    </div>
-    <div class="col">
-      <h2>Text</h2>
-      <ul>
-        <li><a href="#">Text title 01</a><span>Publication, year</span></li>
-        <li><a href="#">Text title 02</a><span>Publication, year</span></li>
-        <li><a href="#">Text title 03</a><span>Publication, year</span></li>
-        <li><a href="#">Text title 04</a><span>Publication, year</span></li>
-        <li><a href="#">Text title 05</a><span>Publication, year</span></li>
-      </ul>
-    </div>
+    <div class="ixhead" aria-hidden="true"><span>Text</span><span>Building</span><span>Furniture</span><span>Text</span></div>
+    <div class="ixrows" id="ixrows"></div>
   </section>
   </div>
   <div class="sbar" aria-hidden="true"></div>
@@ -206,21 +166,62 @@
     w.addEventListener("pointercancel",up);
   });
 
-  /* ---- index: the site stays still, only the text layer scrolls; the columns sit below the words ---- */
+  /* ==================================================================
+     THE INDEX
+     One row per pair: the building's text on the far left, the building, the furniture, the furniture's text on the
+     far right. Add, remove or reorder entries here; leave "link" as "#" until the project has its own page.
+     ================================================================== */
+  var BUILDINGS = [
+    {title:"Building title 01", meta:"City, year", link:"#", text:"Text about this building. Two or three sentences on what it is, where it is, who it is for and what makes it particular."},
+    {title:"Building title 02", meta:"City, year", link:"#", text:"Text about this building. Two or three sentences on what it is, where it is, who it is for and what makes it particular."},
+    {title:"Building title 03", meta:"City, year", link:"#", text:"Text about this building. Two or three sentences on what it is, where it is, who it is for and what makes it particular."},
+    {title:"Building title 04", meta:"City, year", link:"#", text:"Text about this building. Two or three sentences on what it is, where it is, who it is for and what makes it particular."},
+    {title:"Building title 05", meta:"City, year", link:"#", text:"Text about this building. Two or three sentences on what it is, where it is, who it is for and what makes it particular."},
+    {title:"Building title 06", meta:"City, year", link:"#", text:"Text about this building. Two or three sentences on what it is, where it is, who it is for and what makes it particular."}
+  ];
+  var FURNITURE = [
+    {title:"Furniture title 01", meta:"Material, year", link:"#", text:"Text about this piece. Two or three sentences on what it is, what it is made of and how it came about."},
+    {title:"Furniture title 02", meta:"Material, year", link:"#", text:"Text about this piece. Two or three sentences on what it is, what it is made of and how it came about."},
+    {title:"Furniture title 03", meta:"Material, year", link:"#", text:"Text about this piece. Two or three sentences on what it is, what it is made of and how it came about."},
+    {title:"Furniture title 04", meta:"Material, year", link:"#", text:"Text about this piece. Two or three sentences on what it is, what it is made of and how it came about."},
+    {title:"Furniture title 05", meta:"Material, year", link:"#", text:"Text about this piece. Two or three sentences on what it is, what it is made of and how it came about."},
+    {title:"Furniture title 06", meta:"Material, year", link:"#", text:"Text about this piece. Two or three sentences on what it is, what it is made of and how it came about."}
+  ];
+
   var stageEl=document.querySelector(".stage"),ixEl=document.querySelector(".ix"),panel=document.getElementById("index"),
       scr=document.getElementById("scroller"),underEl=document.querySelector(".under"),sbar=document.querySelector(".sbar"),
-      cols=panel.querySelectorAll(".col");
+      rowsEl=document.getElementById("ixrows"),headEl=panel.querySelector(".ixhead"),sets=[];
+  function esc(t){return String(t==null?"":t).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})}
+  function proj(p){return p?'<a href="'+esc(p.link||"#")+'">'+esc(p.title)+'</a><span>'+esc(p.meta)+'</span>':""}
+  function makeSet(){                                      // one full run of the projects; the list is made of copies of this
+    var d=document.createElement("div"),n=Math.max(BUILDINGS.length,FURNITURE.length),h="";d.className="ixset";
+    for(var i=0;i<n;i++){var b=BUILDINGS[i],f=FURNITURE[i];
+      h+='<div class="row"><p class="tx l">'+esc(b&&b.text)+'</p><div class="pj b">'+proj(b)+'</div><div class="pj f">'+proj(f)+'</div><p class="tx r">'+esc(f&&f.text)+'</p></div>'}
+    d.innerHTML=h;return d;
+  }
+  function fill(){                                         // endless: add a copy below before you reach the end, drop old ones far above
+    var h=scr.clientHeight;
+    while(sets.length<2||scr.scrollHeight-scr.scrollTop-h<h*1.5){var s1=makeSet();rowsEl.appendChild(s1);sets.push(s1);if(sets.length>40)break}
+    while(sets.length>4&&sets[0].offsetTop+sets[0].offsetHeight<scr.scrollTop-h){
+      var gone=sets.shift(),gh=gone.offsetHeight;gone.remove();scr.scrollTop-=gh;
+    }
+  }
   function place(){
     var st=scr.scrollTop,u=underEl.getBoundingClientRect(),cs=getComputedStyle(underEl),
         c1=parseFloat(cs.gridTemplateColumns),gap=parseFloat(cs.columnGap)||0,
         xL=u.left+c1,xR=xL+gap,m=Math.max(16,innerWidth*.03),                    // xL / xR: the two edges of the gutter between the word columns
-        W=Math.max(40,Math.min(xL-m,innerWidth-xR-m)/2);                          // four equal columns, as wide as the screen allows
-    [xL-2*W,xL-W,xR,xR+W].forEach(function(x,i){cols[i].style.left=x+"px";cols[i].style.width=W+"px"});
-    panel.style.top=Math.max(u.bottom+st+parseFloat(cs.fontSize)*3,st+innerHeight)+"px";   // the columns wait just below the screen until you scroll
-    bar();
+        W=Math.max(40,Math.min(xL-m,innerWidth-xR-m)/2);                          // four equal columns
+    panel.style.setProperty("--w",W+"px");panel.style.setProperty("--g",gap+"px");panel.style.setProperty("--x0",(xL-2*W)+"px");
+    panel.style.marginTop=Math.max(u.bottom+st+parseFloat(cs.fontSize)*3,st+innerHeight)+"px";   // the columns wait just below the screen
+    fill();bar();
   }
-  function bar(){var h=scr.clientHeight,H=scr.scrollHeight,l=H>h?Math.max(24,h*h/H):0;sbar.style.height=l+"px";sbar.style.transform="translateY("+((h-l)*scr.scrollTop/Math.max(1,H-h))+"px)"}
-  scr.addEventListener("scroll",bar,{passive:true});
+  function bar(){                                          // thin scrollbar: moves with the words, then loops with each run of projects
+    var h=scr.clientHeight,l=Math.round(h*.18),st=scr.scrollTop,start=panel.offsetTop,f;
+    if(st<start)f=.5*st/Math.max(1,start);
+    else{var sh=sets[0]?sets[0].offsetHeight:1;f=.5+.5*(((st-start)%sh)/sh)}
+    sbar.style.height=l+"px";sbar.style.transform="translateY("+((h-l)*f)+"px)";
+  }
+  scr.addEventListener("scroll",function(){if(stageEl.classList.contains("indexed")){fill();bar()}},{passive:true});
   addEventListener("resize",function(){if(stageEl.classList.contains("indexed"))place()});
   stageEl.addEventListener("wheel",function(e){          // scrolling anywhere, even over the card, moves only the text
     if(!stageEl.classList.contains("indexed")||(e.target.closest&&e.target.closest(".scroller")))return;
@@ -230,8 +231,9 @@
     if(on){stageEl.classList.add("indexed");place();ixEl.setAttribute("aria-expanded","true")}
     else{
       ixEl.setAttribute("aria-expanded","false");
-      if(scr.scrollTop>0){scr.scrollTo({top:0,behavior:"smooth"});setTimeout(function(){stageEl.classList.remove("indexed")},500)}
-      else stageEl.classList.remove("indexed");
+      var done=function(){stageEl.classList.remove("indexed");sets.forEach(function(x){x.remove()});sets=[]};
+      if(scr.scrollTop>0){scr.scrollTo({top:0,behavior:scr.scrollTop<innerHeight*3?"smooth":"auto"});setTimeout(done,500)}
+      else done();
     }
   }
   window.setIndex=setIndex;
