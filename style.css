@@ -254,3 +254,19 @@ a:focus-visible,button:focus-visible,input:focus-visible,textarea:focus-visible{
   .mailbox .sendrow,.mailbox .padsend{margin-top:.6em}
 }
 .mailbox .contact form{grid-template-columns:minmax(0,1fr)}.mailbox .contact label,.mailbox .contact input,.mailbox .contact textarea{min-width:0;width:100%;box-sizing:border-box}.mailbox .contact .fields{width:100%}
+
+/* the card turns over: front and back are two faces of one card */
+.card{transform-style:preserve-3d}
+.card>svg,.card>.rot,.card>.flipb{backface-visibility:hidden;-webkit-backface-visibility:hidden}
+.cback{position:absolute;inset:0;background:#fff;transform:rotateY(180deg);backface-visibility:hidden;-webkit-backface-visibility:hidden;
+  box-shadow:0 12px 24px rgba(0,0,0,.08);display:grid;place-items:center}
+.card .flipb{position:absolute;right:7px;top:7px;width:26px;height:26px;margin:0;padding:0;border:0;background:none;color:#333;display:grid;place-items:center;
+  opacity:0;pointer-events:none;transition:opacity .4s ease .6s;-webkit-tap-highlight-color:transparent;
+  cursor:url(cursor-move.png) 11 11,pointer;cursor:-webkit-image-set(url(cursor-move.png) 1x,url(cursor-move@2x.png) 2x) 11 11,pointer}
+.card .flipb svg{width:15px;height:15px;display:block;pointer-events:none}
+.card.open .flipb{opacity:1;pointer-events:auto}
+.card .flipb:focus-visible,.card .listen:focus-visible{outline:1px solid #333;outline-offset:2px}
+.card .listen{display:block;width:34%;border-radius:50%;transition:transform .3s ease;
+  cursor:url(cursor-move.png) 11 11,pointer;cursor:-webkit-image-set(url(cursor-move.png) 1x,url(cursor-move@2x.png) 2x) 11 11,pointer}
+.card .listen svg{width:100%;height:auto;pointer-events:none}
+.card .listen:hover{transform:rotate(40deg)}

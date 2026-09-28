@@ -3,13 +3,111 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Work — Office Oficina</title>
-<link rel="stylesheet" href="style.css">
+<title>Listen — Office Oficina</title>
+<link rel="stylesheet" href="style.css?v=42">
+<style>
+  /* a very plain record player: the record spins while a song plays */
+  .player{min-height:100%;min-height:100dvh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2.2rem;padding:4rem 1rem}
+  .home{position:fixed;left:clamp(1rem,3vw,2.5rem);top:clamp(1rem,3vw,2.5rem)}
+  .deck{position:relative;width:min(70vw,52vh,440px);aspect-ratio:1}
+  .record{position:absolute;inset:0;border-radius:50%;border:0;padding:0;background:
+      radial-gradient(circle,#fff 0 13.5%,#111 13.6% 14.2%,transparent 14.3%),
+      repeating-radial-gradient(circle,#0b0b0b 0 2px,#1d1d1d 2.5px 3px),#111;
+    box-shadow:0 10px 30px rgba(0,0,0,.18);animation:spin 1.8s linear infinite;animation-play-state:paused;
+    cursor:url(cursor-move.png) 11 11,pointer;cursor:-webkit-image-set(url(cursor-move.png) 1x,url(cursor-move@2x.png) 2x) 11 11,pointer}
+  .record::after{content:"";position:absolute;left:50%;top:50%;width:2.4%;height:2.4%;margin:-1.2% 0 0 -1.2%;border-radius:50%;background:#000}
+  .record .mark{position:absolute;left:50%;top:50%;width:5.5%;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:flex-end;gap:5%}
+  .record .mark i{display:block;width:100%;aspect-ratio:1.09;border-radius:50%;background:#000}
+  .record .mark b{display:block;width:70%;aspect-ratio:1.05;background:#000;clip-path:polygon(0 0,100% 39%,100% 61%,0 100%)}
+  .playing .record{animation-play-state:running}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  /* the arm swings onto the record when a song plays */
+  .arm{position:absolute;right:-9%;top:-4%;width:8%;height:62%;transform-origin:50% 6%;transform:rotate(-8deg);transition:transform .8s ease;pointer-events:none}
+  .arm::before{content:"";position:absolute;left:50%;top:0;width:44%;aspect-ratio:1;transform:translateX(-50%);border-radius:50%;background:#000}
+  .arm::after{content:"";position:absolute;left:50%;top:6%;bottom:0;width:6%;transform:translateX(-50%);background:#000}
+  .arm span{position:absolute;left:50%;bottom:-4%;width:40%;height:9%;transform:translateX(-50%);background:#000}
+  .playing .arm{transform:rotate(18deg)}
+  .controls{display:flex;align-items:center;gap:1.2rem}
+  .controls button{font:inherit;background:var(--fg);color:var(--bg);border:0;padding:.6rem 1.2rem;
+    cursor:url(cursor-move.png) 11 11,pointer;cursor:-webkit-image-set(url(cursor-move.png) 1x,url(cursor-move@2x.png) 2x) 11 11,pointer}
+  .now{font-size:.8em;color:#555;min-height:1.2em;text-align:center}
+  @media (prefers-reduced-motion:reduce){.record{animation-duration:6s}}
+</style>
 </head>
 <body>
-<div class="contact">
-  <p><a class="home" href="index.html">Office Oficina</a></p>
-  <h1>Work</h1>
+<div class="player" id="player">
+  <a class="home" href="index.html">Office Oficina</a>
+  <div class="deck">
+    <button class="record" id="record" type="button" aria-label="Play">
+      <span class="mark" aria-hidden="true"><i></i><i></i><b></b></span>
+    </button>
+    <div class="arm" aria-hidden="true"><span></span></div>
+  </div>
+  <div class="controls">
+    <button type="button" id="play">Play</button>
+    <button type="button" id="next">Next</button>
+  </div>
+  <p class="now" id="now" aria-live="polite"></p>
 </div>
+
+<script>
+/* ==================================================================
+   SONGS
+   Put your music files in a  music/  folder next to this page and list
+   them here, in order. While this list is empty, three little tunes
+   made right here in the browser play instead.
+   ================================================================== */
+var SONGS = [
+  // {title:"Song title", src:"music/song-1.mp3"},
+  // {title:"Another song", src:"music/song-2.mp3"},
+];
+
+(function(){
+  var player=document.getElementById("player"),rec=document.getElementById("record"),
+      playB=document.getElementById("play"),nextB=document.getElementById("next"),now=document.getElementById("now"),
+      i=0,playing=false,audio=null,ctx=null,timer=null,voices=[];
+
+  /* the stand-in tunes: simple melodies over a bass line, played by the browser itself */
+  var N=function(n){return 440*Math.pow(2,(n-69)/12)};
+  var DEMOS=[
+    {title:"Tune 01",bpm:92,mel:[64,67,71,72,71,67,64,62, 60,64,67,69,67,64,62,60],bass:[48,48,43,43,45,45,41,43]},
+    {title:"Tune 02",bpm:78,mel:[69,72,76,74,72,69,67,69, 72,74,76,79,76,74,72,69],bass:[45,45,41,41,48,48,43,43]},
+    {title:"Tune 03",bpm:104,mel:[62,66,69,74,73,69,66,64, 62,64,66,69,71,69,66,62],bass:[50,50,47,47,43,43,45,45]}
+  ];
+  var list=SONGS.length?SONGS:DEMOS;
+
+  function tone(t,f,d,type,vol){
+    var o=ctx.createOscillator(),g=ctx.createGain();o.type=type;o.frequency.value=f;
+    g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(vol,t+.02);g.gain.exponentialRampToValueAtTime(.0001,t+d);
+    o.connect(g);g.connect(ctx.destination);o.start(t);o.stop(t+d+.05);voices.push(o);
+  }
+  function playDemo(d){
+    ctx=ctx||new (window.AudioContext||window.webkitAudioContext)();ctx.resume();
+    var beat=60/d.bpm/2,t0=ctx.currentTime+.08,loops=4,total=d.mel.length*beat*loops;
+    for(var l=0;l<loops;l++){
+      d.mel.forEach(function(n,k){tone(t0+(l*d.mel.length+k)*beat,N(n),beat*1.6,"triangle",.14)});
+      d.bass.forEach(function(n,k){tone(t0+(l*d.bass.length+k)*beat*2,N(n),beat*2.2,"sine",.2)});
+    }
+    timer=setTimeout(next,total*1000+300);
+  }
+  function stopAll(){
+    clearTimeout(timer);voices.forEach(function(o){try{o.stop()}catch(e){}});voices=[];
+    if(audio){audio.pause();audio=null}
+  }
+  function start(){
+    var s=list[i];stopAll();playing=true;player.classList.add("playing");
+    playB.textContent="Pause";rec.setAttribute("aria-label","Pause");now.textContent=s.title;
+    if(s.src){audio=new Audio(s.src);audio.addEventListener("ended",next);audio.play().catch(function(){pause()})}
+    else playDemo(s);
+  }
+  function pause(){stopAll();playing=false;player.classList.remove("playing");playB.textContent="Play";rec.setAttribute("aria-label","Play")}
+  function next(){i=(i+1)%list.length;if(playing)start();else now.textContent=list[i].title}
+  function toggle(){if(playing)pause();else start()}
+
+  rec.addEventListener("click",toggle);playB.addEventListener("click",toggle);
+  nextB.addEventListener("click",function(){i=(i+1)%list.length;if(playing)start();else now.textContent=list[i].title});
+  now.textContent=list[0].title;
+})();
+</script>
 </body>
 </html>
