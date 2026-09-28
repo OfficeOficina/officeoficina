@@ -155,6 +155,9 @@
     <!-- once the card is unlocked: flip it over; on the back, the record -->
     <button class="flipb" id="flipF" type="button" aria-label="Flip the card over" tabindex="-1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v18"/><path d="M8 7L3 12l5 5z"/><path d="M16 7l5 5-5 5z"/></svg></button>
     <div class="cback" aria-hidden="true">
+      <button class="rot" id="rotB" type="button" aria-label="Rotate the card" tabindex="-1">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+    </button>
       <button class="flipb" id="flipB" type="button" aria-label="Flip the card back" tabindex="-1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v18"/><path d="M8 7L3 12l5 5z"/><path d="M16 7l5 5-5 5z"/></svg></button>
       <!-- the back of the card: the same cut-out letters seen from behind (mirrored), the logo shapes still in them -->
       <svg class="backsvg" viewBox="0 0 525 920" aria-hidden="true">
@@ -423,35 +426,35 @@
     if(emb){emb.setAttribute("dx",(c*2-n*3).toFixed(2));emb.setAttribute("dy",(-n*2-c*3).toFixed(2))}
   }
   /* ---- rotate handle: appears once all three shapes are in; drag it around the card to turn it a full 360 ---- */
-  var rotEl=document.getElementById("rot"),rd=null;
+  var rotEl=document.getElementById("rot"),rotB=document.getElementById("rotB"),rd=null;
   function ang(e){var r=card.getBoundingClientRect();return Math.atan2(e.clientY-(r.top+r.height/2),e.clientX-(r.left+r.width/2))*180/Math.PI}
-  rotEl.addEventListener("pointerdown",function(e){
-    e.preventDefault();e.stopPropagation();rd={a:ang(e)};rotEl.setPointerCapture(e.pointerId);
-  });
-  rotEl.addEventListener("pointermove",function(e){
-    if(!rd)return;var a=ang(e),d=a-rd.a;while(d>180)d-=360;while(d<-180)d+=360;
-    rot+=d;rd.a=a;apply();
-  });
   function rotEnd(){rd=null}
-  rotEl.addEventListener("pointerup",rotEnd);rotEl.addEventListener("pointercancel",rotEnd);
-  /* ---- flip: the card turns over like a real card; the back has the record ---- */
+  [rotEl,rotB].forEach(function(el){                       // the same handle on both sides of the card
+    el.addEventListener("pointerdown",function(e){e.preventDefault();e.stopPropagation();rd={a:ang(e)};el.setPointerCapture(e.pointerId)});
+    el.addEventListener("pointermove",function(e){
+      if(!rd)return;var a=ang(e),d=a-rd.a;while(d>180)d-=360;while(d<-180)d+=360;
+      rot+=d;rd.a=a;apply();
+    });
+    el.addEventListener("pointerup",rotEnd);el.addEventListener("pointercancel",rotEnd);
+    el.addEventListener("keydown",function(e){
+      var st=e.shiftKey?15:5,k=e.key;
+      if(k==="ArrowRight"||k==="ArrowUp")rot+=st;else if(k==="ArrowLeft"||k==="ArrowDown")rot-=st;else return;
+      e.preventDefault();apply();
+    });
+  });
+  /* ---- flip: the card turns over like a real card and back again, as often as you like ---- */
   var flipping=false,fF=document.getElementById("flipF"),fB=document.getElementById("flipB"),lis=document.getElementById("listen");
   function flipTo(to){
     if(flipping||!unlocked)return;flipping=true;var from=flip;
     tween(700,function(p){var e=p<.5?4*p*p*p:1-Math.pow(-2*p+2,3)/2;flip=from+(to-from)*e;apply()},function(){
       flip=to;apply();flipping=false;var back=to===180;card.classList.toggle("flipped",back);
-      fF.tabIndex=back?-1:0;fB.tabIndex=lis.tabIndex=back?0:-1;card.querySelector(".cback").setAttribute("aria-hidden",back?"false":"true");
+      fF.tabIndex=rotEl.tabIndex=back?-1:0;fB.tabIndex=lis.tabIndex=rotB.tabIndex=back?0:-1;card.querySelector(".cback").setAttribute("aria-hidden",back?"false":"true");
       (back?fB:fF).focus({preventScroll:true});
     });
   }
   [fF,fB,lis].forEach(function(b){b.addEventListener("pointerdown",function(e){e.stopPropagation()})});   // a press on a button never drags the card
   fF.addEventListener("click",function(){flipTo(180)});
   fB.addEventListener("click",function(){flipTo(0)});
-  rotEl.addEventListener("keydown",function(e){
-    var st=e.shiftKey?15:5,k=e.key;
-    if(k==="ArrowRight"||k==="ArrowUp")rot+=st;else if(k==="ArrowLeft"||k==="ArrowDown")rot-=st;else return;
-    e.preventDefault();apply();
-  });
 })();
 </script>
 <script>
