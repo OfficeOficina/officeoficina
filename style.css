@@ -205,14 +205,26 @@ a:focus-visible,button:focus-visible,input:focus-visible,textarea:focus-visible{
 @media (max-width:700px){.aboutbook{font-size:17px}}
 @media (max-width:700px){.index .tx{font-size:.72em;line-height:1.3}.index .tx.l{padding-right:.8em}.index .tx.r{padding-left:.8em}}
 
-/* the slit, top right: a thin black slot the card can be posted into */
-.slit{position:fixed;z-index:3;top:calc(var(--H)*.015 + 4px);right:calc(var(--H)*.038);width:calc(var(--h)*525/920*.4);height:6px;
-  padding:0;border:0;border-radius:3px;background:#000;transition:height .2s ease,margin .2s ease;
+/* the slit, top centre: a thin black slot exactly as wide as the card; the card slides up into it */
+.slit{position:fixed;z-index:3;top:calc(var(--H)*.015 + 4px);left:50%;transform:translateX(-50%);width:calc(var(--h)*525/920 + 6px);height:6px;
+  padding:0;border:0;border-radius:3px;background:#000;
   cursor:url(cursor-move.png) 11 11,pointer;cursor:-webkit-image-set(url(cursor-move.png) 1x,url(cursor-move@2x.png) 2x) 11 11,pointer}
-.slit::after{content:"";position:absolute;inset:-14px -10px}                  /* easier to hit */
-.slit.hint{animation:slitPulse 1s ease-in-out infinite}                        /* same pulse as the holes, while you drag the card */
-.slit.near,.slit.open{height:10px;margin-top:-2px;animation:none;background:#000}
-@keyframes slitPulse{0%,100%{background:#000}50%{background:#808080}}
+.slit::after{content:"";position:absolute;inset:-14px -10px}
 .slit:focus-visible{outline:1px solid #000;outline-offset:4px}
-@media (max-width:700px){.slit{top:calc(4vw + 3px);right:3.2vw;height:4px}.slit.near,.slit.open{height:7px}.ixhead{padding-top:calc(.7em + 14px)}}
-@media (prefers-reduced-motion:reduce){.slit.hint{animation:none;background:#808080}}
+.ixhead{padding-top:calc(var(--H)*.015 + 22px)}                 /* the index title line sits just under the slit */
+@media (max-width:700px){.slit{top:calc(4vw + 3px);height:4px}.ixhead{padding-top:calc(4vw + 16px)}}
+
+/* write to us (mail icon): the words fade; the message sits on the OFFICE side, the drawing pad on the OFICINA side */
+.under .w{transition:opacity .3s ease}
+.stage.mailing .under .w:not(.ix){opacity:0;pointer-events:none}
+.mailbox{position:absolute;inset:0;pointer-events:none;opacity:0;visibility:hidden;transition:opacity .35s ease,visibility 0s linear .35s;
+  font-size:max(13px,calc(var(--H)*.02));z-index:0}
+.stage.mailing .mailbox{opacity:1;visibility:visible;transition:opacity .35s ease .1s,visibility 0s}
+.mailbox .contact{position:absolute;padding:0;max-width:none;pointer-events:auto}
+.mailbox .contact form{margin-top:0;gap:1em}
+.mailbox .contact .fields{gap:1em}
+.mailbox .contact textarea{min-height:4em}
+.mailbox .padwrap{margin-top:0}
+@media (max-width:700px){.mailbox .padtools{position:static;margin:0 0 .6em;flex-direction:row;flex-wrap:wrap;align-items:center;gap:8px}}
+.mailbox .padsend{margin-top:1em}
+@media (max-width:700px){.mailbox .contact textarea{min-height:2.6em}.mailbox .contact form,.mailbox .contact .fields{gap:.7em}.mailbox .padsend{margin-top:.7em}}

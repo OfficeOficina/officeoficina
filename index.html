@@ -9,7 +9,7 @@
 <meta property="og:description" content="OFFICE COLLABORATIVE is a COLLABORATIVE OFFICE of architecture.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://officeoficina.com">
-<link rel="stylesheet" href="style.css?v=36">
+<link rel="stylesheet" href="style.css?v=37">
 </head>
 <body>
 <main class="stage">
@@ -24,7 +24,7 @@
     <span class="w l">Austin TX</span><span class="w r">USA</span>
     <span class="w l">Mexico City</span><span class="w r">CDMX</span>
     <span class="icrow">
-      <a class="ic" href="contact.html" aria-label="contact-form">
+      <a class="ic mailic" href="contact.html" role="button" aria-label="Write to us" aria-controls="mailbox" aria-expanded="false">
         <svg viewBox="0 0 26 20" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"><rect x="1" y="1" width="24" height="18"/><path d="M1 1l12 10L25 1M1 19l9-9M25 19l-9-9"/></svg>
       </a>
       <a class="ic" href="https://www.instagram.com/officeoficina/" rel="noopener" aria-label="Instagram">
@@ -47,6 +47,54 @@
   </div>
   <div class="sbar" aria-hidden="true"></div>
 
+  <!-- write to us: opened by the mail icon. The message takes the OFFICE side, the drawing pad the OFICINA side. -->
+  <div class="mailbox" id="mailbox" aria-hidden="true">
+    <div class="contact mailL">
+    <!-- Messages and drawings are emailed to lucasjstrzelec@gmail.com through FormSubmit.
+         To hide the address, replace it in the action below with the random code FormSubmit gives you after activation. -->
+    <form id="mailForm" action="https://formsubmit.co/lucasjstrzelec@gmail.com" method="POST">
+      <input type="hidden" name="_subject" value="New message from the Office Oficina website">
+      <input type="hidden" name="_captcha" value="false">
+      <input type="hidden" name="_template" value="box">
+      <input type="text" name="_honey" value="" tabindex="-1" autocomplete="off" style="display:none">
+      <div class="fields" id="fields">
+        <label>Name <input name="name" required autocomplete="name"></label>
+        <label>Email <input name="email" type="email" required autocomplete="email"></label>
+        <label>Message <textarea name="message" required></textarea></label>
+      </div>
+      <div class="sendrow">
+        <button type="submit" id="mailSend">Send</button>
+        <span id="mailStatus" role="status"></span>
+      </div>
+    </form>
+    </div>
+    <div class="contact mailR">
+    <!-- drawing pad: same size as the message form, draw inside the dashed line -->
+    <div class="padwrap">
+      <div class="padtools" role="toolbar" aria-label="Drawing tools">
+        <div class="padtop">
+          <button class="padtool on" id="padTool" type="button" aria-pressed="true" aria-label="Pencil"><img src="pencil.png" alt=""></button>
+          <button class="padundo" id="padUndo" type="button" aria-label="Go back (erase the last line)" title="Go back" disabled>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 14L4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 010 11H11"/></svg>
+          </button>
+        </div>
+        <div class="padcolors" role="group" aria-label="Colours">
+          <button class="padsw sel" type="button" data-c="#000000" style="--c:#000000" aria-label="Black"></button>
+          <button class="padsw" type="button" data-c="#ee2a1e" style="--c:#ee2a1e" aria-label="Red"></button>
+          <button class="padsw" type="button" data-c="#2447ff" style="--c:#2447ff" aria-label="Blue"></button>
+          <button class="padsw" type="button" data-c="#ffd400" style="--c:#ffd400" aria-label="Yellow"></button>
+        </div>
+        <div class="padsize"><input id="padSize" type="range" min="1" max="24" value="3" aria-label="Thickness"></div>
+      </div>
+      <div class="pad" id="pad"><canvas id="padCanvas" aria-label="Drawing pad"></canvas></div>
+    </div>
+    <div class="padsend">
+      <button type="button" id="padSend">Send</button>
+      <span id="padStatus" role="status"></span>
+    </div>
+    </div>
+  </div>
+
   <!-- about: the flip book opens here, in place of the text; the card and the logo stay -->
   <div class="aboutbook" id="about" aria-hidden="true">
     <div class="spread" id="spread"></div>
@@ -56,7 +104,7 @@
     </div>
   </div>
 
-  <!-- the slit: drop the card into it and it slips away; click it to get the card back -->
+  <!-- the slit, top centre: drop the card into it and it slips away; click it to get the card back -->
   <button class="slit" id="slit" type="button" aria-label="Card slot: drop the card here"></button>
 
   <div class="logo" aria-label="Office Oficina logo">
@@ -129,9 +177,9 @@
     if(!drag) return;
     if(!drag.moved){ if(Math.hypot(e.clientX-drag.px,e.clientY-drag.py)<5) return; drag.moved=true; }   // a click never nudges the card
     x=drag.x+(e.clientX-drag.px); y=drag.y+(e.clientY-drag.py);
-    apply(); slit.classList.add("hint"); slit.classList.toggle("near",nearSlit());
+    apply();
   });
-  function end(){ var was=drag; drag=null; card.classList.remove("dragging"); slit.classList.remove("hint","near");
+  function end(){ var was=drag; drag=null; card.classList.remove("dragging");
     if(was&&was.moved&&nearSlit()){post();return}
     if(was&&!was.moved&&unlocked) location.href="work.html"; }
   card.addEventListener("pointerup",end);
@@ -145,7 +193,7 @@
   });
   addEventListener("resize",apply);
 
-  /* ---- the slit (top right): drop the card on it and it slips in and disappears; click the slit and it comes back out ---- */
+  /* ---- the slit (top centre, as wide as the card): drop the card on it and it slips in and disappears; click the slit and it comes back out ---- */
   var slit=document.getElementById("slit"),posted=false,busyS=false;
   function nearSlit(){                                    // is the card over, or close to, the slit? (generous, so it is easy to post)
     var c=card.getBoundingClientRect(),s=slit.getBoundingClientRect(),pad=Math.max(70,s.width*.6);
@@ -153,7 +201,7 @@
   }
   function restC(){var t=card.style.transform;card.style.transform="none";var r=card.getBoundingClientRect();card.style.transform=t;return{x:r.left+r.width/2,y:r.top+r.height/2}}
   function slitPlan(){                                    // where the card lines up under the slit, shrunk to fit through it
-    var b=restC(),s=slit.getBoundingClientRect(),cw=card.offsetWidth,ch=card.offsetHeight,sc=Math.min(1,s.width*.86/cw);
+    var b=restC(),s=slit.getBoundingClientRect(),cw=card.offsetWidth,ch=card.offsetHeight,sc=Math.min(1,s.width/cw);
     return{sc:sc,ch:ch,x:s.left+s.width/2-b.x,y:s.top+s.height/2+ch*sc/2-b.y};
   }
   function put(t,cut){card.style.transform="translate("+t.x+"px,"+t.y+"px) rotate("+t.r+"deg) scale("+t.s+")";card.style.clipPath=cut>0?"inset("+cut+"px 0 0 0)":""}
@@ -162,10 +210,9 @@
   function post(){
     if(busyS||posted)return;busyS=true;posted=true;
     var P=slitPlan(),a0={x:x+sx,y:y+sy,r:tilt+rot+sr,s:1},a1={x:P.x,y:P.y,r:0,s:P.sc};
-    slit.classList.add("open");
     tween(420,function(p){put(mix(a0,a1,io(p)),0)},function(){
       tween(520,function(p){var up=P.ch*P.sc*p*p;put({x:a1.x,y:a1.y-up,r:0,s:P.sc},up/P.sc)},function(){
-        card.style.visibility="hidden";slit.classList.remove("open");busyS=false;
+        card.style.visibility="hidden";busyS=false;
         slit.setAttribute("aria-label","Card slot: get the card back");
       });
     });
@@ -173,9 +220,9 @@
   function retrieve(){
     if(busyS||!posted)return;busyS=true;
     x=0;y=0;var P=slitPlan(),a1={x:P.x,y:P.y,r:0,s:P.sc},a2={x:0,y:0,r:tilt+rot,s:1};
-    slit.classList.add("open");put({x:a1.x,y:a1.y-P.ch*P.sc,r:0,s:P.sc},P.ch);card.style.visibility="";
+    put({x:a1.x,y:a1.y-P.ch*P.sc,r:0,s:P.sc},P.ch);card.style.visibility="";
     tween(520,function(p){var q=1-p,up=P.ch*P.sc*q*q;put({x:a1.x,y:a1.y-up,r:0,s:P.sc},up/P.sc)},function(){
-      slit.classList.remove("open");
+      
       tween(480,function(p){put(mix(a1,a2,io(p)),0)},function(){
         card.style.clipPath="";posted=false;busyS=false;apply();
         slit.setAttribute("aria-label","Card slot: drop the card here");
@@ -272,7 +319,7 @@
     e.preventDefault();scr.scrollTop+=e.deltaMode===1?e.deltaY*16:e.deltaY;
   },{passive:false});
   function setIndex(on){
-    if(on){stageEl.classList.add("indexed");place();ixEl.setAttribute("aria-expanded","true")}
+    if(on){if(window.setMail)setMail(false);stageEl.classList.add("indexed");place();ixEl.setAttribute("aria-expanded","true")}
     else{
       ixEl.setAttribute("aria-expanded","false");
       var done=function(){stageEl.classList.remove("indexed");sets.forEach(function(x){x.remove()});sets=[]};
@@ -288,7 +335,7 @@
   Array.prototype.forEach.call(document.querySelectorAll(".nm"),function(n){
     var pair=[n];
     function on(v){Array.prototype.forEach.call(pair,function(p){p.classList.toggle("pulse",v)})}
-    n.addEventListener("pointerenter",function(){on(true)});
+    n.addEventListener("pointerenter",function(){if(!n.classList.contains("ix"))on(true)});
     n.addEventListener("pointerleave",function(){on(false)});
     n.addEventListener("focus",function(){on(true)});
     n.addEventListener("blur",function(){on(false)});
@@ -473,7 +520,7 @@ var BACKS = ["#000", "#fff"];
   /* open / close: the text fades out, the book fades in, same page (#about) */
   var under=document.querySelector(".under"),book=document.getElementById("about"),q=document.querySelector(".qa");
   function show(on){
-    if(on&&window.setIndex)setIndex(false);
+    if(on&&window.setIndex)setIndex(false);if(on&&window.setMail)setMail(false);
     book.classList.toggle("on",on);under.classList.toggle("away",on);book.setAttribute("aria-hidden",on?"false":"true");
   }
   var pushed=false;
@@ -492,6 +539,140 @@ var BACKS = ["#000", "#fff"];
       var t;do{t=Math.floor(Math.random()*N)}while(N>1&&t===cur[p]);
       setTimeout(function(){turnTo(p,t,1)},p*90);
     });
+  });
+})();
+</script>
+<script>
+/* ---- write to us: the words give way; the form sits in the left column, the drawing pad in the right ---- */
+(function(){
+  var stage=document.querySelector(".stage"),box=document.getElementById("mailbox"),ic=document.querySelector(".mailic"),
+      under=document.querySelector(".under"),L=box.querySelector(".mailL"),R=box.querySelector(".mailR");
+  function place(){
+    var u=under.getBoundingClientRect(),cs=getComputedStyle(under),c1=parseFloat(cs.gridTemplateColumns),gap=parseFloat(cs.columnGap)||0,
+        xL=u.left+c1,xR=xL+gap,m=Math.max(12,innerWidth*.03),W=Math.min(xL-m,innerWidth-xR-m,Math.max(260,innerWidth*.26));
+    L.style.left=(xL-W)+"px";L.style.width=W+"px";R.style.left=xR+"px";R.style.width=W+"px";
+    dispatchEvent(new Event("mailboxresize"));             // the pad takes the same height as the message fields
+    var ic=document.querySelector(".icrow").getBoundingClientRect(),fs=parseFloat(getComputedStyle(box).fontSize),
+        h=Math.max(L.offsetHeight,R.offsetHeight),top=Math.min(u.top,ic.top-h-fs*1.6);   // starts where the words start, moved up only if it would reach the icons
+    if(innerWidth<=700)top=document.querySelector(".ix").getBoundingClientRect().bottom+fs*.8;   // phones: no room above, so it sits below "index"
+    L.style.top=R.style.top=Math.max(8,top)+"px";
+  }
+  function setMail(on){
+    if(on){if(window.setIndex&&stage.classList.contains("indexed"))setIndex(false);place()}
+    stage.classList.toggle("mailing",on);box.setAttribute("aria-hidden",on?"false":"true");ic.setAttribute("aria-expanded",on?"true":"false");
+  }
+  window.setMail=setMail;
+  ic.addEventListener("click",function(e){e.preventDefault();setMail(!stage.classList.contains("mailing"))});
+  addEventListener("resize",function(){if(stage.classList.contains("mailing"))place()});
+  addEventListener("keydown",function(e){if(e.key==="Escape"&&stage.classList.contains("mailing"))setMail(false)});
+})();
+</script>
+<script>
+(function(){
+  var mailForm=document.getElementById("mailForm"),ENDPOINT=mailForm.action;   // one address for the message and the drawings: the form's action
+  var pad=document.getElementById("pad"),cv=document.getElementById("padCanvas"),ctx=cv.getContext("2d"),
+      tool=document.getElementById("padTool"),fields=document.getElementById("fields"),
+      send=document.getElementById("padSend"),status=document.getElementById("padStatus"),
+      strokes=[],cur=null,on=true,color="#000000",size=3,                 // size = pencil thickness in px
+      sizeEl=document.getElementById("padSize"),undo=document.getElementById("padUndo");
+
+  function fit(){                                                        // pad = same size as the message form
+    var h=fields.offsetHeight;if(h>60)pad.style.height=h+"px";
+    var r=cv.getBoundingClientRect(),d=window.devicePixelRatio||1;
+    cv.width=Math.max(1,Math.round(r.width*d));cv.height=Math.max(1,Math.round(r.height*d));redraw();
+  }
+  function strokePath(g,pts,w,h,lw){
+    g.lineWidth=lw;g.lineCap="round";g.lineJoin="round";g.beginPath();
+    var p=function(i){return[pts[i][0]*w,pts[i][1]*h]},a=p(0),i;
+    if(pts.length===1){g.moveTo(a[0],a[1]);g.lineTo(a[0]+.01,a[1])}
+    else{
+      g.moveTo(a[0],a[1]);
+      for(i=1;i<pts.length-1;i++){var b=p(i),c=p(i+1);g.quadraticCurveTo(b[0],b[1],(b[0]+c[0])/2,(b[1]+c[1])/2)}
+      var e=p(pts.length-1);g.lineTo(e[0],e[1]);
+    }
+    g.stroke();
+  }
+  function redraw(){
+    ctx.clearRect(0,0,cv.width,cv.height);
+    var d=window.devicePixelRatio||1;strokes.forEach(function(s){ctx.strokeStyle=s.c;strokePath(ctx,s.p,cv.width,cv.height,s.w*d)});
+  }
+  function norm(e){var r=cv.getBoundingClientRect();return[Math.min(1,Math.max(0,(e.clientX-r.left)/r.width)),Math.min(1,Math.max(0,(e.clientY-r.top)/r.height))]}
+  cv.addEventListener("pointerdown",function(e){
+    if(!on)return;e.preventDefault();cv.setPointerCapture(e.pointerId);cur={p:[norm(e)],c:color,w:size};status.textContent="";
+  });
+  cv.addEventListener("pointermove",function(e){
+    if(!cur)return;cur.p.push(norm(e));redraw();ctx.strokeStyle=cur.c;
+    var d=window.devicePixelRatio||1;strokePath(ctx,cur.p,cv.width,cv.height,cur.w*d);
+  });
+  function up(){if(!cur)return;strokes.push(cur);cur=null;redraw();syncUndo()}
+  function syncUndo(){undo.disabled=!strokes.length}
+  undo.addEventListener("click",function(){strokes.pop();redraw();syncUndo();status.textContent=""});      // go back: erase the last line
+  cv.addEventListener("pointerup",up);cv.addEventListener("pointercancel",up);
+
+  tool.addEventListener("click",function(){                              // pencil on / off
+    setOn(!on);
+  });
+  function setOn(v){on=v;tool.classList.toggle("on",on);tool.setAttribute("aria-pressed",on?"true":"false");pad.classList.toggle("off",!on);dotCursor()}
+
+  function dotCursor(){                                                  // the cursor is a dot: pencil size, pencil colour
+    if(!on){pad.style.cursor="";return}
+    var d=Math.max(2,size),S=Math.ceil(d)+6,h=Math.round(S/2);
+    function make(k){
+      var c=document.createElement("canvas");c.width=c.height=S*k;var g=c.getContext("2d");g.scale(k,k);
+      g.beginPath();g.arc(S/2,S/2,d/2,0,Math.PI*2);g.fillStyle=color;g.fill();
+      g.lineWidth=1;g.strokeStyle="rgba(0,0,0,.5)";g.stroke();return c.toDataURL("image/png");
+    }
+    var u1=make(1),u2=make(2);
+    pad.style.cursor="url("+u1+") "+h+" "+h+", crosshair";
+    pad.style.cursor="-webkit-image-set(url("+u1+") 1x, url("+u2+") 2x) "+h+" "+h+", crosshair";   // sharper on retina; ignored where unsupported
+  }
+  [].forEach.call(document.querySelectorAll(".padsw"),function(b){
+    b.addEventListener("click",function(){
+      color=b.getAttribute("data-c");
+      [].forEach.call(document.querySelectorAll(".padsw"),function(o){o.classList.toggle("sel",o===b)});
+      setOn(true);
+    });
+  });
+  sizeEl.addEventListener("input",function(){size=+sizeEl.value;setOn(true)});
+
+  function picture(cb){
+    var W=1200,H=Math.round(W*cv.height/cv.width),c=document.createElement("canvas");c.width=W;c.height=H;
+    var g=c.getContext("2d");g.fillStyle="#fff";g.fillRect(0,0,W,H);
+    strokes.forEach(function(s){g.strokeStyle=s.c;strokePath(g,s.p,W,H,s.w*W/cv.getBoundingClientRect().width)});
+    c.toBlob(cb,"image/png");
+  }
+  send.addEventListener("click",function(){
+    if(!strokes.length){status.textContent="draw something first";return}
+    send.disabled=true;status.textContent="sending…";
+    picture(function(blob){
+      var fd=new FormData();
+      fd.append("attachment",blob,"drawing.png");
+      fd.append("_subject","New drawing from the Office Oficina contact page");
+      fd.append("_captcha","false");fd.append("_template","box");fd.append("_honey","");
+      fd.append("message","Someone sent a drawing from the contact page. The picture is attached.");
+      fetch(ENDPOINT,{method:"POST",body:fd,mode:"no-cors"}).then(function(){
+        strokes=[];redraw();syncUndo();status.textContent="sent, thank you";
+      }).catch(function(){status.textContent="couldn't send, please try again"}).then(function(){send.disabled=false});
+    });
+  });
+
+  dotCursor();fit();addEventListener("resize",fit);addEventListener("mailboxresize",fit);
+  if(window.ResizeObserver)new ResizeObserver(fit).observe(fields);
+  if(document.fonts&&document.fonts.ready)document.fonts.ready.then(fit);
+
+  /* ---- the message form: sends in the background, shows "sent" here ---- */
+  var mailSend=document.getElementById("mailSend"),mailStatus=document.getElementById("mailStatus"),nativeSend=false;
+  mailForm.addEventListener("submit",function(e){
+    if(nativeSend)return;                                            // fallback: let the browser send it the normal way
+    e.preventDefault();mailSend.disabled=true;mailStatus.textContent="sending…";
+    fetch(mailForm.action.replace("formsubmit.co/","formsubmit.co/ajax/"),{method:"POST",body:new FormData(mailForm),headers:{Accept:"application/json"}})
+      .then(function(r){return r.json()})
+      .then(function(j){
+        if(String(j.success)==="true"){mailForm.reset();mailStatus.textContent="sent, thank you"}
+        else{nativeSend=true;mailForm.submit()}                      // e.g. first time: FormSubmit's own page explains the activation
+      })
+      .catch(function(){nativeSend=true;mailForm.submit()})
+      .then(function(){mailSend.disabled=false});
   });
 })();
 </script>
