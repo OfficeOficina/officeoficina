@@ -9,7 +9,7 @@
 <meta property="og:description" content="OFFICE COLLABORATIVE is a COLLABORATIVE OFFICE of architecture.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://officeoficina.com">
-<link rel="stylesheet" href="style.css?v=35">
+<link rel="stylesheet" href="style.css?v=36">
 </head>
 <body>
 <main class="stage">
@@ -55,6 +55,9 @@
       <button type="button" class="x" id="closeAbout" aria-label="Close">&times;</button>
     </div>
   </div>
+
+  <!-- the slit: drop the card into it and it slips away; click it to get the card back -->
+  <button class="slit" id="slit" type="button" aria-label="Card slot: drop the card here"></button>
 
   <div class="logo" aria-label="Office Oficina logo">
     <span class="m dot"></span><span class="m dot"></span>
@@ -126,9 +129,11 @@
     if(!drag) return;
     if(!drag.moved){ if(Math.hypot(e.clientX-drag.px,e.clientY-drag.py)<5) return; drag.moved=true; }   // a click never nudges the card
     x=drag.x+(e.clientX-drag.px); y=drag.y+(e.clientY-drag.py);
-    apply();
+    apply(); slit.classList.add("hint"); slit.classList.toggle("near",nearSlit());
   });
-  function end(){ var was=drag; drag=null; card.classList.remove("dragging"); if(was&&!was.moved&&unlocked) location.href="work.html"; }
+  function end(){ var was=drag; drag=null; card.classList.remove("dragging"); slit.classList.remove("hint","near");
+    if(was&&was.moved&&nearSlit()){post();return}
+    if(was&&!was.moved&&unlocked) location.href="work.html"; }
   card.addEventListener("pointerup",end);
   card.addEventListener("pointercancel",end);
   card.addEventListener("keydown",function(e){
@@ -139,6 +144,45 @@
     e.preventDefault(); apply();
   });
   addEventListener("resize",apply);
+
+  /* ---- the slit (top right): drop the card on it and it slips in and disappears; click the slit and it comes back out ---- */
+  var slit=document.getElementById("slit"),posted=false,busyS=false;
+  function nearSlit(){                                    // is the card over, or close to, the slit? (generous, so it is easy to post)
+    var c=card.getBoundingClientRect(),s=slit.getBoundingClientRect(),pad=Math.max(70,s.width*.6);
+    return c.left<s.right+pad&&c.right>s.left-pad&&c.top<s.bottom+pad&&c.bottom>s.top-pad;
+  }
+  function restC(){var t=card.style.transform;card.style.transform="none";var r=card.getBoundingClientRect();card.style.transform=t;return{x:r.left+r.width/2,y:r.top+r.height/2}}
+  function slitPlan(){                                    // where the card lines up under the slit, shrunk to fit through it
+    var b=restC(),s=slit.getBoundingClientRect(),cw=card.offsetWidth,ch=card.offsetHeight,sc=Math.min(1,s.width*.86/cw);
+    return{sc:sc,ch:ch,x:s.left+s.width/2-b.x,y:s.top+s.height/2+ch*sc/2-b.y};
+  }
+  function put(t,cut){card.style.transform="translate("+t.x+"px,"+t.y+"px) rotate("+t.r+"deg) scale("+t.s+")";card.style.clipPath=cut>0?"inset("+cut+"px 0 0 0)":""}
+  function mix(a,b,e){return{x:a.x+(b.x-a.x)*e,y:a.y+(b.y-a.y)*e,r:a.r+(b.r-a.r)*e,s:a.s+(b.s-a.s)*e}}
+  function io(p){return p<.5?4*p*p*p:1-Math.pow(-2*p+2,3)/2}
+  function post(){
+    if(busyS||posted)return;busyS=true;posted=true;
+    var P=slitPlan(),a0={x:x+sx,y:y+sy,r:tilt+rot+sr,s:1},a1={x:P.x,y:P.y,r:0,s:P.sc};
+    slit.classList.add("open");
+    tween(420,function(p){put(mix(a0,a1,io(p)),0)},function(){
+      tween(520,function(p){var up=P.ch*P.sc*p*p;put({x:a1.x,y:a1.y-up,r:0,s:P.sc},up/P.sc)},function(){
+        card.style.visibility="hidden";slit.classList.remove("open");busyS=false;
+        slit.setAttribute("aria-label","Card slot: get the card back");
+      });
+    });
+  }
+  function retrieve(){
+    if(busyS||!posted)return;busyS=true;
+    x=0;y=0;var P=slitPlan(),a1={x:P.x,y:P.y,r:0,s:P.sc},a2={x:0,y:0,r:tilt+rot,s:1};
+    slit.classList.add("open");put({x:a1.x,y:a1.y-P.ch*P.sc,r:0,s:P.sc},P.ch);card.style.visibility="";
+    tween(520,function(p){var q=1-p,up=P.ch*P.sc*q*q;put({x:a1.x,y:a1.y-up,r:0,s:P.sc},up/P.sc)},function(){
+      slit.classList.remove("open");
+      tween(480,function(p){put(mix(a1,a2,io(p)),0)},function(){
+        card.style.clipPath="";posted=false;busyS=false;apply();
+        slit.setAttribute("aria-label","Card slot: drop the card here");
+      });
+    });
+  }
+  slit.addEventListener("click",function(){if(posted)retrieve();else post()});
 
   /* ---- every word ---- */
   var top=1;
