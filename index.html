@@ -9,7 +9,7 @@
 <meta property="og:description" content="OFFICE COLLABORATIVE is a COLLABORATIVE OFFICE of architecture.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://officeoficina.com">
-<link rel="stylesheet" href="style.css?v=45">
+<link rel="stylesheet" href="style.css?v=46">
 </head>
 <body>
 <main class="stage">
@@ -104,7 +104,7 @@
   <!-- the slit, top centre: drop the card into it and it slips away; click it to get the card back -->
   <button class="slit" id="slit" type="button" aria-label="Card slot: drop the card here"></button>
 
-  <div class="logo" aria-label="Office Oficina logo">
+  <div class="logo" aria-label="Office Oficina logo: click to go back to the start, or drag the shapes into the card">
     <span class="m dot"></span><span class="m dot"></span>
     <span class="m tri"><svg viewBox="0 0 39 37" preserveAspectRatio="none" aria-hidden="true"><path d="M0 0L39 14.5V22.5L0 37Z"/></svg></span>
   </div>
@@ -263,7 +263,7 @@
         wx=ox; wy=oy; w.style.transform="translate("+wx+"px,"+wy+"px)";
       }
     });
-    function up(){ var was=d; d=null; w.classList.remove("dragging"); if(was&&w.classList.contains("m")){ dropCheck(w); hintRelease(); }
+    function up(){ var was=d; d=null; w.classList.remove("dragging"); if(was&&w.classList.contains("m")){ if(!was.moved){hintRelease();goHome();return} dropCheck(w); hintRelease(); }
       if(was&&!was.moved&&w.classList.contains("nm")) act(w); }   // click "index": the index
     w.addEventListener("pointerup",up);
     w.addEventListener("pointercancel",up);
@@ -364,6 +364,13 @@
     if(n.tagName==="A") n.addEventListener("click",function(e){e.preventDefault();act(n)});
     else n.addEventListener("keydown",function(e){if(e.key==="Enter"||e.key===" "){e.preventDefault();act(n)}});
   });
+
+  /* ---- a click on the logo (without dragging it) always brings you back to the home view ---- */
+  function goHome(){
+    if(window.setIndex&&document.querySelector(".stage").classList.contains("indexed"))setIndex(false);
+    if(window.setMail)setMail(false);
+    if(document.getElementById("about").classList.contains("on"))document.getElementById("closeAbout").click();
+  }
 
   /* ---- the logo shapes fit into the card's letters: O into OFFICE's O, O into OFICINA's O, A into OFICINA's A ---- */
   var stage=document.querySelector(".stage"),plugs=[].slice.call(document.querySelectorAll(".plug")),still=window.matchMedia("(prefers-reduced-motion: reduce)").matches;

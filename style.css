@@ -286,3 +286,7 @@ a:focus-visible,button:focus-visible,input:focus-visible,textarea:focus-visible{
 .wheelv::-webkit-slider-runnable-track{height:12px;background:transparent}
 .wheelv::-webkit-slider-thumb{-webkit-appearance:none;margin-top:-1px;width:14px;height:14px;border-radius:50%;background:#fff;border:2px solid #000}
 .wheelv::-moz-range-thumb{width:12px;height:12px;border-radius:50%;background:#fff;border:2px solid #000}
+
+/* on the other pages the logo is simply the way home */
+a.logolink{text-decoration:none;cursor:pointer}
+a.logolink .m{cursor:pointer}

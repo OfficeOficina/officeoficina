@@ -4,11 +4,10 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Listen — Office Oficina</title>
-<link rel="stylesheet" href="style.css?v=45">
+<link rel="stylesheet" href="style.css?v=46">
 <style>
   /* a record spinning in the middle of the page; the songs listed to its right */
   html,body{height:100%;overflow:hidden}
-  .home{position:fixed;left:clamp(1rem,3vw,2.5rem);top:clamp(1rem,3vw,2.5rem);z-index:2}
   .room{position:fixed;inset:0}
   .record{position:absolute;left:50%;top:50%;width:min(62vw,62vh,520px);aspect-ratio:1;transform:translate(-50%,-50%);border-radius:50%;border:0;padding:0;
     background:radial-gradient(circle,#fff 0 13.5%,#111 13.6% 14.2%,transparent 14.3%),repeating-radial-gradient(circle,#0b0b0b 0 2px,#1d1d1d 2.5px 3px),#111;
@@ -48,7 +47,10 @@
 </style>
 </head>
 <body>
-<a class="home" href="index.html">Office Oficina</a>
+<a class="logo logolink" href="index.html" aria-label="Office Oficina: back to the home page">
+  <span class="m dot"></span><span class="m dot"></span>
+  <span class="m tri"><svg viewBox="0 0 39 37" preserveAspectRatio="none" aria-hidden="true"><path d="M0 0L39 14.5V22.5L0 37Z"/></svg></span>
+</a>
 <main class="room" id="room">
   <button class="record" id="record" type="button" aria-label="Pause">
     <span class="disc"><span class="mark" aria-hidden="true"><i></i><i></i><b></b></span></span>
@@ -70,6 +72,7 @@
    ================================================================== */
 var SONGS = [
   {title:"Pattern Against User", by:"At the Drive-In", youtube:"3jBK7aHHufE"},
+  {title:"Basic Instinct", by:"Quasimoto", youtube:"JXeJA2i-Lck"},
   // more from YouTube: copy the code after "v=" in the video's link
   // {title:"Song title", by:"Artist", youtube:"xxxxxxxxxxx"},
   // or your own files, from a music/ folder:
