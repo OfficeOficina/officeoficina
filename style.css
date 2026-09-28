@@ -258,8 +258,8 @@ a:focus-visible,button:focus-visible,input:focus-visible,textarea:focus-visible{
 
 /* the card turns over: front and back are two faces of one card */
 .card{transform-style:preserve-3d}
-.card>svg,.card>.rot,.card>.flipb{backface-visibility:hidden;-webkit-backface-visibility:hidden}
-.cback{position:absolute;inset:0;transform:rotateY(180deg);backface-visibility:hidden;-webkit-backface-visibility:hidden;filter:drop-shadow(0 12px 14px rgba(0,0,0,.07))}
+.card>svg{backface-visibility:hidden;-webkit-backface-visibility:hidden}
+.cback{position:absolute;inset:0;transform:rotateY(180deg);backface-visibility:hidden;-webkit-backface-visibility:hidden}
 .cback .backsvg{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
 .card .flipb{position:absolute;right:7px;top:7px;width:26px;height:26px;margin:0;padding:0;border:0;background:none;color:#333;display:grid;place-items:center;
   opacity:0;pointer-events:none;transition:opacity .4s ease .6s;-webkit-tap-highlight-color:transparent;
@@ -290,3 +290,21 @@ a:focus-visible,button:focus-visible,input:focus-visible,textarea:focus-visible{
 /* on the other pages the logo is simply the way home */
 a.logolink{text-decoration:none;cursor:pointer}
 a.logolink .m{cursor:pointer}
+
+/* the rotate and flip buttons: one pair that always sits on the side facing you (rotate top left, flip top right) */
+.card>.rot,.card>.flipb{z-index:3;transform:translateZ(1px)}
+.card.flipped>.rot{left:auto;right:7px;transform:translateZ(-1px) rotateY(180deg)}
+.card.flipped>.flipb{right:auto;left:7px;transform:translateZ(-1px) rotateY(180deg)}
+.card.flipping>.rot,.card.flipping>.flipb{opacity:0!important;transition:none}
+.card .enter{z-index:2}
+
+/* rotate and flip: a little bigger and darker so it is clear they can be used */
+.card .rot,.card .flipb{width:max(28px,calc(var(--h)*.05));height:max(28px,calc(var(--h)*.05));color:#000;top:8px}
+.card .rot{left:8px}.card .flipb{right:8px}
+.card.flipped>.rot{left:auto;right:8px}.card.flipped>.flipb{right:auto;left:8px}
+.card .rot svg,.card .flipb svg{width:60%;height:60%}
+
+/* the colour wheel can be dragged anywhere by its border or the bar on top */
+.wheelpop{cursor:grab;touch-action:none}
+.wheelpop.moving{cursor:grabbing;box-shadow:0 10px 30px rgba(0,0,0,.25)}
+.wheelgrip{display:block;justify-self:center;width:36px;height:4px;margin:-3px 0 -4px;border-radius:2px;background:#cfcfcf}
