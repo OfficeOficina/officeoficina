@@ -9,7 +9,7 @@
 <meta property="og:description" content="OFFICE COLLABORATIVE is a COLLABORATIVE OFFICE of architecture.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://officeoficina.com">
-<link rel="stylesheet" href="style.css?v=42">
+<link rel="stylesheet" href="style.css?v=43">
 </head>
 <body>
 <main class="stage">
@@ -83,6 +83,7 @@
           <button class="padsw" type="button" data-c="#ee2a1e" style="--c:#ee2a1e" aria-label="Red"></button>
           <button class="padsw" type="button" data-c="#2447ff" style="--c:#2447ff" aria-label="Blue"></button>
           <button class="padsw" type="button" data-c="#ffd400" style="--c:#ffd400" aria-label="Yellow"></button>
+          <span class="wheelwrap"><button class="padsw wheelsw" type="button" data-c="#000000" style="--c:#000000" aria-label="Any colour: open the colour wheel" aria-expanded="false"></button><span class="wheelpop" hidden><canvas width="320" height="320" aria-label="Colour wheel: click or drag to pick a colour"></canvas><i class="wheelmark"></i></span></span>
         </div>
         <div class="padsize"><input id="padSize" type="range" min="1" max="24" value="3" aria-label="Thickness"></div>
       </div>
@@ -680,6 +681,38 @@ var BACKS = ["#000", "#fff"];
     });
   });
   sizeEl.addEventListener("input",function(){size=+sizeEl.value;setOn(true)});
+  /* ---- the colour wheel: the last dot opens it; click or drag on the wheel to pick any colour ---- */
+  (function(){
+    var sw=document.querySelector(".wheelsw");if(!sw)return;
+    var pop=sw.parentNode.querySelector(".wheelpop"),wc=pop.querySelector("canvas"),mk=pop.querySelector(".wheelmark"),g=wc.getContext("2d"),drawn=false,down=false;
+    function hsv(h,s,v){var i=Math.floor(h*6),f=h*6-i,p=v*(1-s),q=v*(1-f*s),t=v*(1-(1-f)*s),r,gg,b;
+      switch(i%6){case 0:r=v;gg=t;b=p;break;case 1:r=q;gg=v;b=p;break;case 2:r=p;gg=v;b=t;break;case 3:r=p;gg=q;b=v;break;case 4:r=t;gg=p;b=v;break;default:r=v;gg=p;b=q}
+      return[Math.round(r*255),Math.round(gg*255),Math.round(b*255)]}
+    function draw(){                                        // white in the middle, full colour at the edge
+      var W=wc.width,R=W/2,img=g.createImageData(W,W),d=img.data;
+      for(var y=0;y<W;y++)for(var x=0;x<W;x++){var dx=x-R+.5,dy=y-R+.5,r=Math.sqrt(dx*dx+dy*dy),k=(y*W+x)*4;
+        if(r>R){d[k+3]=0;continue}
+        var c=hsv(((Math.atan2(-dy,dx)/(2*Math.PI))+1)%1,Math.min(1,r/R),1);d[k]=c[0];d[k+1]=c[1];d[k+2]=c[2];d[k+3]=r>R-1?Math.round(255*(R-r)):255}
+      g.putImageData(img,0,0);drawn=true;
+    }
+    function hex(c){return"#"+c.map(function(v){return("0"+v.toString(16)).slice(-2)}).join("")}
+    function pick(e){
+      var b=wc.getBoundingClientRect(),R=b.width/2,dx=e.clientX-b.left-R,dy=e.clientY-b.top-R,r=Math.min(R,Math.sqrt(dx*dx+dy*dy)),a=Math.atan2(-dy,dx);
+      var c=hex(hsv((a/(2*Math.PI)+1)%1,r/R,1));
+      mk.style.left=(R+Math.cos(a)*r)+"px";mk.style.top=(R-Math.sin(a)*r)+"px";
+      sw.setAttribute("data-c",c);sw.style.setProperty("--c",c);color=c;
+      [].forEach.call(document.querySelectorAll(".padsw"),function(o){o.classList.toggle("sel",o===sw)});setOn(true);
+    }
+    function open(v){pop.hidden=!v;sw.setAttribute("aria-expanded",v?"true":"false");if(v&&!drawn)draw()}
+    sw.addEventListener("click",function(e){e.stopPropagation();open(pop.hidden)});
+    wc.addEventListener("pointerdown",function(e){e.preventDefault();down=true;wc.setPointerCapture(e.pointerId);pick(e)});
+    wc.addEventListener("pointermove",function(e){if(down)pick(e)});
+    wc.addEventListener("pointerup",function(){down=false;setTimeout(function(){open(false)},250)});
+    pop.addEventListener("click",function(e){e.stopPropagation()});
+    document.addEventListener("click",function(){if(!pop.hidden)open(false)});
+    addEventListener("keydown",function(e){if(e.key==="Escape"&&!pop.hidden)open(false)});
+  })();
+
 
   function picture(cb){
     var W=1200,H=Math.round(W*cv.height/cv.width),c=document.createElement("canvas");c.width=W;c.height=H;
