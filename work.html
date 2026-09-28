@@ -60,6 +60,21 @@
     .side{position:static;transform:none;max-width:86vw;justify-items:center}
     .songs{font-size:.85em}
   }
+  /* the logo on the record: its place flashes while you hold that shape; the dive */
+  .record .mark .hint{animation:markPulse 1s ease-in-out infinite}
+  @keyframes markPulse{0%,100%{background:#000}50%{background:#b0b0b0}}
+  .record .mark .flash{animation:markFlash .4s ease-out}
+  @keyframes markFlash{from{background:#fff}to{background:#000}}
+  .m.gone{visibility:hidden}
+  html.dive,html.dive body{background:#000;transition:background .9s}
+  html.dive .book,html.dive .lside,html.dive .side,html.dive .logo{opacity:0;transition:opacity .7s;pointer-events:none}
+  html.dive body{overflow:hidden}
+  html.back,html.back body{transition:background 1.2s}
+  html.back .book,html.back .lside,html.back .side,html.back .logo{transition:opacity 1.2s}
+  .tunnel{position:fixed;inset:0;width:100vw;height:100vh;z-index:50;animation:tIn .35s ease-out}
+  @keyframes tIn{from{opacity:0}to{opacity:1}}
+  .ptw{position:fixed;inset:0;z-index:51;display:flex;align-items:center;justify-content:center;color:#fff;font-size:clamp(1.4rem,3vw,2.4rem);opacity:0;transition:opacity 1.6s ease;pointer-events:none}
+  .ptw.on{opacity:1}
   @media (prefers-reduced-motion:reduce){.record .disc{animation-duration:8s}}
 </style>
 </head>
@@ -181,22 +196,101 @@ var SONGS = [
 })();
 </script>
 <script>
-/* the logo: drag any of the three shapes around; a click (without dragging) takes you home */
+/* the logo: drag any of the three shapes around; a click (without dragging) takes you home.
+   Holding a shape makes its place in the little logo in the middle of the record flash (like the holes in the card).
+   Drop all three into place and you fall into the record: a tunnel, faster and faster, then black space ... Poo-tee-weet? */
 (function(){
   var link=document.querySelector(".logolink");if(!link)return;
+  var rec=document.getElementById("record"),marks=[].slice.call(rec.querySelectorAll(".mark i,.mark b")),
+      pieces=[].slice.call(link.querySelectorAll(".m")),filled=0,busy=false,hintTO=null,hintMouse=false;
   link.addEventListener("click",function(e){e.preventDefault()});
-  [].forEach.call(link.querySelectorAll(".m"),function(m){
-    var x=0,y=0,d=null;
-    m.addEventListener("pointerdown",function(e){e.preventDefault();d={px:e.clientX,py:e.clientY,x:x,y:y,moved:false};m.setPointerCapture(e.pointerId);m.classList.add("dragging")});
+  function kind(el){return el.tagName==="B"||el.classList.contains("tri")?"t":"o"}
+  function open(p){return marks.filter(function(t){return kind(t)===kind(p)&&!t.classList.contains("in")})}
+  function hintOn(p,ptype){clearTimeout(hintTO);hintMouse=(ptype==="mouse");hintOff();open(p).forEach(function(t){t.classList.add("hint")})}
+  function hintOff(){marks.forEach(function(t){t.classList.remove("hint")})}
+  function hintRelease(){clearTimeout(hintTO);if(hintMouse){hintOff();return}hintTO=setTimeout(hintOff,3000)}   // mouse: only while held. touch: 3 s more
+  function mid(r){return{x:r.left+r.width/2,y:r.top+r.height/2}}
+  pieces.forEach(function(m){
+    var d=null;m._x=0;m._y=0;
+    function put(extra){m.style.transform="translate("+m._x+"px,"+m._y+"px)"+(extra||"")}
+    m._reset=function(){m._x=0;m._y=0;m.style.transition="";m.style.transform="";m.classList.remove("gone")};
+    m.addEventListener("pointerdown",function(e){e.preventDefault();if(busy||m.classList.contains("gone"))return;d={px:e.clientX,py:e.clientY,x:m._x,y:m._y,moved:false};m.setPointerCapture(e.pointerId);m.classList.add("dragging");hintOn(m,e.pointerType)});
     m.addEventListener("pointermove",function(e){
       if(!d)return;if(!d.moved){if(Math.hypot(e.clientX-d.px,e.clientY-d.py)<5)return;d.moved=true}
-      var ox=x,oy=y;x=d.x+e.clientX-d.px;y=d.y+e.clientY-d.py;m.style.transform="translate("+x+"px,"+y+"px)";
-      var r=m.getBoundingClientRect();if(r.right<12||r.left>innerWidth-12||r.bottom<12||r.top>innerHeight-12){x=ox;y=oy;m.style.transform="translate("+x+"px,"+y+"px)"}
+      var ox=m._x,oy=m._y;m._x=d.x+e.clientX-d.px;m._y=d.y+e.clientY-d.py;put();
+      var r=m.getBoundingClientRect();if(r.right<12||r.left>innerWidth-12||r.bottom<12||r.top>innerHeight-12){m._x=ox;m._y=oy;put()}
     });
-    function up(){var was=d;d=null;m.classList.remove("dragging");if(was&&!was.moved)location.href=link.getAttribute("href")}
-    m.addEventListener("pointerup",up);m.addEventListener("pointercancel",function(){d=null;m.classList.remove("dragging")});
+    function up(){var was=d;d=null;m.classList.remove("dragging");if(!was)return;
+      if(!was.moved){hintOff();location.href=link.getAttribute("href");return}
+      hintRelease();drop(m,put)}
+    m.addEventListener("pointerup",up);m.addEventListener("pointercancel",function(){d=null;m.classList.remove("dragging");hintOff()});
   });
   link.addEventListener("keydown",function(e){if(e.key==="Enter")location.href=link.getAttribute("href")});
+
+  /* dropped close enough to its place on the record: it shrinks into it and becomes part of the record's logo */
+  function drop(m,put){
+    var pr=m.getBoundingClientRect(),pc=mid(pr),best=null,bd=1e9;
+    open(m).forEach(function(t){var c=mid(t.getBoundingClientRect()),dd=Math.hypot(c.x-pc.x,c.y-pc.y);if(dd<bd){bd=dd;best=t}});
+    if(!best)return;var tr=best.getBoundingClientRect(),tc=mid(tr);
+    if(bd>Math.max(tr.width*.9,pr.width*.5,14))return;
+    best.classList.add("in");best.classList.remove("hint");filled++;
+    m._x+=tc.x-pc.x;m._y+=tc.y-pc.y;m.style.transition="transform .22s ease-out";put(" scale("+(tr.width/pr.width)+")");
+    setTimeout(function(){m.classList.add("gone");m.style.transition="";best.classList.add("flash");setTimeout(function(){best.classList.remove("flash")},400)},220);
+    if(filled===marks.length){busy=true;clearTimeout(hintTO);hintOff();setTimeout(dive,700)}
+  }
+
+  /* the dive: the record glides to the middle, the lights go out, and you fall into it */
+  function dive(){
+    var root=document.documentElement,r=rec.getBoundingClientRect(),c=mid(r),R=r.width/2;
+    var dx=innerWidth/2-c.x,dy=innerHeight/2-c.y;
+    root.classList.add("dive");
+    rec.style.transition="transform 1.1s cubic-bezier(.6,0,.3,1)";rec.style.transform="translate("+dx+"px,"+dy+"px)";
+    var cv=document.createElement("canvas"),msg=document.createElement("div");cv.className="tunnel";msg.className="ptw";msg.textContent="Poo-tee-weet?";
+    document.body.appendChild(cv);document.body.appendChild(msg);
+    setTimeout(function(){tunnel(cv,R,function(){             // reached full speed: black space
+      setTimeout(function(){msg.classList.add("on")},1100);
+      setTimeout(function(){msg.classList.remove("on")},4300);
+      setTimeout(reset,6300);
+    })},1300);
+    function reset(){
+      root.classList.add("back");rec.style.transition="none";rec.style.transform="";
+      marks.forEach(function(t){t.classList.remove("in")});pieces.forEach(function(p){p._reset()});filled=0;
+      cv.style.transition="opacity 1.2s";cv.style.opacity="0";
+      setTimeout(function(){root.classList.remove("dive")},30);
+      setTimeout(function(){cv.remove();msg.remove();root.classList.remove("back");rec.style.transition="";busy=false},1300);
+    }
+  }
+
+  /* the tunnel: the grooves of the record become rings flying past you; at the far end, a white circle the size of the record */
+  function tunnel(cv,R,done){
+    var dpr=Math.min(devicePixelRatio||1,2),W=innerWidth,H=innerHeight,x=cv.getContext("2d");
+    cv.width=W*dpr;cv.height=H*dpr;x.scale(dpr,dpr);
+    var cx=W/2,cy=H/2,diag=Math.hypot(W,H)/2+20,K=.02,gap=.006,N=170,D=N*gap,rings=[],t0=null,last=0,L0=R*.135,END=5200;
+    for(var n=0;n<N;n++)rings.push({d:D-n*gap,s:n%3?1:.45});   // every third groove a little dimmer
+    x.fillStyle="#000";x.fillRect(0,0,W,H);
+    function frame(now){
+      if(t0===null){t0=now;last=now}
+      var t=now-t0,dt=Math.min(50,now-last)/1000;last=now;
+      if(t>=END){x.globalAlpha=1;x.fillStyle="#000";x.fillRect(0,0,W,H);done();return}
+      var k=Math.min(1,t/1000),e=k*k*(3-2*k),                     // first second: the label opens up to the size of the record
+          Rw=L0+(R-L0)*e,
+          v=.02*Math.exp(Math.max(0,t-400)/1000*1.05),               // faster and faster
+          fast=Math.min(1,v/1.2),
+          jx=fast>.3?(Math.random()-.5)*fast*6:0,jy=fast>.3?(Math.random()-.5)*fast*6:0;
+      x.globalAlpha=1;x.fillStyle="rgba(0,0,0,"+(1-.72*fast)+")";x.fillRect(0,0,W,H);   // trails when fast
+      rings.forEach(function(g){
+        g.d-=v*dt;while(g.d<=.0004)g.d+=D;
+        var r=Rw*(1+K/g.d);if(r>diag)return;
+        var a=Math.min(1,(r/Rw-1)/.08)*Math.min(1,(1-g.d/D)*4)*.5*g.s*e;
+        if(a<=0)return;
+        x.globalAlpha=a;x.strokeStyle="#fff";x.lineWidth=Math.max(.6,.7*r/Rw);
+        x.beginPath();x.arc(cx+jx*(r/diag),cy+jy*(r/diag),r,0,6.2832);x.stroke();
+      });
+      x.globalAlpha=1;x.fillStyle="#fff";x.beginPath();x.arc(cx,cy,Rw,0,6.2832);x.fill();
+      requestAnimationFrame(frame);
+    }
+    requestAnimationFrame(frame);
+  }
 })();
 </script>
 <script>
