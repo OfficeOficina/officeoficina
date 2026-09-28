@@ -9,10 +9,11 @@
 <meta property="og:description" content="OFFICE COLLABORATIVE is a COLLABORATIVE OFFICE of architecture.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://officeoficina.com">
-<link rel="stylesheet" href="style.css?v=30">
+<link rel="stylesheet" href="style.css?v=31">
 </head>
 <body>
 <main class="stage">
+  <div class="sbar" aria-hidden="true"></div>
   <!-- the words live on the page; every word can be dragged. The card sits on top and covers them. -->
   <div class="under">
     <span class="w l"><span class="lt o" data-p="0">O<svg viewBox="0 0 784 1180" aria-hidden="true"><path d="M744 537Q744 699 648 806Q552 913 392 913Q234 913 137 807.5Q40 702 40 531Q40 360 137 254.5Q234 149 391 149Q551 149 647.5 255Q744 361 744 537Z"/></svg></span>FFICE</span><span class="w r"><span class="lt o" data-p="1">O<svg viewBox="0 0 784 1180" aria-hidden="true"><path d="M744 537Q744 699 648 806Q552 913 392 913Q234 913 137 807.5Q40 702 40 531Q40 360 137 254.5Q234 149 391 149Q551 149 647.5 255Q744 361 744 537Z"/></svg></span>FICIN<span class="lt a" data-p="2">A<svg viewBox="0 0 666 1180" aria-hidden="true"><path d="M-12.8 890L258.2 161L407.8 161L678.8 890Z"/></svg></span></span>
@@ -22,14 +23,66 @@
     <span class="w l">based</span><span class="w r">in</span>
     <span class="w l">Austin TX</span><span class="w r">USA</span>
     <span class="w l">Mexico City</span><span class="w r">CDMX</span>
-    <a class="ic l" href="contact.html" aria-label="contact-form">
-      <svg viewBox="0 0 26 20" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"><rect x="1" y="1" width="24" height="18"/><path d="M1 1l12 10L25 1M1 19l9-9M25 19l-9-9"/></svg>
-    </a>
-    <a class="ic r" href="https://www.instagram.com/officeoficina/" rel="noopener" aria-label="Instagram">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="2" width="20" height="20" rx="6"/><circle cx="12" cy="12" r="4.6"/><circle cx="17.6" cy="6.4" r="1" fill="currentColor" stroke="none"/></svg>
-    </a>
-    <span class="w r nm q" tabindex="0" role="button" aria-label="About us" aria-controls="about">?</span>
+    <span class="icrow">
+      <a class="ic" href="contact.html" aria-label="contact-form">
+        <svg viewBox="0 0 26 20" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"><rect x="1" y="1" width="24" height="18"/><path d="M1 1l12 10L25 1M1 19l9-9M25 19l-9-9"/></svg>
+      </a>
+      <a class="ic" href="https://www.instagram.com/officeoficina/" rel="noopener" aria-label="Instagram">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="2" width="20" height="20" rx="6"/><circle cx="12" cy="12" r="4.6"/><circle cx="17.6" cy="6.4" r="1" fill="currentColor" stroke="none"/></svg>
+      </a>
+      <a class="ic nm qa" href="#about" role="button" aria-label="About us" aria-controls="about">
+        <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="11" stroke="currentColor" stroke-width="1.2"/><text x="12" y="16.6" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="13.5" fill="currentColor">?</text></svg>
+      </a>
+    </span>
+    <span class="w nm ix" tabindex="0" role="button" aria-label="Index" aria-controls="index" aria-expanded="false">index</span>
   </div>
+
+  <!-- index: opened by "index" at the bottom of the text. Four equal columns: text, project, project, text.
+       Replace the placeholder titles below with the real ones (and the # with a link). -->
+  <section class="index" id="index" aria-label="Index">
+    <div class="col l">
+      <h2>Text</h2>
+      <ul>
+        <li><a href="#">Text title 01</a><span>Publication, year</span></li>
+        <li><a href="#">Text title 02</a><span>Publication, year</span></li>
+        <li><a href="#">Text title 03</a><span>Publication, year</span></li>
+        <li><a href="#">Text title 04</a><span>Publication, year</span></li>
+        <li><a href="#">Text title 05</a><span>Publication, year</span></li>
+      </ul>
+    </div>
+    <div class="col l">
+      <h2>Project</h2>
+      <ul>
+        <li><a href="#">Project title 01</a><span>City, year</span></li>
+        <li><a href="#">Project title 02</a><span>City, year</span></li>
+        <li><a href="#">Project title 03</a><span>City, year</span></li>
+        <li><a href="#">Project title 04</a><span>City, year</span></li>
+        <li><a href="#">Project title 05</a><span>City, year</span></li>
+        <li><a href="#">Project title 06</a><span>City, year</span></li>
+      </ul>
+    </div>
+    <div class="col r">
+      <h2>Project</h2>
+      <ul>
+        <li><a href="#">Project title 01</a><span>City, year</span></li>
+        <li><a href="#">Project title 02</a><span>City, year</span></li>
+        <li><a href="#">Project title 03</a><span>City, year</span></li>
+        <li><a href="#">Project title 04</a><span>City, year</span></li>
+        <li><a href="#">Project title 05</a><span>City, year</span></li>
+        <li><a href="#">Project title 06</a><span>City, year</span></li>
+      </ul>
+    </div>
+    <div class="col r">
+      <h2>Text</h2>
+      <ul>
+        <li><a href="#">Text title 01</a><span>Publication, year</span></li>
+        <li><a href="#">Text title 02</a><span>Publication, year</span></li>
+        <li><a href="#">Text title 03</a><span>Publication, year</span></li>
+        <li><a href="#">Text title 04</a><span>Publication, year</span></li>
+        <li><a href="#">Text title 05</a><span>Publication, year</span></li>
+      </ul>
+    </div>
+  </section>
 
   <!-- about: the flip book opens here, in place of the text; the card and the logo stay -->
   <div class="aboutbook" id="about" aria-hidden="true">
@@ -145,12 +198,29 @@
       }
     });
     function up(){ var was=d; d=null; w.classList.remove("dragging"); if(was&&w.classList.contains("m")){ dropCheck(w); hintRelease(); }
-      if(was&&!was.moved&&w.classList.contains("nm")) openAbout(); }   // click the ?: the flip book
+      if(was&&!was.moved&&w.classList.contains("nm")) act(w); }   // click "index": the index
     w.addEventListener("pointerup",up);
     w.addEventListener("pointercancel",up);
   });
 
-  /* ---- the ?: pulses on hover; click or Enter opens About ---- */
+  /* ---- index: the words stay put, a thin scrollbar appears, the four columns wait below ---- */
+  var stageEl=document.querySelector(".stage"),ixEl=document.querySelector(".ix");
+  function setIndex(on){
+    if(on){stageEl.classList.add("indexed");ixEl.setAttribute("aria-expanded","true")}
+    else{
+      ixEl.setAttribute("aria-expanded","false");
+      if(stageEl.scrollTop>0){stageEl.scrollTo({top:0,behavior:"smooth"});setTimeout(function(){stageEl.classList.remove("indexed")},600)}
+      else stageEl.classList.remove("indexed");
+    }
+  }
+  window.setIndex=setIndex;
+  var sbar=document.querySelector(".sbar");                // the thin scrollbar: its length and position follow the page
+  function bar(){var h=stageEl.clientHeight,H=stageEl.scrollHeight,l=Math.max(24,h*h/H);sbar.style.height=l+"px";sbar.style.transform="translateY("+((h-l)*stageEl.scrollTop/Math.max(1,H-h))+"px)"}
+  stageEl.addEventListener("scroll",bar,{passive:true});addEventListener("resize",bar);
+  new MutationObserver(bar).observe(stageEl,{attributes:true,attributeFilter:["class"]});
+  function act(n){if(n.classList.contains("ix"))setIndex(!stageEl.classList.contains("indexed"));else openAbout()}
+
+  /* ---- the ? and "index": pulse on hover; click or Enter opens them ---- */
   Array.prototype.forEach.call(document.querySelectorAll(".nm"),function(n){
     var pair=[n];
     function on(v){Array.prototype.forEach.call(pair,function(p){p.classList.toggle("pulse",v)})}
@@ -158,7 +228,8 @@
     n.addEventListener("pointerleave",function(){on(false)});
     n.addEventListener("focus",function(){on(true)});
     n.addEventListener("blur",function(){on(false)});
-    n.addEventListener("keydown",function(e){if(e.key==="Enter"||e.key===" "){e.preventDefault();openAbout()}});
+    if(n.tagName==="A") n.addEventListener("click",function(e){e.preventDefault();act(n)});
+    else n.addEventListener("keydown",function(e){if(e.key==="Enter"||e.key===" "){e.preventDefault();act(n)}});
   });
 
   /* ---- the logo shapes fit into the card's letters: O into OFFICE's O, O into OFICINA's O, A into OFICINA's A ---- */
@@ -336,8 +407,9 @@ var BACKS = ["#000", "#fff"];
   function step(p,d){turnTo(p,cur[p]+d,d)}
 
   /* open / close: the text fades out, the book fades in, same page (#about) */
-  var under=document.querySelector(".under"),book=document.getElementById("about"),q=document.querySelector(".q");
+  var under=document.querySelector(".under"),book=document.getElementById("about"),q=document.querySelector(".qa");
   function show(on){
+    if(on){var st=document.querySelector(".stage");st.scrollTop=0;st.classList.remove("indexed");document.querySelector(".ix").setAttribute("aria-expanded","false")}
     book.classList.toggle("on",on);under.classList.toggle("away",on);book.setAttribute("aria-hidden",on?"false":"true");
   }
   var pushed=false;
