@@ -9,7 +9,7 @@
 <meta property="og:description" content="OFFICE COLLABORATIVE is a COLLABORATIVE OFFICE of architecture.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://officeoficina.com">
-<link rel="stylesheet" href="style.css?v=53">
+<link rel="stylesheet" href="style.css?v=55">
 </head>
 <body>
 <main class="stage">
@@ -43,6 +43,11 @@
   <section class="index" id="index" aria-label="Index">
     <div class="ixhead" aria-hidden="true"><span>Text</span><span>Building</span><span>Furniture</span><span>Text</span></div>
     <div class="ixcols" id="ixcols"><div class="ixc"></div><div class="ixc"></div><div class="ixc"></div><div class="ixc"></div></div>
+    <!-- one project, opened by clicking its drawings (or title): its text on the left, one image at a time on the right -->
+    <div class="pview" id="pview" aria-live="polite">
+      <div class="pv-text"><b></b><span class="pv-meta"></span><p></p></div>
+      <div class="pv-img"><img alt=""><span class="pv-count"></span></div>
+    </div>
   </section>
   </div>
   <div class="sbar" aria-hidden="true"></div>
@@ -293,12 +298,12 @@
       headEl=panel.querySelector(".ixhead"),colsEl=document.getElementById("ixcols"),cols=[].slice.call(colsEl.children),
       sets=[[],[],[],[]],lastCol=null;
   function esc(t){return String(t==null?"":t).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})}
-  function proj(p){                                        // title, place and year, then the drawings / photos (if any) one under the other
-    var im=(p.images||[]).map(function(src){return '<img src="'+esc(src)+'" alt="'+esc(p.title)+'" loading="lazy">'}).join("");
-    return '<div class="it pj"><a href="'+esc(p.link||"#")+'">'+esc(p.title)+'</a><span>'+esc(p.meta)+'</span>'+(im?'<div class="ims">'+im+'</div>':'')+'</div>'}
-  function txt(p){return '<div class="it tx"><b>'+esc(p.title)+'</b><p>'+esc(p.text)+'</p></div>'}
-  var MAKE=[function(){return BUILDINGS.map(txt).join("")},function(){return BUILDINGS.map(proj).join("")},
-            function(){return FURNITURE.map(proj).join("")},function(){return FURNITURE.map(txt).join("")}];
+  function proj(p,k,kind){                                 // title, place and year, then the drawings / photos (if any) one under the other
+    var im=(p.images||[]).map(function(src,j){return '<img src="'+esc(src)+'" alt="'+esc(p.title)+'" loading="lazy" data-j="'+j+'">'}).join("");
+    return '<div class="it pj" data-kind="'+kind+'" data-k="'+k+'"><a href="'+esc(p.link||"#")+'">'+esc(p.title)+'</a><span>'+esc(p.meta)+'</span>'+(im?'<div class="ims">'+im+'</div>':'')+'</div>'}
+  function txt(p,k,kind){return '<div class="it tx" data-kind="'+kind+'" data-k="'+k+'"><b>'+esc(p.title)+'</b><p>'+esc(p.text)+'</p></div>'}
+  var MAKE=[function(){return BUILDINGS.map(function(p,k){return txt(p,k,"b")}).join("")},function(){return BUILDINGS.map(function(p,k){return proj(p,k,"b")}).join("")},
+            function(){return FURNITURE.map(function(p,k){return proj(p,k,"f")}).join("")},function(){return FURNITURE.map(function(p,k){return txt(p,k,"f")}).join("")}];
   function fill(i){                                        // each column is endless on its own: another run is added before you reach its end
     var c=cols[i],h=c.clientHeight||innerHeight;
     while(sets[i].length<2||(c.scrollHeight-c.scrollTop-h<h*1.5&&sets[i].length<400)){
@@ -325,7 +330,41 @@
     if(lastCol){var i=cols.indexOf(lastCol),sh=sets[i][0]?sets[i][0].offsetHeight:1;f=(lastCol.scrollTop%sh)/sh}
     sbar.style.height=l+"px";sbar.style.transform="translateY("+((h-l)*f)+"px)";
   }
-  cols.forEach(function(c,i){c.addEventListener("scroll",function(){lastCol=c;fill(i);bar()},{passive:true})});
+  /* each text column is linked to its projects column: the building texts (far left) with the buildings, the furniture
+     texts (far right) with the furniture. Scroll either one and the other follows, project by project - while you read
+     a text, its drawings are next to it; at the end of the text the next project comes up on both sides. */
+  var PAIR={0:1,1:0,2:3,3:2};
+  function tops(col){var its=col.querySelectorAll(".it"),t=[];for(var k=0;k<its.length;k++)t.push(its[k].offsetTop);return t}
+  function syncFrom(i){
+    var A=cols[i],B=cols[PAIR[i]],ta=tops(A);if(ta.length<2)return;
+    var st=A.scrollTop,k=0;while(k<ta.length-1&&ta[k+1]<=st)k++;
+    var f=k<ta.length-1?(st-ta[k])/Math.max(1,ta[k+1]-ta[k]):0;
+    var guard=0;while(B.querySelectorAll(".it").length<k+2&&guard++<50){var d=document.createElement("div");d.className="ixset";d.innerHTML=MAKE[PAIR[i]]();B.appendChild(d);sets[PAIR[i]].push(d)}
+    var tb=tops(B),to=tb[k]+f*((tb[k+1]||tb[k])-tb[k]);
+    if(Math.abs(B.scrollTop-to)>1){B._sync=to;B.scrollTop=to}
+  }
+  cols.forEach(function(c,i){c.addEventListener("scroll",function(){
+    lastCol=c;fill(i);bar();
+    if(c._sync!=null&&Math.abs(c.scrollTop-c._sync)<2){c._sync=null;return}   // this scroll came from its partner: don't bounce it back
+    c._sync=null;syncFrom(i);
+  },{passive:true})});
+
+  /* a project on its own: text on the left, the image on the right; click the image for the next one */
+  var pv=document.getElementById("pview"),pvImg=pv.querySelector(".pv-img img"),pvCount=pv.querySelector(".pv-count"),cur=null;
+  function showImg(){var ims=cur.p.images||[];if(!ims.length){pvImg.removeAttribute("src");pvCount.textContent="";pv.classList.add("noimg");return}
+    pv.classList.remove("noimg");pvImg.src=ims[cur.j];pvImg.alt=cur.p.title+", image "+(cur.j+1)+" of "+ims.length;pvCount.textContent=(cur.j+1)+" / "+ims.length}
+  function openProject(kind,k,j){
+    var p=(kind==="b"?BUILDINGS:FURNITURE)[k];if(!p)return;cur={p:p,j:j||0};
+    pv.querySelector(".pv-text b").textContent=p.title;pv.querySelector(".pv-meta").textContent=p.meta||"";pv.querySelector(".pv-text p").textContent=p.text||"";
+    pv.querySelector(".pv-text").scrollTop=0;showImg();stageEl.classList.add("projecting");
+  }
+  function closeProject(){stageEl.classList.remove("projecting");cur=null}
+  pvImg.addEventListener("click",function(){if(!cur)return;var n=(cur.p.images||[]).length;if(n){cur.j=(cur.j+1)%n;showImg()}});
+  colsEl.addEventListener("click",function(e){
+    var it=e.target.closest(".it[data-kind]");if(!it)return;
+    var img=e.target.closest("img[data-j]"),a=e.target.closest("a");
+    if(img||(a&&a.getAttribute("href")==="#")){e.preventDefault();openProject(it.dataset.kind,+it.dataset.k,img?+img.dataset.j:0)}
+  });
   addEventListener("resize",function(){if(stageEl.classList.contains("indexed"))place()});
   function colAt(x){var best=cols[0],bd=1e9;cols.forEach(function(c){var r=c.getBoundingClientRect(),d=x<r.left?r.left-x:x>r.right?x-r.right:0;if(d<bd){bd=d;best=c}});return best}
   stageEl.addEventListener("wheel",function(e){          // anywhere else (over the card, the icons, the margins): scroll the column underneath
@@ -336,13 +375,13 @@
     if(on){if(window.setMail)setMail(false);stageEl.classList.add("indexed");place();ixEl.setAttribute("aria-expanded","true")}
     else{
       ixEl.setAttribute("aria-expanded","false");
-      stageEl.classList.remove("indexed");
+      stageEl.classList.remove("indexed","projecting");cur=null;
       setTimeout(function(){if(stageEl.classList.contains("indexed"))return;cols.forEach(function(c){c.innerHTML="";c.scrollTop=0});sets=[[],[],[],[]];lastCol=null},400);
     }
   }
   window.setIndex=setIndex;
-  addEventListener("keydown",function(e){if(e.key==="Escape"&&stageEl.classList.contains("indexed"))setIndex(false)});
-  function act(n){if(n.classList.contains("ix"))setIndex(!stageEl.classList.contains("indexed"));else openAbout()}
+  addEventListener("keydown",function(e){if(e.key==="Escape"&&stageEl.classList.contains("indexed")){if(stageEl.classList.contains("projecting"))closeProject();else setIndex(false)}});
+  function act(n){if(n.classList.contains("ix")){if(stageEl.classList.contains("projecting"))closeProject();else setIndex(!stageEl.classList.contains("indexed"))}else openAbout()}
 
   /* ---- the ? and "index": pulse on hover; click or Enter opens them ---- */
   Array.prototype.forEach.call(document.querySelectorAll(".nm"),function(n){

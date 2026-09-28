@@ -269,7 +269,7 @@ a:focus-visible,button:focus-visible,input:focus-visible,textarea:focus-visible{
 .card .flipb:focus-visible{outline:1px solid #333;outline-offset:3px}
 /* back of the card: the triangle sitting in the A is a door - hover and it opens a little, click and it swings open */
 .cback .backsvg .adoor{pointer-events:auto;cursor:pointer}
-.cback .backsvg .adoor path{transform-box:fill-box;transform-origin:50% 100%;transition:transform .45s cubic-bezier(.3,.1,.2,1)}
+.cback .backsvg .adoor path{transform-box:fill-box;transform-origin:50% 0;transition:transform .45s cubic-bezier(.3,.1,.2,1)}
 .cback .backsvg .adoor:hover path{transform:scaleY(.72) skewX(-10deg)}
 .cback .backsvg .adoor.open path{transform:scaleY(.06) skewX(-24deg);transition-duration:.6s}
 .cback .backsvg .adoor:focus{outline:none}
@@ -315,3 +315,26 @@ a.logolink .m.dragging{cursor:grabbing}
 .index .ixhead{padding-top:.2em}
 @media (max-width:700px){.index .ixhead{padding-top:.2em}}
 .aboutbook button:hover{text-decoration:underline;text-underline-offset:.15em}
+
+/* index: items know their column position (for the linked scrolling) */
+.ixc{position:relative}
+.index .pj img{cursor:pointer}
+/* one project open: text on the OFFICE side, the image on the OFICINA side */
+.pview{display:none;position:absolute;top:0;bottom:0;left:var(--x0);width:calc(var(--w)*4 + var(--g));
+  grid-template-columns:calc(var(--w)*2) var(--g) calc(var(--w)*2)}
+.stage.projecting .pview{display:grid}
+.stage.projecting .ixhead,.stage.projecting .ixcols{visibility:hidden}
+.pv-text{grid-column:1;overflow-y:auto;scrollbar-width:none;padding-right:1.5em;color:#555}
+.pv-text::-webkit-scrollbar{display:none}
+.pv-text b{display:block;font-weight:400;color:#000}
+.pv-meta{display:block;color:#888;margin-bottom:1.2em}
+.pv-text p{margin:0 0 2em;line-height:1.35}
+.pv-img{grid-column:3;min-height:0;display:flex;flex-direction:column;align-items:flex-start;gap:.6em}
+.pv-img img{display:block;max-width:100%;max-height:calc(100% - 2em);object-fit:contain;mix-blend-mode:multiply;cursor:pointer}
+.pv-count{color:#888}
+.pview.noimg .pv-img{display:none}
+@media (max-width:700px){
+  .pview{left:4vw;width:92vw;grid-template-columns:1fr;grid-template-rows:auto 1fr;gap:1em}
+  .pv-img{grid-column:1;grid-row:1;max-height:45%}
+  .pv-text{grid-column:1;grid-row:2;padding-right:0}
+}
