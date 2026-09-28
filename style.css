@@ -1,5 +1,6 @@
 @font-face{font-family:"FreeSans Web";src:url(freesans.woff) format("woff");font-weight:400;font-style:normal;font-display:swap}
-html{cursor:url(cursor.png) 11 11,default;cursor:-webkit-image-set(url(cursor.png) 1x,url(cursor@2x.png) 2x) 11 11,default}
+html{cursor:default}
+a,button,[role=button],select,input[type=range]{cursor:pointer}   /* the arrow everywhere; a hand wherever you can click or move something */
 :root{--bg:#fafafa;--fg:#000;--H:min(90vh,940px,140vw);--h:calc(var(--H)*.72)}   /* --H sets the type, --h the card (smaller than before, relative to the type) */
 *{box-sizing:border-box}
 html,body{margin:0;height:100%}
@@ -18,25 +19,25 @@ a:focus-visible,button:focus-visible,input:focus-visible,textarea:focus-visible{
 .under{isolation:isolate;position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:max-content;max-width:100vw;align-content:start;
   display:grid;grid-template-columns:auto auto;column-gap:.38em;
   font-size:calc(var(--H)*.035);line-height:1.18;letter-spacing:.035em;color:#333;-webkit-text-stroke:.1px currentColor}
-.w{display:block;cursor:url(cursor-move.png) 11 11,grab;cursor:-webkit-image-set(url(cursor-move.png) 1x,url(cursor-move@2x.png) 2x) 11 11,grab;touch-action:none;user-select:none;-webkit-user-select:none;position:relative;white-space:nowrap}
+.w{display:block;cursor:grab;touch-action:none;user-select:none;-webkit-user-select:none;position:relative;white-space:nowrap}
 .w.l{justify-self:end;text-align:right}
 .w.r{justify-self:start}
-.w.dragging{cursor:url(cursor-move.png) 11 11,grabbing;cursor:-webkit-image-set(url(cursor-move.png) 1x,url(cursor-move@2x.png) 2x) 11 11,grabbing}
-.ic{display:block;margin:2.5em 0;color:#333;-webkit-text-stroke:0;align-self:center;cursor:url(cursor-move.png) 11 11,pointer;cursor:-webkit-image-set(url(cursor-move.png) 1x,url(cursor-move@2x.png) 2x) 11 11,pointer}
+.w.dragging{cursor:grabbing}
+.ic{display:block;margin:2.5em 0;color:#333;-webkit-text-stroke:0;align-self:center;cursor:pointer}
 .ic.l{justify-self:end;margin-right:.03em;width:1.12em;height:.8em}
 .ic.r{justify-self:start;margin-left:.03em;width:1.05em;height:1em}
 .ic svg{width:100%;height:100%;display:block}
 .card{position:relative;z-index:2;will-change:transform;height:var(--h);aspect-ratio:525/920;touch-action:none;user-select:none;-webkit-user-select:none;
-  cursor:url(cursor-move.png) 11 11,grab;cursor:-webkit-image-set(url(cursor-move.png) 1x,url(cursor-move@2x.png) 2x) 11 11,grab}
-.card.dragging{cursor:url(cursor-move.png) 11 11,grabbing;cursor:-webkit-image-set(url(cursor-move.png) 1x,url(cursor-move@2x.png) 2x) 11 11,grabbing}
+  cursor:grab}
+.card.dragging{cursor:grabbing}
 .card svg{width:100%;height:100%;overflow:visible;display:block;pointer-events:none}
 .card:focus,.card:focus-visible{outline:none}
 
 /* logo: three movable shapes, sitting above the card */
 .logo{position:fixed;z-index:3;left:calc(var(--H)*.038);top:calc(var(--H)*.015);display:flex;flex-direction:column;align-items:flex-end;
   --d:calc(var(--h)*.0595)}   /* = the height of an O cut into the card, so the shapes are exactly the size of the holes */
-.m{display:block;position:relative;cursor:url(cursor-move.png) 11 11,grab;cursor:-webkit-image-set(url(cursor-move.png) 1x,url(cursor-move@2x.png) 2x) 11 11,grab;touch-action:none;user-select:none;-webkit-user-select:none}
-.m.dragging{cursor:url(cursor-move.png) 11 11,grabbing;cursor:-webkit-image-set(url(cursor-move.png) 1x,url(cursor-move@2x.png) 2x) 11 11,grabbing}
+.m{display:block;position:relative;cursor:grab;touch-action:none;user-select:none;-webkit-user-select:none}
+.m.dragging{cursor:grabbing}
 .dot{width:calc(var(--d)*1.089);height:var(--d);background:#000;border-radius:50%}
 .dot+.dot{margin-top:calc(var(--d)*.094)}
 .tri{width:calc(var(--d)*1.038);height:calc(var(--d)*.986);margin-top:calc(var(--d)*.12);color:#000}
@@ -55,7 +56,7 @@ a:focus-visible,button:focus-visible,input:focus-visible,textarea:focus-visible{
 @supports (height:1dvh){@media (max-width:700px){:root{--H:min(94vw,72dvh)}}}
 
 .contact h1{font-weight:400;font-size:inherit;margin:2rem 0 0}
-.home{cursor:url(cursor-move.png) 11 11,pointer;cursor:-webkit-image-set(url(cursor-move.png) 1x,url(cursor-move@2x.png) 2x) 11 11,pointer}
+.home{cursor:pointer}
 
 /* logo shapes fitted into the card */
 .card .plugs{position:absolute;left:0;top:0}
@@ -113,7 +114,7 @@ a:focus-visible,button:focus-visible,input:focus-visible,textarea:focus-visible{
 /* rotate handle: tiny arrow in the card's top-left corner, only once the card is unlocked */
 .card .rot{position:absolute;left:7px;top:7px;width:26px;height:26px;margin:0;padding:0;border:0;background:none;color:#333;display:grid;place-items:center;
   opacity:0;pointer-events:none;transition:opacity .4s ease .6s;touch-action:none;-webkit-tap-highlight-color:transparent;
-  cursor:url(cursor-move.png) 11 11,grab;cursor:-webkit-image-set(url(cursor-move.png) 1x,url(cursor-move@2x.png) 2x) 11 11,grab}
+  cursor:grab}
 .card .rot svg{width:14px;height:14px;display:block;pointer-events:none}
 .card.open .rot{opacity:1;pointer-events:auto}
 .card .rot:focus-visible{outline:1px solid #333;outline-offset:1px}
@@ -135,7 +136,7 @@ a:focus-visible,button:focus-visible,input:focus-visible,textarea:focus-visible{
 .aboutbook .spread{position:relative;display:grid;grid-template-columns:var(--p) var(--p);grid-template-rows:repeat(3,calc(var(--p)*2.5/3 - 2px));
   gap:1px;background:#000}
 .aboutbook .cell{position:relative;background:#fff;
-  cursor:url(cursor-move.png) 11 11,pointer;cursor:-webkit-image-set(url(cursor-move.png) 1x,url(cursor-move@2x.png) 2x) 11 11,pointer}
+  cursor:pointer}
 .aboutbook .cell.rp{perspective:2200px;perspective-origin:calc(var(--sp)/-2) 50%;z-index:2}
 .aboutbook .cell.rp:has(.leaf){z-index:4}
 .aboutbook .cell:focus-visible{outline:1px solid #000;outline-offset:2px}
@@ -153,7 +154,7 @@ a:focus-visible,button:focus-visible,input:focus-visible,textarea:focus-visible{
 @media (prefers-reduced-motion:reduce){.aboutbook .leaf.fwd,.aboutbook .leaf.rev{animation-duration:1ms}}
 .aboutbook .bookctl{display:flex;justify-content:center;align-items:center;gap:1rem}
 .aboutbook button{font:inherit;background:var(--fg);color:var(--bg);border:0;padding:.6rem 1.2rem;
-  cursor:url(cursor-move.png) 11 11,pointer;cursor:-webkit-image-set(url(cursor-move.png) 1x,url(cursor-move@2x.png) 2x) 11 11,pointer}
+  cursor:pointer}
 .aboutbook.on{opacity:1;visibility:visible;transition:opacity .45s ease .15s,visibility 0s}
 .aboutbook button.x{background:none;color:var(--fg);font-size:1.4em;line-height:1;padding:.2rem .4rem}
 .under{transition:opacity .35s ease}
@@ -213,7 +214,7 @@ a:focus-visible,button:focus-visible,input:focus-visible,textarea:focus-visible{
 /* the very thin scrollbar at the right edge of the screen */
 .sbar{position:fixed;right:3px;top:0;width:2px;background:#000;z-index:4;pointer-events:none;opacity:0;transition:opacity .3s}
 .stage.indexed .sbar{opacity:1}
-.index a{cursor:url(cursor-move.png) 11 11,pointer;cursor:-webkit-image-set(url(cursor-move.png) 1x,url(cursor-move@2x.png) 2x) 11 11,pointer}
+.index a{cursor:pointer}
 
 @media (max-width:700px){.aboutbook{font-size:17px}}
 @media (max-width:700px){.index .tx{font-size:.72em;line-height:1.3}.ixc:nth-child(1) .tx{padding-right:.8em}.ixc:nth-child(4) .tx{padding-left:.8em}}
@@ -221,7 +222,7 @@ a:focus-visible,button:focus-visible,input:focus-visible,textarea:focus-visible{
 /* the slit, top centre: a thin black slot exactly as wide as the card; the card slides up into it */
 .slit{position:fixed;z-index:3;top:calc(var(--H)*.015 + 4px);left:50%;transform:translateX(-50%);width:calc(var(--h)*525/920 + 6px);height:6px;
   padding:0;border:0;border-radius:3px;background:#000;
-  cursor:url(cursor-move.png) 11 11,pointer;cursor:-webkit-image-set(url(cursor-move.png) 1x,url(cursor-move@2x.png) 2x) 11 11,pointer}
+  cursor:pointer}
 .slit::after{content:"";position:absolute;inset:-14px -10px}
 .slit:focus-visible{outline:1px solid #000;outline-offset:4px}
 .ixhead{padding-top:calc(var(--H)*.015 + 22px)}                 /* the index title line sits just under the slit */
@@ -262,21 +263,26 @@ a:focus-visible,button:focus-visible,input:focus-visible,textarea:focus-visible{
 .cback .backsvg{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
 .card .flipb{position:absolute;right:7px;top:7px;width:26px;height:26px;margin:0;padding:0;border:0;background:none;color:#333;display:grid;place-items:center;
   opacity:0;pointer-events:none;transition:opacity .4s ease .6s;-webkit-tap-highlight-color:transparent;
-  cursor:url(cursor-move.png) 11 11,pointer;cursor:-webkit-image-set(url(cursor-move.png) 1x,url(cursor-move@2x.png) 2x) 11 11,pointer}
+  cursor:pointer}
 .card .flipb svg{width:15px;height:15px;display:block;pointer-events:none}
 .card.open .flipb{opacity:1;pointer-events:auto}
 .card .flipb:focus-visible,.card .enter:focus-visible{outline:1px solid #333;outline-offset:3px}
 /* ENTER, under the letters on the back */
 .card .enter{position:absolute;left:50%;bottom:8.5%;transform:translateX(-50%);font-family:Helvetica,Arial,sans-serif;font-weight:700;
   font-size:calc(var(--h)*.036);letter-spacing:.06em;color:#000;text-decoration:none;line-height:1;
-  cursor:url(cursor-move.png) 11 11,pointer;cursor:-webkit-image-set(url(cursor-move.png) 1x,url(cursor-move@2x.png) 2x) 11 11,pointer}
+  cursor:pointer}
 .card .enter:hover{text-decoration:none;opacity:.6}
 
-/* drawing pad: the colour-wheel dot and its wheel */
+/* drawing pad: one colour dot; it opens the colour wheel and a dark-to-light strip */
 .wheelwrap{position:relative;display:inline-flex}
-.wheelpop{position:absolute;right:-4px;top:calc(100% + 10px);z-index:20;width:160px;height:160px;border-radius:50%;
-  box-shadow:0 6px 24px rgba(0,0,0,.18);background:#fff}
+.contact button.wheelsw{width:22px;height:22px}
+.wheelpop{position:absolute;right:-6px;top:calc(100% + 10px);z-index:20;width:170px;padding:10px;box-sizing:border-box;border-radius:12px;background:#fff;
+  box-shadow:0 6px 24px rgba(0,0,0,.18);display:grid;gap:10px}
 .wheelpop[hidden]{display:none}
-.wheelpop canvas{display:block;width:100%;height:100%;border-radius:50%;touch-action:none;
-  cursor:url(cursor-move.png) 11 11,crosshair;cursor:-webkit-image-set(url(cursor-move.png) 1x,url(cursor-move@2x.png) 2x) 11 11,crosshair}
-.wheelmark{position:absolute;left:50%;top:50%;width:12px;height:12px;margin:-6px 0 0 -6px;border:2px solid #000;border-radius:50%;pointer-events:none;box-sizing:border-box}
+.wheelarea{position:relative;display:block;width:150px;height:150px}
+.wheelpop canvas{display:block;width:100%;height:100%;border-radius:50%;touch-action:none;cursor:pointer}
+.wheelmark{position:absolute;left:50%;top:50%;width:12px;height:12px;margin:-6px 0 0 -6px;border:2px solid #000;border-radius:50%;pointer-events:none;box-sizing:border-box;box-shadow:0 0 0 1px #fff}
+.contact input.wheelv,.wheelv{-webkit-appearance:none;appearance:none;display:block;width:100%;height:12px;margin:0;padding:0;border:0;border-radius:6px;background:linear-gradient(90deg,#000,var(--full,#fff));box-shadow:inset 0 0 0 1px rgba(0,0,0,.15);cursor:pointer}
+.wheelv::-webkit-slider-runnable-track{height:12px;background:transparent}
+.wheelv::-webkit-slider-thumb{-webkit-appearance:none;margin-top:-1px;width:14px;height:14px;border-radius:50%;background:#fff;border:2px solid #000}
+.wheelv::-moz-range-thumb{width:12px;height:12px;border-radius:50%;background:#fff;border:2px solid #000}

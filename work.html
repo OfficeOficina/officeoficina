@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Listen — Office Oficina</title>
-<link rel="stylesheet" href="style.css?v=44">
+<link rel="stylesheet" href="style.css?v=45">
 <style>
   /* a record spinning in the middle of the page; the songs listed to its right */
   html,body{height:100%;overflow:hidden}
@@ -13,7 +13,7 @@
   .record{position:absolute;left:50%;top:50%;width:min(62vw,62vh,520px);aspect-ratio:1;transform:translate(-50%,-50%);border-radius:50%;border:0;padding:0;
     background:radial-gradient(circle,#fff 0 13.5%,#111 13.6% 14.2%,transparent 14.3%),repeating-radial-gradient(circle,#0b0b0b 0 2px,#1d1d1d 2.5px 3px),#111;
     box-shadow:0 10px 30px rgba(0,0,0,.18);
-    cursor:url(cursor-move.png) 11 11,pointer;cursor:-webkit-image-set(url(cursor-move.png) 1x,url(cursor-move@2x.png) 2x) 11 11,pointer}
+    cursor:pointer}
   .record .disc{position:absolute;inset:0;border-radius:50%;animation:spin 1.8s linear infinite;animation-play-state:paused}
   .record .disc::before{content:"";position:absolute;inset:0;border-radius:50%;background:conic-gradient(from 20deg,transparent 0 10%,rgba(255,255,255,.06) 14%,transparent 18% 60%,rgba(255,255,255,.05) 64%,transparent 68%)}
   .record .disc::after{content:"";position:absolute;left:50%;top:50%;width:2.4%;height:2.4%;margin:-1.2% 0 0 -1.2%;border-radius:50%;background:#000}
@@ -26,7 +26,7 @@
   .songs{position:absolute;top:50%;left:calc(50% + min(31vw,31vh,260px) + clamp(1.5rem,4vw,4rem));transform:translateY(-50%);
     list-style:none;margin:0;padding:0;display:grid;gap:.55em;font-size:.9em;max-width:calc(50vw - min(31vw,31vh,260px) - 5rem)}
   .songs button{font:inherit;color:#999;background:none;border:0;padding:0;text-align:left;display:flex;gap:.8em;
-    cursor:url(cursor-move.png) 11 11,pointer;cursor:-webkit-image-set(url(cursor-move.png) 1x,url(cursor-move@2x.png) 2x) 11 11,pointer}
+    cursor:pointer}
   .songs button:hover{color:#555}
   .songs .on button{color:#000}
   .songs .n{font-variant-numeric:tabular-nums;min-width:1.4em}

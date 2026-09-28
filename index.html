@@ -9,7 +9,7 @@
 <meta property="og:description" content="OFFICE COLLABORATIVE is a COLLABORATIVE OFFICE of architecture.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://officeoficina.com">
-<link rel="stylesheet" href="style.css?v=44">
+<link rel="stylesheet" href="style.css?v=45">
 </head>
 <body>
 <main class="stage">
@@ -79,11 +79,7 @@
           </button>
         </div>
         <div class="padcolors" role="group" aria-label="Colours">
-          <button class="padsw sel" type="button" data-c="#000000" style="--c:#000000" aria-label="Black"></button>
-          <button class="padsw" type="button" data-c="#ee2a1e" style="--c:#ee2a1e" aria-label="Red"></button>
-          <button class="padsw" type="button" data-c="#2447ff" style="--c:#2447ff" aria-label="Blue"></button>
-          <button class="padsw" type="button" data-c="#ffd400" style="--c:#ffd400" aria-label="Yellow"></button>
-          <span class="wheelwrap"><button class="padsw wheelsw" type="button" data-c="#000000" style="--c:#000000" aria-label="Any colour: open the colour wheel" aria-expanded="false"></button><span class="wheelpop" hidden><canvas width="320" height="320" aria-label="Colour wheel: click or drag to pick a colour"></canvas><i class="wheelmark"></i></span></span>
+          <span class="wheelwrap"><button class="padsw wheelsw sel" type="button" data-c="#000000" style="--c:#000000" aria-label="Colour: open the colour wheel" aria-expanded="false"></button><span class="wheelpop" hidden><span class="wheelarea"><canvas width="320" height="320" aria-label="Colour wheel: click or drag to pick a colour"></canvas><i class="wheelmark"></i></span><input class="wheelv" type="range" min="0" max="100" value="0" aria-label="Light to dark"></span></span>
         </div>
         <div class="padsize"><input id="padSize" type="range" min="1" max="24" value="3" aria-label="Thickness"></div>
       </div>
@@ -686,13 +682,15 @@ var BACKS = ["#000", "#fff"];
     });
   });
   sizeEl.addEventListener("input",function(){size=+sizeEl.value;setOn(true)});
-  /* ---- the colour wheel: the last dot opens it; click or drag on the wheel to pick any colour ---- */
+  /* ---- colour: one dot; click it for the colour wheel (any colour), the strip under the wheel goes from dark to light ---- */
   (function(){
     var sw=document.querySelector(".wheelsw");if(!sw)return;
-    var pop=sw.parentNode.querySelector(".wheelpop"),wc=pop.querySelector("canvas"),mk=pop.querySelector(".wheelmark"),g=wc.getContext("2d"),drawn=false,down=false;
+    var pop=sw.parentNode.querySelector(".wheelpop"),wc=pop.querySelector("canvas"),mk=pop.querySelector(".wheelmark"),vs=pop.querySelector(".wheelv"),
+        g=wc.getContext("2d"),drawn=false,down=false,H=0,S=0,V=0;          // starts black
     function hsv(h,s,v){var i=Math.floor(h*6),f=h*6-i,p=v*(1-s),q=v*(1-f*s),t=v*(1-(1-f)*s),r,gg,b;
       switch(i%6){case 0:r=v;gg=t;b=p;break;case 1:r=q;gg=v;b=p;break;case 2:r=p;gg=v;b=t;break;case 3:r=p;gg=q;b=v;break;case 4:r=t;gg=p;b=v;break;default:r=v;gg=p;b=q}
       return[Math.round(r*255),Math.round(gg*255),Math.round(b*255)]}
+    function hex(c){return"#"+c.map(function(v){return("0"+v.toString(16)).slice(-2)}).join("")}
     function draw(){                                        // white in the middle, full colour at the edge
       var W=wc.width,R=W/2,img=g.createImageData(W,W),d=img.data;
       for(var y=0;y<W;y++)for(var x=0;x<W;x++){var dx=x-R+.5,dy=y-R+.5,r=Math.sqrt(dx*dx+dy*dy),k=(y*W+x)*4;
@@ -700,22 +698,25 @@ var BACKS = ["#000", "#fff"];
         var c=hsv(((Math.atan2(-dy,dx)/(2*Math.PI))+1)%1,Math.min(1,r/R),1);d[k]=c[0];d[k+1]=c[1];d[k+2]=c[2];d[k+3]=r>R-1?Math.round(255*(R-r)):255}
       g.putImageData(img,0,0);drawn=true;
     }
-    function hex(c){return"#"+c.map(function(v){return("0"+v.toString(16)).slice(-2)}).join("")}
+    function apply(){
+      var c=hex(hsv(H,S,V));sw.setAttribute("data-c",c);sw.style.setProperty("--c",c);color=c;
+      vs.style.setProperty("--full",hex(hsv(H,S,1)));setOn(true);
+    }
     function pick(e){
       var b=wc.getBoundingClientRect(),R=b.width/2,dx=e.clientX-b.left-R,dy=e.clientY-b.top-R,r=Math.min(R,Math.sqrt(dx*dx+dy*dy)),a=Math.atan2(-dy,dx);
-      var c=hex(hsv((a/(2*Math.PI)+1)%1,r/R,1));
-      mk.style.left=(R+Math.cos(a)*r)+"px";mk.style.top=(R-Math.sin(a)*r)+"px";
-      sw.setAttribute("data-c",c);sw.style.setProperty("--c",c);color=c;
-      [].forEach.call(document.querySelectorAll(".padsw"),function(o){o.classList.toggle("sel",o===sw)});setOn(true);
+      H=(a/(2*Math.PI)+1)%1;S=r/R;if(V<.05){V=1;vs.value=100}
+      mk.style.left=(R+Math.cos(a)*r)+"px";mk.style.top=(R-Math.sin(a)*r)+"px";apply();
     }
     function open(v){pop.hidden=!v;sw.setAttribute("aria-expanded",v?"true":"false");if(v&&!drawn)draw()}
     sw.addEventListener("click",function(e){e.stopPropagation();open(pop.hidden)});
     wc.addEventListener("pointerdown",function(e){e.preventDefault();down=true;wc.setPointerCapture(e.pointerId);pick(e)});
     wc.addEventListener("pointermove",function(e){if(down)pick(e)});
-    wc.addEventListener("pointerup",function(){down=false;setTimeout(function(){open(false)},250)});
+    wc.addEventListener("pointerup",function(){down=false});
+    vs.addEventListener("input",function(){V=+vs.value/100;apply()});
     pop.addEventListener("click",function(e){e.stopPropagation()});
     document.addEventListener("click",function(){if(!pop.hidden)open(false)});
     addEventListener("keydown",function(e){if(e.key==="Escape"&&!pop.hidden)open(false)});
+    vs.style.setProperty("--full","#ffffff");
   })();
 
 
