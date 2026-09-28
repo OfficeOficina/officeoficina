@@ -266,12 +266,15 @@ a:focus-visible,button:focus-visible,input:focus-visible,textarea:focus-visible{
   cursor:pointer}
 .card .flipb svg{width:15px;height:15px;display:block;pointer-events:none}
 .card.open .flipb{opacity:1;pointer-events:auto}
-.card .flipb:focus-visible,.card .enter:focus-visible{outline:1px solid #333;outline-offset:3px}
-/* ENTER, under the letters on the back */
-.card .enter{position:absolute;left:50%;bottom:8.5%;transform:translateX(-50%);font-family:Helvetica,Arial,sans-serif;font-weight:700;
-  font-size:calc(var(--h)*.036);letter-spacing:.06em;color:#000;text-decoration:none;line-height:1;
-  cursor:pointer}
-.card .enter:hover{text-decoration:none;opacity:.6}
+.card .flipb:focus-visible{outline:1px solid #333;outline-offset:3px}
+/* the little door under the letters on the back: click it and it swings open */
+.card .door{position:absolute;left:50%;bottom:7%;transform:translateX(-50%);width:calc(var(--h)*.042);height:calc(var(--h)*.072);
+  box-sizing:border-box;border:1.5px solid #000;border-bottom-width:2.5px;background:#000;perspective:120px;z-index:2;cursor:pointer}
+.card .door .leaf{position:absolute;inset:0;background:#fff;transform-origin:0 50%;transition:transform .6s cubic-bezier(.3,.1,.2,1);outline:1px solid #000;outline-offset:-1px}
+.card .door .leaf i{position:absolute;right:16%;top:52%;width:14%;aspect-ratio:1;border-radius:50%;background:#000}
+.card .door:hover .leaf{transform:rotateY(-22deg)}
+.card .door.open .leaf{transform:rotateY(-105deg)}
+.card .door:focus-visible{outline:1px solid #333;outline-offset:3px}
 
 /* drawing pad: one colour dot; it opens the colour wheel and a dark-to-light strip */
 .wheelwrap{position:relative;display:inline-flex}
@@ -288,21 +291,21 @@ a:focus-visible,button:focus-visible,input:focus-visible,textarea:focus-visible{
 .wheelv::-moz-range-thumb{width:12px;height:12px;border-radius:50%;background:#fff;border:2px solid #000}
 
 /* on the other pages the logo is simply the way home */
-a.logolink{text-decoration:none;cursor:pointer}
-a.logolink .m{cursor:pointer}
+a.logolink{text-decoration:none;cursor:default}
+a.logolink .m{cursor:grab}
+a.logolink .m.dragging{cursor:grabbing}
 
 /* the rotate and flip buttons: one pair that always sits on the side facing you (rotate top left, flip top right) */
 .card>.rot,.card>.flipb{z-index:3;transform:translateZ(1px)}
 .card.flipped>.rot{left:auto;right:7px;transform:translateZ(-1px) rotateY(180deg)}
 .card.flipped>.flipb{right:auto;left:7px;transform:translateZ(-1px) rotateY(180deg)}
 .card.flipping>.rot,.card.flipping>.flipb{opacity:0!important;transition:none}
-.card .enter{z-index:2}
 
 /* rotate and flip: a little bigger and darker so it is clear they can be used */
-.card .rot,.card .flipb{width:max(28px,calc(var(--h)*.05));height:max(28px,calc(var(--h)*.05));color:#000;top:8px}
-.card .rot{left:8px}.card .flipb{right:8px}
-.card.flipped>.rot{left:auto;right:8px}.card.flipped>.flipb{right:auto;left:8px}
-.card .rot svg,.card .flipb svg{width:60%;height:60%}
+.card .rot,.card .flipb{width:max(20px,calc(var(--h)*.036));height:max(20px,calc(var(--h)*.036));color:#000;top:7px}
+.card .rot{left:7px}.card .flipb{right:7px}
+.card.flipped>.rot{left:auto;right:7px}.card.flipped>.flipb{right:auto;left:7px}
+.card .rot svg,.card .flipb svg{width:62%;height:62%}
 
 /* the colour wheel can be dragged anywhere by its border or the bar on top */
 .wheelpop{cursor:grab;touch-action:none}

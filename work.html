@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Listen — Office Oficina</title>
-<link rel="stylesheet" href="style.css?v=49">
+<link rel="stylesheet" href="style.css?v=50">
 <style>
   /* a record spinning in the middle of the page; the songs listed to its right */
   html,body{height:100%;overflow:hidden}
@@ -155,6 +155,25 @@ var SONGS = [
 
   if(list[0].spotify){mark();spPlay(list[0].spotify)}   // Spotify may wait for a first click (on the record or its bar) before it plays
   else start();   // you came in through ENTER: the record is already turning
+})();
+</script>
+<script>
+/* the logo: drag any of the three shapes around; a click (without dragging) takes you home */
+(function(){
+  var link=document.querySelector(".logolink");if(!link)return;
+  link.addEventListener("click",function(e){e.preventDefault()});
+  [].forEach.call(link.querySelectorAll(".m"),function(m){
+    var x=0,y=0,d=null;
+    m.addEventListener("pointerdown",function(e){e.preventDefault();d={px:e.clientX,py:e.clientY,x:x,y:y,moved:false};m.setPointerCapture(e.pointerId);m.classList.add("dragging")});
+    m.addEventListener("pointermove",function(e){
+      if(!d)return;if(!d.moved){if(Math.hypot(e.clientX-d.px,e.clientY-d.py)<5)return;d.moved=true}
+      var ox=x,oy=y;x=d.x+e.clientX-d.px;y=d.y+e.clientY-d.py;m.style.transform="translate("+x+"px,"+y+"px)";
+      var r=m.getBoundingClientRect();if(r.right<12||r.left>innerWidth-12||r.bottom<12||r.top>innerHeight-12){x=ox;y=oy;m.style.transform="translate("+x+"px,"+y+"px)"}
+    });
+    function up(){var was=d;d=null;m.classList.remove("dragging");if(was&&!was.moved)location.href=link.getAttribute("href")}
+    m.addEventListener("pointerup",up);m.addEventListener("pointercancel",function(){d=null;m.classList.remove("dragging")});
+  });
+  link.addEventListener("keydown",function(e){if(e.key==="Enter")location.href=link.getAttribute("href")});
 })();
 </script>
 </body>
