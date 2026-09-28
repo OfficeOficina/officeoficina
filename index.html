@@ -9,7 +9,7 @@
 <meta property="og:description" content="OFFICE COLLABORATIVE is a COLLABORATIVE OFFICE of architecture.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://officeoficina.com">
-<link rel="stylesheet" href="style.css?v=37">
+<link rel="stylesheet" href="style.css?v=38">
 </head>
 <body>
 <main class="stage">
@@ -543,26 +543,42 @@ var BACKS = ["#000", "#fff"];
 })();
 </script>
 <script>
-/* ---- write to us: the words give way; the form sits in the left column, the drawing pad in the right ---- */
+/* ---- write to us: the words, icons and "index" give way to two squares - the message on the OFFICE side,
+        the drawing on the OFICINA side (on phones: one above the other). Click the empty page or press Escape to go back. ---- */
 (function(){
   var stage=document.querySelector(".stage"),box=document.getElementById("mailbox"),ic=document.querySelector(".mailic"),
       under=document.querySelector(".under"),L=box.querySelector(".mailL"),R=box.querySelector(".mailR");
   function place(){
-    var u=under.getBoundingClientRect(),cs=getComputedStyle(under),c1=parseFloat(cs.gridTemplateColumns),gap=parseFloat(cs.columnGap)||0,
-        xL=u.left+c1,xR=xL+gap,m=Math.max(12,innerWidth*.03),W=Math.min(xL-m,innerWidth-xR-m,Math.max(260,innerWidth*.26));
-    L.style.left=(xL-W)+"px";L.style.width=W+"px";R.style.left=xR+"px";R.style.width=W+"px";
-    dispatchEvent(new Event("mailboxresize"));             // the pad takes the same height as the message fields
-    var ic=document.querySelector(".icrow").getBoundingClientRect(),fs=parseFloat(getComputedStyle(box).fontSize),
-        h=Math.max(L.offsetHeight,R.offsetHeight),top=Math.min(u.top,ic.top-h-fs*1.6);   // starts where the words start, moved up only if it would reach the icons
-    if(innerWidth<=700)top=document.querySelector(".ix").getBoundingClientRect().bottom+fs*.8;   // phones: no room above, so it sits below "index"
-    L.style.top=R.style.top=Math.max(8,top)+"px";
+    var vw=innerWidth,vh=innerHeight,S;
+    if(vw<=700){                                           // phones: stacked, centred, as big as fits
+      S=Math.round(Math.min(vw*.86,(vh-250)/2,420));
+      for(var k=0;k<2;k++){                                 // size once, measure, and shrink if both squares don't fit on screen
+        L.style.width=R.style.width=S+"px";L.style.left=R.style.left=((vw-S)/2)+"px";
+        dispatchEvent(new Event("mailboxresize"));
+        var over=L.offsetHeight+R.offsetHeight+18-(vh-84);if(over<=0)break;S=Math.max(140,Math.round(S-over/2));
+      }
+      var top=Math.max(64,(vh-(L.offsetHeight+R.offsetHeight+18))/2);
+      L.style.top=top+"px";R.style.top=(top+L.offsetHeight+18)+"px";
+    }else{                                                 // desktop: side by side, meeting at the gutter between the two columns of words
+      var u=under.getBoundingClientRect(),cs=getComputedStyle(under),c1=parseFloat(cs.gridTemplateColumns),gap=parseFloat(cs.columnGap)||0,
+          xL=u.left+c1,xR=xL+gap,m=Math.max(16,vw*.03);
+      S=Math.round(Math.min(xL-m,vw-xR-m-120,vh*.55,440));  // 120px on the right for the pencil and colours
+      L.style.width=R.style.width=S+"px";L.style.left=(xL-S)+"px";R.style.left=xR+"px";
+      dispatchEvent(new Event("mailboxresize"));
+      L.style.top=R.style.top=Math.max(64,vh/2-S/2)+"px";
+    }
   }
   function setMail(on){
-    if(on){if(window.setIndex&&stage.classList.contains("indexed"))setIndex(false);place()}
-    stage.classList.toggle("mailing",on);box.setAttribute("aria-hidden",on?"false":"true");ic.setAttribute("aria-expanded",on?"true":"false");
+    if(on){if(window.setIndex&&stage.classList.contains("indexed"))setIndex(false);stage.classList.add("mailing");place()}
+    else stage.classList.remove("mailing");
+    box.setAttribute("aria-hidden",on?"false":"true");ic.setAttribute("aria-expanded",on?"true":"false");
   }
   window.setMail=setMail;
-  ic.addEventListener("click",function(e){e.preventDefault();setMail(!stage.classList.contains("mailing"))});
+  ic.addEventListener("click",function(e){e.preventDefault();e.stopPropagation();setMail(!stage.classList.contains("mailing"))});
+  stage.addEventListener("click",function(e){              // a click on the empty page closes it
+    if(!stage.classList.contains("mailing")||e.target.closest(".mailbox .contact,.card,.logo,.slit,.mailic"))return;
+    setMail(false);
+  });
   addEventListener("resize",function(){if(stage.classList.contains("mailing"))place()});
   addEventListener("keydown",function(e){if(e.key==="Escape"&&stage.classList.contains("mailing"))setMail(false)});
 })();
