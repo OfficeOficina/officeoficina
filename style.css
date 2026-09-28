@@ -343,3 +343,7 @@ a.logolink .m.dragging{cursor:grabbing}
 .pv-text,.pv-count{display:none!important}
 .pv-img{grid-column:1!important;grid-row:1!important;width:100%;height:100%;max-height:none!important;justify-content:center;align-items:center}
 .pv-img img{max-width:100%;max-height:100%}
+/* looking at the images: the icons and "index" step aside, and the image gets the whole screen height (logo or Escape to go back) */
+.stage.projecting .icrow,.stage.projecting .under .ix{opacity:0;visibility:hidden;pointer-events:none}
+.stage.projecting .index{height:calc(100vh - max(56px,7vh) - 40px)!important}
+@supports (height:1dvh){.stage.projecting .index{height:calc(100dvh - max(56px,7dvh) - 40px)!important}}
