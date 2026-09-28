@@ -9,13 +9,11 @@
 <meta property="og:description" content="OFFICE COLLABORATIVE is a COLLABORATIVE OFFICE of architecture.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://officeoficina.com">
-<link rel="stylesheet" href="style.css?v=32">
+<link rel="stylesheet" href="style.css?v=33">
 </head>
 <body>
 <main class="stage">
-  <div class="sbar" aria-hidden="true"></div>
   <!-- the words live on the page; every word can be dragged. The card sits on top and covers them. -->
-  <div class="scroller" id="scroller">
   <div class="under">
     <span class="w l"><span class="lt o" data-p="0">O<svg viewBox="0 0 784 1180" aria-hidden="true"><path d="M744 537Q744 699 648 806Q552 913 392 913Q234 913 137 807.5Q40 702 40 531Q40 360 137 254.5Q234 149 391 149Q551 149 647.5 255Q744 361 744 537Z"/></svg></span>FFICE</span><span class="w r"><span class="lt o" data-p="1">O<svg viewBox="0 0 784 1180" aria-hidden="true"><path d="M744 537Q744 699 648 806Q552 913 392 913Q234 913 137 807.5Q40 702 40 531Q40 360 137 254.5Q234 149 391 149Q551 149 647.5 255Q744 361 744 537Z"/></svg></span>FICIN<span class="lt a" data-p="2">A<svg viewBox="0 0 666 1180" aria-hidden="true"><path d="M-12.8 890L258.2 161L407.8 161L678.8 890Z"/></svg></span></span>
     <span class="w l">is</span><span class="w r">a</span>
@@ -38,53 +36,55 @@
     <span class="w nm ix" tabindex="0" role="button" aria-label="Index" aria-controls="index" aria-expanded="false">index</span>
   </div>
 
-  <!-- index: opened by "index" at the bottom of the text. Four equal columns: text, building, furniture, text.
+  <!-- index: opened by "index". It takes the place of the words; only the list scrolls, inside its own frame. Four equal columns: text, building, furniture, text.
        Replace the placeholder titles below with the real ones (and the # with a link). -->
-  <section class="index" id="index" aria-label="Index">
-    <div class="col">
-      <h2>Text</h2>
-      <ul>
-        <li><a href="#">Text title 01</a><span>Publication, year</span></li>
-        <li><a href="#">Text title 02</a><span>Publication, year</span></li>
-        <li><a href="#">Text title 03</a><span>Publication, year</span></li>
-        <li><a href="#">Text title 04</a><span>Publication, year</span></li>
-        <li><a href="#">Text title 05</a><span>Publication, year</span></li>
-      </ul>
-    </div>
-    <div class="col">
-      <h2>Building</h2>
-      <ul>
-        <li><a href="#">Building title 01</a><span>City, year</span></li>
-        <li><a href="#">Building title 02</a><span>City, year</span></li>
-        <li><a href="#">Building title 03</a><span>City, year</span></li>
-        <li><a href="#">Building title 04</a><span>City, year</span></li>
-        <li><a href="#">Building title 05</a><span>City, year</span></li>
-        <li><a href="#">Building title 06</a><span>City, year</span></li>
-      </ul>
-    </div>
-    <div class="col">
-      <h2>Furniture</h2>
-      <ul>
-        <li><a href="#">Furniture title 01</a><span>Material, year</span></li>
-        <li><a href="#">Furniture title 02</a><span>Material, year</span></li>
-        <li><a href="#">Furniture title 03</a><span>Material, year</span></li>
-        <li><a href="#">Furniture title 04</a><span>Material, year</span></li>
-        <li><a href="#">Furniture title 05</a><span>Material, year</span></li>
-        <li><a href="#">Furniture title 06</a><span>Material, year</span></li>
-      </ul>
-    </div>
-    <div class="col">
-      <h2>Text</h2>
-      <ul>
-        <li><a href="#">Text title 01</a><span>Publication, year</span></li>
-        <li><a href="#">Text title 02</a><span>Publication, year</span></li>
-        <li><a href="#">Text title 03</a><span>Publication, year</span></li>
-        <li><a href="#">Text title 04</a><span>Publication, year</span></li>
-        <li><a href="#">Text title 05</a><span>Publication, year</span></li>
-      </ul>
-    </div>
+  <section class="index" id="index" aria-label="Index" aria-hidden="true">
+    <div class="ixs" id="ixs"><div class="ixgrid">
+        <div class="col">
+          <h2>Text</h2>
+          <ul>
+            <li><a href="#">Text title 01</a><span>Publication, year</span></li>
+            <li><a href="#">Text title 02</a><span>Publication, year</span></li>
+            <li><a href="#">Text title 03</a><span>Publication, year</span></li>
+            <li><a href="#">Text title 04</a><span>Publication, year</span></li>
+            <li><a href="#">Text title 05</a><span>Publication, year</span></li>
+          </ul>
+        </div>
+        <div class="col">
+          <h2>Building</h2>
+          <ul>
+            <li><a href="#">Building title 01</a><span>City, year</span></li>
+            <li><a href="#">Building title 02</a><span>City, year</span></li>
+            <li><a href="#">Building title 03</a><span>City, year</span></li>
+            <li><a href="#">Building title 04</a><span>City, year</span></li>
+            <li><a href="#">Building title 05</a><span>City, year</span></li>
+            <li><a href="#">Building title 06</a><span>City, year</span></li>
+          </ul>
+        </div>
+        <div class="col">
+          <h2>Furniture</h2>
+          <ul>
+            <li><a href="#">Furniture title 01</a><span>Material, year</span></li>
+            <li><a href="#">Furniture title 02</a><span>Material, year</span></li>
+            <li><a href="#">Furniture title 03</a><span>Material, year</span></li>
+            <li><a href="#">Furniture title 04</a><span>Material, year</span></li>
+            <li><a href="#">Furniture title 05</a><span>Material, year</span></li>
+            <li><a href="#">Furniture title 06</a><span>Material, year</span></li>
+          </ul>
+        </div>
+        <div class="col">
+          <h2>Text</h2>
+          <ul>
+            <li><a href="#">Text title 01</a><span>Publication, year</span></li>
+            <li><a href="#">Text title 02</a><span>Publication, year</span></li>
+            <li><a href="#">Text title 03</a><span>Publication, year</span></li>
+            <li><a href="#">Text title 04</a><span>Publication, year</span></li>
+            <li><a href="#">Text title 05</a><span>Publication, year</span></li>
+          </ul>
+        </div>
+    </div></div>
+    <div class="sbar" aria-hidden="true"></div>
   </section>
-  </div>
 
   <!-- about: the flip book opens here, in place of the text; the card and the logo stay -->
   <div class="aboutbook" id="about" aria-hidden="true">
@@ -205,23 +205,26 @@
     w.addEventListener("pointercancel",up);
   });
 
-  /* ---- index: the words stay put, a thin scrollbar appears, the four columns wait below ---- */
-  var stageEl=document.querySelector(".stage"),scr=document.getElementById("scroller"),ixEl=document.querySelector(".ix"),underEl=document.querySelector(".under");
-  function place(){scr.style.setProperty("--uh",underEl.offsetHeight+"px")}   // the index starts just below the words
-  place();addEventListener("resize",place);if(document.fonts&&document.fonts.ready)document.fonts.ready.then(place);
+  /* ---- index: the words give way to the index in the same place; only the list scrolls, the site stays still ---- */
+  var stageEl=document.querySelector(".stage"),ixEl=document.querySelector(".ix"),panel=document.getElementById("index"),
+      ixs=document.getElementById("ixs"),icrow=document.querySelector(".icrow"),sbar=panel.querySelector(".sbar");
+  function place(){                                        // the frame runs from near the top down to just above the icons
+    var r=icrow.getBoundingClientRect(),fs=parseFloat(getComputedStyle(panel).fontSize)||14,
+        top=Math.max(innerHeight*.12,60),bottom=r.top-fs*2.2;
+    panel.style.top=top+"px";panel.style.height=Math.max(120,bottom-top)+"px";bar();
+  }
+  function bar(){var h=ixs.clientHeight,H=ixs.scrollHeight,l=H>h?Math.max(24,h*h/H):0;sbar.style.height=l+"px";sbar.style.transform="translateY("+((h-l)*ixs.scrollTop/Math.max(1,H-h))+"px)"}
+  ixs.addEventListener("scroll",bar,{passive:true});
+  stageEl.addEventListener("wheel",function(e){          // scrolling anywhere (even over the card) moves the index, never the site
+    if(!stageEl.classList.contains("indexed")||ixs.contains(e.target))return;
+    e.preventDefault();ixs.scrollTop+=e.deltaMode===1?e.deltaY*16:e.deltaY;
+  },{passive:false});
+  addEventListener("resize",place);if(document.fonts&&document.fonts.ready)document.fonts.ready.then(place);
   function setIndex(on){
-    if(on){stageEl.classList.add("indexed");ixEl.setAttribute("aria-expanded","true")}
-    else{
-      ixEl.setAttribute("aria-expanded","false");
-      if(scr.scrollTop>0){scr.scrollTo({top:0,behavior:"smooth"});setTimeout(function(){stageEl.classList.remove("indexed")},600)}
-      else stageEl.classList.remove("indexed");
-    }
+    if(on){place();stageEl.classList.add("indexed");ixEl.setAttribute("aria-expanded","true");panel.setAttribute("aria-hidden","false");bar()}
+    else{stageEl.classList.remove("indexed");ixEl.setAttribute("aria-expanded","false");panel.setAttribute("aria-hidden","true");setTimeout(function(){ixs.scrollTop=0},450)}
   }
   window.setIndex=setIndex;
-  var sbar=document.querySelector(".sbar");                // the thin scrollbar: its length and position follow the page
-  function bar(){var h=scr.clientHeight,H=scr.scrollHeight,l=Math.max(24,h*h/H);sbar.style.height=l+"px";sbar.style.transform="translateY("+((h-l)*scr.scrollTop/Math.max(1,H-h))+"px)"}
-  scr.addEventListener("scroll",bar,{passive:true});addEventListener("resize",bar);
-  new MutationObserver(bar).observe(stageEl,{attributes:true,attributeFilter:["class"]});
   function act(n){if(n.classList.contains("ix"))setIndex(!stageEl.classList.contains("indexed"));else openAbout()}
 
   /* ---- the ? and "index": pulse on hover; click or Enter opens them ---- */
@@ -413,7 +416,7 @@ var BACKS = ["#000", "#fff"];
   /* open / close: the text fades out, the book fades in, same page (#about) */
   var under=document.querySelector(".under"),book=document.getElementById("about"),q=document.querySelector(".qa");
   function show(on){
-    if(on){var st=document.querySelector(".stage");document.getElementById("scroller").scrollTop=0;st.classList.remove("indexed");document.querySelector(".ix").setAttribute("aria-expanded","false")}
+    if(on&&window.setIndex)setIndex(false);
     book.classList.toggle("on",on);under.classList.toggle("away",on);book.setAttribute("aria-hidden",on?"false":"true");
   }
   var pushed=false;
