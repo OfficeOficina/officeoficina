@@ -330,17 +330,22 @@
     if(lastCol){var i=cols.indexOf(lastCol),sh=sets[i][0]?sets[i][0].offsetHeight:1;f=(lastCol.scrollTop%sh)/sh}
     sbar.style.height=l+"px";sbar.style.transform="translateY("+((h-l)*f)+"px)";
   }
-  /* every column scrolls on its own. One link: when you read past the end of a project's text (far left / far right),
-     its images column glides down to that next project's images - after that it is free to scroll again. */
-  var PAIR={0:1,3:2},lastK={0:0,3:0};
+  /* every column scrolls on its own. One link, both ways: when you scroll past the end of a project in the text column,
+     its images column glides to the next project - and when you scroll past a project's last image, its text column
+     glides to the next text. After the glide both are free again. */
+  var PAIR={0:1,1:0,2:3,3:2},lastK={0:0,1:0,2:0,3:0};
   function curItem(col){var its=col.querySelectorAll(".it"),st=col.scrollTop+col.clientHeight*.3,k=0;while(k<its.length-1&&its[k+1].offsetTop<=st)k++;return k}
   function follow(i){
-    var k=curItem(cols[i]);if(k===lastK[i])return;lastK[i]=k;
+    var A=cols[i],k=curItem(A);
+    if(A._auto){lastK[i]=k;clearTimeout(A._autoT);A._autoT=setTimeout(function(){A._auto=false},180);return}   // this column is being moved for you: don't pass it back
+    if(k===lastK[i])return;lastK[i]=k;
     var j=PAIR[i],B=cols[j],guard=0;
     while(B.querySelectorAll(".it").length<k+2&&guard++<50){var d=document.createElement("div");d.className="ixset";d.innerHTML=MAKE[j]();B.appendChild(d);sets[j].push(d)}
-    var it=B.querySelectorAll(".it")[k];if(it)B.scrollTo({top:it.offsetTop,behavior:"smooth"});
+    var it=B.querySelectorAll(".it")[k];if(!it)return;
+    lastK[j]=k;B._auto=true;clearTimeout(B._autoT);B._autoT=setTimeout(function(){B._auto=false},900);
+    B.scrollTo({top:it.offsetTop,behavior:"smooth"});
   }
-  cols.forEach(function(c,i){c.addEventListener("scroll",function(){lastCol=c;fill(i);bar();if(i in PAIR)follow(i)},{passive:true})});
+  cols.forEach(function(c,i){c.addEventListener("scroll",function(){lastCol=c;fill(i);bar();follow(i)},{passive:true})});
 
   /* a project on its own: text on the left, the image on the right; click the image for the next one */
   var pv=document.getElementById("pview"),pvImg=pv.querySelector(".pv-img img"),pvCount=pv.querySelector(".pv-count"),cur=null;
@@ -369,7 +374,7 @@
     else{
       ixEl.setAttribute("aria-expanded","false");
       stageEl.classList.remove("indexed","projecting");cur=null;
-      setTimeout(function(){if(stageEl.classList.contains("indexed"))return;cols.forEach(function(c){c.innerHTML="";c.scrollTop=0});sets=[[],[],[],[]];lastCol=null;lastK={0:0,3:0}},400);
+      setTimeout(function(){if(stageEl.classList.contains("indexed"))return;cols.forEach(function(c){c.innerHTML="";c.scrollTop=0});sets=[[],[],[],[]];lastCol=null;lastK={0:0,1:0,2:0,3:0}},400);
     }
   }
   window.setIndex=setIndex;
