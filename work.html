@@ -23,16 +23,26 @@
   .playing .record .disc{animation-play-state:running}
   @keyframes spin{to{transform:rotate(360deg)}}
   /* the songs, to the right of the record; the one playing is black */
-  .songs{position:absolute;top:50%;left:calc(50% + min(31vw,31vh,260px) + clamp(1.5rem,4vw,4rem));transform:translateY(-50%);
-    list-style:none;margin:0;padding:0;display:grid;gap:.55em;font-size:.9em;max-width:calc(50vw - min(31vw,31vh,260px) - 5rem)}
-  .songs button{font:inherit;color:#999;background:none;border:0;padding:0;text-align:left;display:flex;gap:.8em;
+  .side{position:absolute;top:50%;left:calc(50% + min(31vw,31vh,260px) + clamp(1.5rem,4vw,4rem));transform:translateY(-50%);
+    display:grid;gap:1.6rem;max-width:calc(50vw - min(31vw,31vh,260px) - 5rem)}
+  .songs{list-style:none;margin:0;padding:0;display:grid;gap:.55em;font-size:.9em}
+  .songs button{display:grid;grid-template-columns:auto 1fr;column-gap:.8em}
+  .songs .by{grid-column:2;color:#999;font-size:.85em}
+  /* the YouTube player: small, but it has to stay visible (YouTube requires at least 200 x 200) */
+  .yt{width:200px;height:200px;background:#000}
+  .yt[hidden]{display:none}
+  .yt iframe{display:block;width:200px;height:200px;border:0}
+  .songs button{font:inherit;color:#999;background:none;border:0;padding:0;text-align:left;display:grid;grid-template-columns:auto 1fr;column-gap:.8em;
     cursor:pointer}
   .songs button:hover{color:#555}
   .songs .on button{color:#000}
   .songs .n{font-variant-numeric:tabular-nums;min-width:1.4em}
   @media (max-width:700px){
     .record{top:40%;width:min(78vw,52vh)}
-    .songs{left:50%;top:calc(40% + min(39vw,26vh) + 2rem);transform:translateX(-50%);max-width:86vw;font-size:.85em}
+    html,body{overflow:auto}
+    .room{position:static;min-height:100dvh}
+    .side{left:50%;top:calc(40% + min(39vw,26vh) + 2rem);transform:translateX(-50%);max-width:86vw;justify-items:center;padding-bottom:2rem}
+    .songs{font-size:.85em}
   }
   @media (prefers-reduced-motion:reduce){.record .disc{animation-duration:8s}}
 </style>
@@ -43,20 +53,27 @@
   <button class="record" id="record" type="button" aria-label="Pause">
     <span class="disc"><span class="mark" aria-hidden="true"><i></i><i></i><b></b></span></span>
   </button>
-  <ol class="songs" id="songs" aria-label="Songs"></ol>
+  <div class="side">
+    <ol class="songs" id="songs" aria-label="Songs"></ol>
+    <div class="yt" id="yt" hidden><div id="ytp"></div></div>
+  </div>
 </main>
 
 <script>
 /* ==================================================================
    SONGS
-   Put your music files in a  music/  folder next to this page and list
-   them here, in order - they show up in the list next to the record.
+   List the songs here, in order - they show up next to the record.
+   A song can come from YouTube (its video code) or be your own MP3 in
+   a  music/  folder next to this page.
    While this list is empty, a few little tunes made right here in the
    browser play instead.
    ================================================================== */
 var SONGS = [
+  {title:"Pattern Against User", by:"At the Drive-In", youtube:"3jBK7aHHufE"},
+  // more from YouTube: copy the code after "v=" in the video's link
+  // {title:"Song title", by:"Artist", youtube:"xxxxxxxxxxx"},
+  // or your own files, from a music/ folder:
   // {title:"Song title", src:"music/song-1.mp3"},
-  // {title:"Another song", src:"music/song-2.mp3"},
 ];
 
 (function(){
@@ -77,7 +94,7 @@ var SONGS = [
   // the list next to the record: click a song to put it on
   list.forEach(function(s,k){
     var li=document.createElement("li"),b=document.createElement("button");b.type="button";
-    b.innerHTML='<span class="n">'+("0"+(k+1)).slice(-2)+'</span><span></span>';b.lastChild.textContent=s.title;
+    b.innerHTML='<span class="n">'+("0"+(k+1)).slice(-2)+'</span><span></span>';b.lastChild.textContent=s.title;if(s.by){var by=document.createElement("span");by.className="by";by.textContent=s.by;b.appendChild(by)}
     b.addEventListener("click",function(){i=k;start()});li.appendChild(b);ol.appendChild(li);
   });
   function mark(){[].forEach.call(ol.children,function(li,k){li.classList.toggle("on",k===i);li.firstChild.setAttribute("aria-current",k===i?"true":"false")})}
@@ -96,10 +113,30 @@ var SONGS = [
     }
     timer=setTimeout(next,total*1000+300);
   }
-  function stopAll(){clearTimeout(timer);voices.forEach(function(o){try{o.stop()}catch(e){}});voices=[];if(audio){audio.pause();audio=null}}
+  /* YouTube songs play in the small player next to the list; the record turns while it plays */
+  var yt=null,ytReady=false,ytWant=null,ytBox=document.getElementById("yt");
+  if(list.some(function(s){return s.youtube})){
+    ytBox.hidden=false;
+    window.onYouTubeIframeAPIReady=function(){
+      yt=new YT.Player("ytp",{width:200,height:200,videoId:(list.filter(function(s){return s.youtube})[0]||{}).youtube,
+        playerVars:{playsinline:1,rel:0,modestbranding:1},
+        events:{onReady:function(){ytReady=true;if(ytWant)ytPlay(ytWant)},
+                onStateChange:function(e){
+                  if(!list[i].youtube)return;
+                  if(e.data===1){playing=true;room.classList.add("playing");rec.setAttribute("aria-label","Pause")}
+                  else if(e.data===2){playing=false;room.classList.remove("playing");rec.setAttribute("aria-label","Play")}
+                  else if(e.data===0)next();
+                }}});
+    };
+    var tag=document.createElement("script");tag.src="https://www.youtube.com/iframe_api";document.head.appendChild(tag);
+  }
+  function ytPlay(id){if(!ytReady){ytWant=id;return}ytWant=null;
+    var cur=yt.getVideoData&&yt.getVideoData().video_id;if(cur===id)yt.playVideo();else yt.loadVideoById(id)}
+  function stopAll(){clearTimeout(timer);voices.forEach(function(o){try{o.stop()}catch(e){}});voices=[];if(audio){audio.pause();audio=null}if(yt&&ytReady&&yt.pauseVideo)yt.pauseVideo()}
   function start(){
     var s=list[i];stopAll();playing=true;room.classList.add("playing");rec.setAttribute("aria-label","Pause");mark();
-    if(s.src){audio=new Audio(s.src);audio.addEventListener("ended",next);audio.play().catch(waitForTap)}
+    if(s.youtube){room.classList.remove("playing");ytPlay(s.youtube)}   // the record starts turning when YouTube actually plays
+    else if(s.src){audio=new Audio(s.src);audio.addEventListener("ended",next);audio.play().catch(waitForTap)}
     else{playDemo(s);if(ctx.state!=="running")waitForTap()}
   }
   function pause(){stopAll();playing=false;room.classList.remove("playing");rec.setAttribute("aria-label","Play")}
@@ -112,7 +149,8 @@ var SONGS = [
   }
   rec.addEventListener("click",function(){if(justUnlocked)return;if(playing)pause();else start()});
 
-  start();   // you came in through ENTER: the record is already turning
+  if(list[0].youtube){mark();ytPlay(list[0].youtube)}   // YouTube may wait for a first click before it plays
+  else start();   // you came in through ENTER: the record is already turning
 })();
 </script>
 </body>
