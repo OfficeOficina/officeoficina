@@ -9,7 +9,7 @@
 <meta property="og:description" content="OFFICE COLLABORATIVE is a COLLABORATIVE OFFICE of architecture.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://officeoficina.com">
-<link rel="stylesheet" href="style.css?v=57">
+<link rel="stylesheet" href="style.css?v=58">
 </head>
 <body>
 <main class="stage">
@@ -247,6 +247,7 @@
   var top=1;
   Array.prototype.forEach.call(document.querySelectorAll(".w,.m"),function(w){
     var wx=0,wy=0,d=null;
+    w.addEventListener("resetpos",function(){wx=0;wy=0;w.style.transform="";w.style.visibility=""});   // used after the skull
     w.addEventListener("pointerdown",function(e){
       e.preventDefault(); if(w.classList.contains("m")) hintOn(w,e.pointerType);
       d={px:e.clientX,py:e.clientY,x:wx,y:wy,moved:false};
@@ -263,7 +264,7 @@
         wx=ox; wy=oy; w.style.transform="translate("+wx+"px,"+wy+"px)";
       }
     });
-    function up(){ var was=d; d=null; w.classList.remove("dragging"); if(was&&w.classList.contains("m")){ if(!was.moved){hintRelease();goHome();return} dropCheck(w); hintRelease(); }
+    function up(){ var was=d; d=null; w.classList.remove("dragging"); if(was&&w.classList.contains("m")){ if(!was.moved){hintRelease();goHome();return} dropCheck(w); hintRelease(); setTimeout(skullCheck,30); }
       if(was&&!was.moved&&w.classList.contains("nm")) act(w); }   // click "index": the index
     w.addEventListener("pointerup",up);
     w.addEventListener("pointercancel",up);
@@ -392,6 +393,48 @@
     if(n.tagName==="A") n.addEventListener("click",function(e){e.preventDefault();act(n)});
     else n.addEventListener("keydown",function(e){if(e.key==="Enter"||e.key===" "){e.preventDefault();act(n)}});
   });
+
+  /* ---- the skull: put the two dots one above the other with the triangle pointing at the gap between them (a face in
+     profile) and the logo turns into a skull - it comes to the middle, turns to look at you, everything goes black,
+     the whole skull appears, then slowly fades away and the logo goes back home ---- */
+  var skullBusy=false;
+  function skullCheck(){
+    if(skullBusy)return;
+    var ms=[].slice.call(document.querySelectorAll(".logo .m"));if(ms.some(function(m){return m.style.visibility==="hidden"}))return;
+    var ds=ms.filter(function(m){return m.classList.contains("dot")}).map(function(m){return m.getBoundingClientRect()}),
+        t=document.querySelector(".logo .tri").getBoundingClientRect();if(ds.length<2)return;
+    var D=ds[0].height,c=function(r){return{x:r.left+r.width/2,y:r.top+r.height/2}},a=c(ds[0]),b=c(ds[1]),n=c(t);
+    if(a.y>b.y){var z=a;a=b;b=z}
+    var midY=(a.y+b.y)/2,dotsX=(a.x+b.x)/2;
+    if(Math.abs(a.x-b.x)<.7*D&&b.y-a.y>1.2*D&&b.y-a.y<3.6*D&&Math.abs(n.y-midY)<.7*D&&dotsX-n.x>.5*D&&dotsX-n.x<3.2*D)skull(ms);
+  }
+  function skull(ms){
+    skullBusy=true;
+    var fx=document.createElement("div");fx.className="skullfx";document.body.appendChild(fx);
+    var rs=ms.map(function(m){return m.getBoundingClientRect()}),
+        cx=rs.reduce(function(s,r){return s+r.left+r.width/2},0)/3,cy=rs.reduce(function(s,r){return s+r.top+r.height/2},0)/3;
+    var grp=document.createElement("div");grp.className="skgrp";grp.style.left=cx+"px";grp.style.top=cy+"px";fx.appendChild(grp);
+    ms.forEach(function(m,k){var r=rs[k],cl=m.cloneNode(true);cl.className=m.className.replace("dragging","")+" skp";
+      cl.style.cssText="position:absolute;margin:0;left:"+(r.left-cx)+"px;top:"+(r.top-cy)+"px;width:"+r.width+"px;height:"+r.height+"px";
+      grp.appendChild(cl);m.style.visibility="hidden"});
+    var ds=rs.filter(function(r,k){return ms[k].classList.contains("dot")}),eye=Math.abs((ds[0].top+ds[0].height/2)-(ds[1].top+ds[1].height/2)),
+        S=Math.min(innerWidth,innerHeight)*.26/eye;                   // the eyes end up about a quarter of the screen apart
+    requestAnimationFrame(function(){requestAnimationFrame(function(){
+      grp.style.transform="translate("+(innerWidth/2-cx)+"px,"+(innerHeight/2-cy)+"px) rotate(-90deg) scale("+S+")";   // to the middle, turning to face you
+    })});
+    setTimeout(function(){fx.classList.add("dark")},1500);             // everything goes black
+    setTimeout(function(){                                             // the whole skull appears around the eyes and nose
+      var ps=[].slice.call(grp.querySelectorAll(".skp")).map(function(e){var r=e.getBoundingClientRect();return{x:r.left+r.width/2,y:r.top+r.height/2,dot:e.classList.contains("dot")}}),
+          ey=ps.filter(function(p){return p.dot}),ex=(ey[0].x+ey[1].x)/2,eyy=(ey[0].y+ey[1].y)/2,k=Math.abs(ey[0].x-ey[1].x)/36;
+      var sv=document.createElementNS("http://www.w3.org/2000/svg","svg");sv.setAttribute("viewBox","0 0 100 120");sv.setAttribute("class","skullsvg");
+      sv.style.width=(100*k)+"px";sv.style.height=(120*k)+"px";sv.style.left=(ex-50*k)+"px";sv.style.top=(eyy-52*k)+"px";
+      sv.innerHTML='<path fill="#fff" d="M50 4C24 4 8 22 8 46c0 14 5 24 12 30v12c0 4 4 6 8 6h4v10c0 4 4 8 10 8h16c6 0 10-4 10-8V94h4c4 0 8-2 8-6V76c7-6 12-16 12-30C92 22 76 4 50 4z"/>'+
+        '<g stroke="#000" stroke-width="1.4" stroke-linecap="round"><path d="M41 97v12M47 97v13M53 97v13M59 97v12"/></g>';
+      fx.insertBefore(sv,grp);requestAnimationFrame(function(){sv.classList.add("on")});
+    },2600);
+    setTimeout(function(){fx.classList.add("gone")},4800);             // then it all slowly fades away
+    setTimeout(function(){fx.remove();ms.forEach(function(m){m.dispatchEvent(new Event("resetpos"))});skullBusy=false},8200);
+  }
 
   /* ---- a click on the logo (without dragging it) always brings you back to the home view ---- */
   function goHome(){
