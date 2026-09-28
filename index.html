@@ -548,6 +548,9 @@ var PHOTOS = [
   // "about/maarten-2.jpg",
 ];
 
+/* a drawn head that replaces the head strip of one figure: figure number (0 = L1, 1 = M1, 2 = L2 ...) : image */
+var HEADS = {0: "about/lucas-head.jpg"};
+
 /* flat black / white blocks that turn up in place of a head, body or legs */
 var BLOCKS = ["#000", "#fff", "#000"];
 
@@ -569,25 +572,28 @@ var BACKS = ["#000", "#fff"];
   }
   var photos=PHOTOS.length?PHOTOS:[0,1,2,3,4,5,6,7].map(stand);
   photos.forEach(function(src){new Image().src=src});
+  Object.keys(HEADS).forEach(function(k){new Image().src=HEADS[k]});
 
   /* each strip gets its own shuffled stack: all photos + the colour blocks.
      Page 0 is always the first photo, so the book opens on a whole person. */
   function rng(seed){return function(){seed=(seed*16807)%2147483647;return(seed-1)/2147483646}}
   var stacks=[0,1,2].map(function(p){
-    var rest=photos.slice(1).map(function(s){return{img:s}}),r=rng(97+p*131);
+    var rest=photos.slice(1).map(function(s,k){return{img:s,head:HEADS[k+1]}}),r=rng(97+p*131);
     for(var i=rest.length-1;i>0;i--){var j=Math.floor(r()*(i+1)),t=rest[i];rest[i]=rest[j];rest[j]=t}
-    var out=[{img:photos[0]}],gap=Math.max(2,Math.round(rest.length/BLOCKS.length)),b=0;   // colour blocks spread through the stack
+    var out=[{img:photos[0],head:HEADS[0]}],gap=Math.max(2,Math.round(rest.length/BLOCKS.length)),b=0;   // colour blocks spread through the stack
     rest.forEach(function(pg,k){out.push(pg);if((k+1+p)%gap===0&&b<BLOCKS.length)out.push({col:BLOCKS[(b++ +p)%BLOCKS.length]})});
     while(b<BLOCKS.length)out.push({col:BLOCKS[(b++ +p)%BLOCKS.length]});
     return out;
   });
   var N=stacks[0].length,cur=[0,0,0],busy=[false,false,false];
   function back(p,i){i=((i%N)+N)%N;return BACKS[(i+p)%BACKS.length]}
-  function paint(el,page){
-    if(page.img){el.style.backgroundColor="";el.style.backgroundImage='url("'+page.img+'")'}
+  function paint(el,page,p){
+    el.style.backgroundSize=el.style.backgroundPosition="";
+    if(page.img&&p===0&&page.head){el.style.backgroundColor="#fff";el.style.backgroundImage='url("'+page.head+'")';el.style.backgroundSize="auto 78%";el.style.backgroundPosition="center 60%"}
+    else if(page.img){el.style.backgroundColor="";el.style.backgroundImage='url("'+page.img+'")'}
     else{el.style.backgroundImage="none";el.style.backgroundColor=page.col}
   }
-  function paintCol(el,c){el.style.backgroundImage="none";el.style.backgroundColor=c}
+  function paintCol(el,c){el.style.backgroundImage="none";el.style.backgroundSize=el.style.backgroundPosition="";el.style.backgroundColor=c}
 
   var spread=document.getElementById("spread"),L=[],R=[];
   [0,1,2].forEach(function(p){
@@ -609,13 +615,13 @@ var BACKS = ["#000", "#fff"];
       });
     });
     spread.appendChild(l);spread.appendChild(r);
-    paintCol(l.firstChild,back(p,-1));paint(r.firstChild,stacks[p][0]);
+    paintCol(l.firstChild,back(p,-1));paint(r.firstChild,stacks[p][0],p);
     L[p]=l;R[p]=r;
   });
 
   function leaf(p,front,backCol,dir){
     var lf=document.createElement("div");lf.className="leaf "+(dir>0?"fwd":"rev");
-    var f=document.createElement("div");f.className="pg";paint(f,front);
+    var f=document.createElement("div");f.className="pg";paint(f,front,p);
     var b=document.createElement("div");b.className="pg bk";paintCol(b,backCol);
     lf.appendChild(f);lf.appendChild(b);R[p].appendChild(lf);return lf;
   }
@@ -625,11 +631,11 @@ var BACKS = ["#000", "#fff"];
     to=((to%N)+N)%N;if(busy[p]||to===cur[p])return;busy[p]=true;
     var from=cur[p],rpg=R[p].firstChild,lpg=L[p].firstChild,lf;
     if(dir>0){
-      lf=leaf(p,stacks[p][from],back(p,to-1),1);paint(rpg,stacks[p][to]);
+      lf=leaf(p,stacks[p][from],back(p,to-1),1);paint(rpg,stacks[p][to],p);
       lf.addEventListener("animationend",function(){paintCol(lpg,back(p,to-1));lf.remove();busy[p]=false},{once:true});
     }else{
       lf=leaf(p,stacks[p][to],back(p,to),-1);paintCol(lpg,back(p,to-1));
-      lf.addEventListener("animationend",function(){paint(rpg,stacks[p][to]);lf.remove();busy[p]=false},{once:true});
+      lf.addEventListener("animationend",function(){paint(rpg,stacks[p][to],p);lf.remove();busy[p]=false},{once:true});
     }
     cur[p]=to;
   }
