@@ -176,13 +176,12 @@ a:focus-visible,button:focus-visible,input:focus-visible,textarea:focus-visible{
 /* index open: the icons go; the words stay until you scroll. Only this text layer scrolls - the card and logo never move */
 .scroller{position:absolute;inset:0;overflow:hidden;scrollbar-width:none}
 .scroller::-webkit-scrollbar{display:none}
-.stage.indexed .scroller{overflow-y:auto;overscroll-behavior:contain}
+.stage.indexed .under .w:not(.ix){opacity:0;pointer-events:none}   /* the words give way to the columns */
 .icrow{transition:opacity .3s ease}
-.stage.indexed .icrow{opacity:0;visibility:hidden;transition:opacity .3s ease,visibility 0s linear .3s}
 /* the four columns: same type as the words; the middle two meet at the words' gutter.
    Grid: text | building | (gutter) | furniture | text */
 .scroller{overflow-anchor:none}
-.index{display:none;padding-left:var(--x0);padding-bottom:0;
+.index{display:none;position:absolute;left:0;right:0;padding-left:var(--x0);padding-bottom:0;
   font-size:calc(var(--H)*.035);line-height:1.18;letter-spacing:.035em;color:#333;-webkit-text-stroke:.1px currentColor}
 .stage.indexed .index{display:block}
 .ixhead,.ixcols{display:grid;grid-template-columns:var(--w) var(--w) var(--g) var(--w) var(--w)}
@@ -195,7 +194,7 @@ a:focus-visible,button:focus-visible,input:focus-visible,textarea:focus-visible{
 /* four columns, each its own endless scroll (only once the title line has locked at the top) */
 .ixc{overflow:hidden;overscroll-behavior-y:auto;scrollbar-width:none;padding-top:.6em;min-width:0}
 .ixc::-webkit-scrollbar{display:none}
-.stage.locked .ixc{overflow-y:auto}
+.stage.indexed .ixc{overflow-y:auto}
 .ixc:nth-child(1){grid-column:1}
 .ixc:nth-child(2){grid-column:2;text-align:right}
 .ixc:nth-child(3){grid-column:4}
@@ -311,3 +310,8 @@ a.logolink .m.dragging{cursor:grabbing}
 .wheelpop{cursor:grab;touch-action:none}
 .wheelpop.moving{cursor:grabbing;box-shadow:0 10px 30px rgba(0,0,0,.25)}
 .wheelgrip{display:block;justify-self:center;width:36px;height:4px;margin:-3px 0 -4px;border-radius:2px;background:#cfcfcf}
+
+/* index title line: sits at the top of the columns (no extra room needed under the slit) */
+.index .ixhead{padding-top:.2em}
+@media (max-width:700px){.index .ixhead{padding-top:.2em}}
+.ixc{-webkit-mask-image:linear-gradient(#000 calc(100% - 2em),transparent);mask-image:linear-gradient(#000 calc(100% - 2em),transparent)}

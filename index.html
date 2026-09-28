@@ -9,7 +9,7 @@
 <meta property="og:description" content="OFFICE COLLABORATIVE is a COLLABORATIVE OFFICE of architecture.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://officeoficina.com">
-<link rel="stylesheet" href="style.css?v=50">
+<link rel="stylesheet" href="style.css?v=51">
 </head>
 <body>
 <main class="stage">
@@ -308,41 +308,37 @@
     }
   }
   function maxMain(){return scr.scrollHeight-scr.clientHeight}
-  function lockCheck(){stageEl.classList.toggle("locked",scr.scrollTop>=maxMain()-2)}   // title line at the top: now each column scrolls on its own
-  function place(){
-    var st=scr.scrollTop,u=underEl.getBoundingClientRect(),cs=getComputedStyle(underEl),
+    function place(){                                        // the columns take the place of the words: from the top down to just above the icons
+    var u=underEl.getBoundingClientRect(),cs=getComputedStyle(underEl),fs=parseFloat(cs.fontSize),
         c1=parseFloat(cs.gridTemplateColumns),gap=parseFloat(cs.columnGap)||0,
         xL=u.left+c1,xR=xL+gap,m=Math.max(16,innerWidth*.03),                    // xL / xR: the two edges of the gutter between the word columns
-        W=Math.max(40,Math.min(xL-m,innerWidth-xR-m)/2);                          // four equal columns
+        W=Math.max(40,Math.min(xL-m,innerWidth-xR-m)/2),                          // four equal columns
+        ic=document.querySelector(".icrow").getBoundingClientRect(),
+        top=Math.max(56,innerHeight*.07),bottom=ic.top-fs*.9;
     panel.style.setProperty("--w",W+"px");panel.style.setProperty("--g",gap+"px");panel.style.setProperty("--x0",(xL-2*W)+"px");
-    panel.style.marginTop=Math.max(u.bottom+st+parseFloat(cs.fontSize)*3,st+innerHeight)+"px";   // the columns wait just below the screen
-    colsEl.style.height=(scr.clientHeight-headEl.offsetHeight)+"px";              // when the title line reaches the top, the columns fill the rest
+    panel.style.top=top+"px";panel.style.height=Math.max(140,bottom-top)+"px";
+    colsEl.style.height=(Math.max(140,bottom-top)-headEl.offsetHeight)+"px";
     for(var i=0;i<4;i++)fill(i);
-    lockCheck();bar();
+    bar();
   }
-  function bar(){                                          // thin scrollbar: follows the words away, then the column you last scrolled
-    var h=scr.clientHeight,l=Math.round(h*.18),f;
-    if(!stageEl.classList.contains("locked")||!lastCol)f=scr.scrollTop/Math.max(1,maxMain())*.3;
-    else{var i=cols.indexOf(lastCol),sh=sets[i][0]?sets[i][0].offsetHeight:1;f=.3+.7*((lastCol.scrollTop%sh)/sh)}
+  function bar(){                                          // thin scrollbar: follows the column you last scrolled
+    var h=scr.clientHeight,l=Math.round(h*.18),f=0;
+    if(lastCol){var i=cols.indexOf(lastCol),sh=sets[i][0]?sets[i][0].offsetHeight:1;f=(lastCol.scrollTop%sh)/sh}
     sbar.style.height=l+"px";sbar.style.transform="translateY("+((h-l)*f)+"px)";
   }
-  scr.addEventListener("scroll",function(){if(stageEl.classList.contains("indexed")){lockCheck();bar()}},{passive:true});
   cols.forEach(function(c,i){c.addEventListener("scroll",function(){lastCol=c;fill(i);bar()},{passive:true})});
   addEventListener("resize",function(){if(stageEl.classList.contains("indexed"))place()});
   function colAt(x){var best=cols[0],bd=1e9;cols.forEach(function(c){var r=c.getBoundingClientRect(),d=x<r.left?r.left-x:x>r.right?x-r.right:0;if(d<bd){bd=d;best=c}});return best}
-  stageEl.addEventListener("wheel",function(e){          // over the card, logo or empty margins: still scroll the text, never the site
-    if(!stageEl.classList.contains("indexed")||(e.target.closest&&e.target.closest(".scroller")))return;
-    e.preventDefault();var dy=e.deltaMode===1?e.deltaY*16:e.deltaY;
-    if(stageEl.classList.contains("locked")){var c=colAt(e.clientX);if(dy<0&&c.scrollTop<=0)scr.scrollTop+=dy;else c.scrollTop+=dy}
-    else scr.scrollTop+=dy;
+  stageEl.addEventListener("wheel",function(e){          // anywhere else (over the card, the icons, the margins): scroll the column underneath
+    if(!stageEl.classList.contains("indexed")||(e.target.closest&&e.target.closest(".ixc")))return;
+    e.preventDefault();var dy=e.deltaMode===1?e.deltaY*16:e.deltaY;colAt(e.clientX).scrollTop+=dy;
   },{passive:false});
   function setIndex(on){
     if(on){if(window.setMail)setMail(false);stageEl.classList.add("indexed");place();ixEl.setAttribute("aria-expanded","true")}
     else{
       ixEl.setAttribute("aria-expanded","false");
-      var done=function(){stageEl.classList.remove("indexed","locked");cols.forEach(function(c){c.innerHTML="";c.scrollTop=0});sets=[[],[],[],[]];lastCol=null};
-      if(scr.scrollTop>0){scr.scrollTo({top:0,behavior:"smooth"});setTimeout(done,500)}
-      else done();
+      stageEl.classList.remove("indexed");
+      setTimeout(function(){if(stageEl.classList.contains("indexed"))return;cols.forEach(function(c){c.innerHTML="";c.scrollTop=0});sets=[[],[],[],[]];lastCol=null},400);
     }
   }
   window.setIndex=setIndex;
@@ -353,7 +349,7 @@
   Array.prototype.forEach.call(document.querySelectorAll(".nm"),function(n){
     var pair=[n];
     function on(v){Array.prototype.forEach.call(pair,function(p){p.classList.toggle("pulse",v)})}
-    n.addEventListener("pointerenter",function(){if(!n.classList.contains("ix"))on(true)});
+
     n.addEventListener("pointerleave",function(){on(false)});
     n.addEventListener("focus",function(){on(true)});
     n.addEventListener("blur",function(){on(false)});
