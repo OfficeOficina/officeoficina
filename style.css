@@ -203,6 +203,11 @@ a:focus-visible,button:focus-visible,input:focus-visible,textarea:focus-visible{
 .index .pj a,.index .pj span{display:block}
 .index .pj span{color:#888}
 .index .tx{font-size:.55em;line-height:1.4;letter-spacing:.02em;color:#555;-webkit-text-stroke:0;margin-bottom:4em}
+.index .tx b{display:block;font-weight:400;color:#000;margin-bottom:.5em}
+.index .tx p{margin:0}
+/* project drawings sit under the title, full column width */
+.index .pj .ims{display:grid;gap:.6em;margin-top:.7em}
+.index .pj img{display:block;width:100%;height:auto;mix-blend-mode:multiply}   /* white paper melts into the page */
 .ixc:nth-child(1) .tx{padding-right:2em}
 .ixc:nth-child(4) .tx{padding-left:2em}
 /* the very thin scrollbar at the right edge of the screen */

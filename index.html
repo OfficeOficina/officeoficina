@@ -9,7 +9,7 @@
 <meta property="og:description" content="OFFICE COLLABORATIVE is a COLLABORATIVE OFFICE of architecture.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://officeoficina.com">
-<link rel="stylesheet" href="style.css?v=40">
+<link rel="stylesheet" href="style.css?v=41">
 </head>
 <body>
 <main class="stage">
@@ -263,7 +263,9 @@
      furniture's texts (far right). Add, remove or reorder entries here; leave "link" as "#" until the project has its own page.
      ================================================================== */
   var BUILDINGS = [
-    {title:"Building title 01", meta:"City, year", link:"#", text:"Text about this building. Two or three sentences on what it is, where it is, who it is for and what makes it particular."},
+    {title:"Dublin Housing", meta:"Dublin, Ireland", link:"#",
+     images:["projects/dublin/1.jpg","projects/dublin/2.jpg","projects/dublin/3.jpg","projects/dublin/4.jpg"],
+     text:"Dublin has been particularly affected by the global housing crisis that has seen city centers become unaffordable for residents, social housing neglected, and a huge rise in homelessness. Currently, there are 30,000 people on the waiting list for social housing in Dublin. For the most part, solutions for affordable housing have involved large scale relocation of people to peripheral urban areas. This project questions the current actions of the government, which have largely been the demolition of the present urban fabric; a plan of tabula rasa, while pushing and pricing people out of their own neighborhoods. I have identified nearly 12 acres of government held, misused property. These properties are typically unique and complex interstitial pockets that have resulted from different generations of urban development, which introduce new challenges and make them more easily dismissed, often sold as a smaller part of a demolition plan for redevelopment. If used differently, these potential sites in this area could accommodate 1,500 units, which by percentage of area and population, is more than adequate to respond to the current need. This plan works as an organizing system that gives the individual agency in their own living space. The system allows for multiple uses and variations. It utilizes a central core that houses all utilities and can be occupied in whatever way suits the occupants. It allows flexibility and relates to the existing context and urban fabric. It gives spaces to the communal and back to the neighborhood when opportune."},
     {title:"Building title 02", meta:"City, year", link:"#", text:"Text about this building. Two or three sentences on what it is, where it is, who it is for and what makes it particular."},
     {title:"Building title 03", meta:"City, year", link:"#", text:"Text about this building. Two or three sentences on what it is, where it is, who it is for and what makes it particular."},
     {title:"Building title 04", meta:"City, year", link:"#", text:"Text about this building. Two or three sentences on what it is, where it is, who it is for and what makes it particular."},
@@ -284,8 +286,10 @@
       headEl=panel.querySelector(".ixhead"),colsEl=document.getElementById("ixcols"),cols=[].slice.call(colsEl.children),
       sets=[[],[],[],[]],lastCol=null;
   function esc(t){return String(t==null?"":t).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})}
-  function proj(p){return '<div class="it pj"><a href="'+esc(p.link||"#")+'">'+esc(p.title)+'</a><span>'+esc(p.meta)+'</span></div>'}
-  function txt(p){return '<p class="it tx">'+esc(p.text)+'</p>'}
+  function proj(p){                                        // title, place and year, then the drawings / photos (if any) one under the other
+    var im=(p.images||[]).map(function(src){return '<img src="'+esc(src)+'" alt="'+esc(p.title)+'" loading="lazy">'}).join("");
+    return '<div class="it pj"><a href="'+esc(p.link||"#")+'">'+esc(p.title)+'</a><span>'+esc(p.meta)+'</span>'+(im?'<div class="ims">'+im+'</div>':'')+'</div>'}
+  function txt(p){return '<div class="it tx"><b>'+esc(p.title)+'</b><p>'+esc(p.text)+'</p></div>'}
   var MAKE=[function(){return BUILDINGS.map(txt).join("")},function(){return BUILDINGS.map(proj).join("")},
             function(){return FURNITURE.map(proj).join("")},function(){return FURNITURE.map(txt).join("")}];
   function fill(i){                                        // each column is endless on its own: another run is added before you reach its end
