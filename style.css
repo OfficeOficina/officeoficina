@@ -182,7 +182,7 @@ a:focus-visible,button:focus-visible,input:focus-visible,textarea:focus-visible{
    Grid: text | building | (gutter) | furniture | text */
 .scroller{overflow-anchor:none}
 .index{display:none;position:absolute;left:0;right:0;padding-left:var(--x0);padding-bottom:0;
-  font-size:calc(var(--H)*.035);line-height:1.18;letter-spacing:.035em;color:#333;-webkit-text-stroke:.1px currentColor}
+  font-size:max(11px,calc(var(--H)*.027));line-height:1.25;letter-spacing:.035em;color:#333;-webkit-text-stroke:.1px currentColor}
 .stage.indexed .index{display:block}
 .ixhead,.ixcols{display:grid;grid-template-columns:var(--w) var(--w) var(--g) var(--w) var(--w)}
 /* the title line locks at the top once it gets there */
@@ -202,7 +202,7 @@ a:focus-visible,button:focus-visible,input:focus-visible,textarea:focus-visible{
 .index .it{margin:0 0 2.2em}
 .index .pj a,.index .pj span{display:block}
 .index .pj span{color:#888}
-.index .tx{font-size:.55em;line-height:1.4;letter-spacing:.02em;color:#555;-webkit-text-stroke:0;margin-bottom:4em}
+.index .tx{font-size:1em;line-height:1.3;color:#555;margin-bottom:3em}
 .index .tx b{display:block;font-weight:400;color:#000;margin-bottom:.5em}
 .index .tx p{margin:0}
 /* project drawings sit under the title, full column width */
@@ -216,7 +216,7 @@ a:focus-visible,button:focus-visible,input:focus-visible,textarea:focus-visible{
 .index a{cursor:pointer}
 
 @media (max-width:700px){.aboutbook{font-size:17px}}
-@media (max-width:700px){.index .tx{font-size:.72em;line-height:1.3}.ixc:nth-child(1) .tx{padding-right:.8em}.ixc:nth-child(4) .tx{padding-left:.8em}}
+@media (max-width:700px){.ixc:nth-child(1) .tx{padding-right:.8em}.ixc:nth-child(4) .tx{padding-left:.8em}}
 
 /* the slit, top centre: a thin black slot exactly as wide as the card; the card slides up into it */
 .slit{position:fixed;z-index:3;top:calc(var(--H)*.015 + 4px);left:50%;transform:translateX(-50%);width:calc(var(--h)*525/920 + 6px);height:6px;
@@ -314,4 +314,3 @@ a.logolink .m.dragging{cursor:grabbing}
 /* index title line: sits at the top of the columns (no extra room needed under the slit) */
 .index .ixhead{padding-top:.2em}
 @media (max-width:700px){.index .ixhead{padding-top:.2em}}
-.ixc{-webkit-mask-image:linear-gradient(#000 calc(100% - 2em),transparent);mask-image:linear-gradient(#000 calc(100% - 2em),transparent)}
