@@ -9,7 +9,7 @@
 <meta property="og:description" content="OFFICE COLLABORATIVE is a COLLABORATIVE OFFICE of architecture.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://officeoficina.com">
-<link rel="stylesheet" href="style.css?v=64">
+<link rel="stylesheet" href="style.css?v=65">
 </head>
 <body>
 <main class="stage">
@@ -322,7 +322,7 @@
         c1=parseFloat(cs.gridTemplateColumns),gap=parseFloat(cs.columnGap)||0,
         xL=u.left+c1,xR=xL+gap,m=Math.max(16,innerWidth*.03),                    // xL / xR: the two edges of the gutter between the word columns
         W=Math.max(40,Math.min(xL-m,innerWidth-xR-m)/2),                          // four equal columns
-        top=Math.max(56,innerHeight*.07),bottom=innerHeight-Math.max(16,innerHeight*.03);   // the whole screen, top to bottom
+        top=document.getElementById("slit").getBoundingClientRect().bottom+14,bottom=innerHeight-Math.max(16,innerHeight*.03);   // the whole screen, from just under the slit to the bottom
     panel.style.setProperty("--w",W+"px");panel.style.setProperty("--g",gap+"px");panel.style.setProperty("--x0",(xL-2*W)+"px");
     panel.style.top=top+"px";panel.style.height=Math.max(140,bottom-top)+"px";
     colsEl.style.height=(Math.max(140,bottom-top)-headEl.offsetHeight)+"px";
@@ -398,8 +398,9 @@
     var u=underEl.getBoundingClientRect(),cs=getComputedStyle(underEl),fs=parseFloat(cs.fontSize),
         c1=parseFloat(cs.gridTemplateColumns),gap=parseFloat(cs.columnGap)||0,xL=u.left+c1,xR=xL+gap,m=Math.max(16,innerWidth*.03),
         lg=document.querySelector(".logo").getBoundingClientRect(),left,width,top,bottom=innerHeight-m;
-    if(innerWidth<=700){left=m;width=innerWidth-2*m;top=lg.bottom+12}                   // phone: under the logo, the full width
-    else{left=Math.max(m,lg.right+m);width=innerWidth-2*left;top=Math.max(56,innerHeight*.07)}   // the whole screen, clear of the logo on both sides
+    top=document.getElementById("slit").getBoundingClientRect().bottom+14;              // just under the slit
+    if(innerWidth<=700){left=m;width=innerWidth-2*m}                                    // phone: the full width
+    else{left=Math.max(m,innerWidth*.07);width=innerWidth-2*left}                       // the whole screen, same margin both sides
     gridEl.style.left=left+"px";gridEl.style.width=width+"px";gridEl.style.top=top+"px";gridEl.style.height=Math.max(140,bottom-top)+"px";
   }
   function setGrid(on){
@@ -446,7 +447,7 @@
     var rs=ms.map(function(m){return m.getBoundingClientRect()}),
         cx=rs.reduce(function(s,r){return s+r.left+r.width/2},0)/3,cy=rs.reduce(function(s,r){return s+r.top+r.height/2},0)/3;
     var grp=document.createElement("div");grp.className="skgrp";grp.style.left=cx+"px";grp.style.top=cy+"px";fx.appendChild(grp);
-    ms.forEach(function(m,k){var r=rs[k],cl=m.cloneNode(true);cl.className=m.className.replace("dragging","")+" skp";
+    ms.forEach(function(m,k){var r=rs[k],cl=m.cloneNode(true);cl.className=m.className.replace("dragging","")+" skp";var sg=cl.querySelector("svg");if(sg){sg.style.transform="rotate(-90deg)";sg.style.transition="transform 1.4s cubic-bezier(.6,0,.2,1)";requestAnimationFrame(function(){requestAnimationFrame(function(){sg.style.transform="rotate(0)"})})}
       cl.style.cssText="position:absolute;margin:0;left:"+(r.left-cx)+"px;top:"+(r.top-cy)+"px;width:"+r.width+"px;height:"+r.height+"px";
       grp.appendChild(cl);m.style.visibility="hidden"});
     var ds=rs.filter(function(r,k){return ms[k].classList.contains("dot")}),eye=Math.abs((ds[0].top+ds[0].height/2)-(ds[1].top+ds[1].height/2)),
@@ -502,7 +503,7 @@
     tween(420,function(p){
       var e=p<.5?4*p*p*p:1-Math.pow(-2*p+2,3)/2,t=ctr(plug),
           cx=x0+(t.x-x0)*e,cy=y0+(t.y-y0)*e,s=1+(sc-1)*e;
-      fly.style.transform="translate("+(cx-pw/2)+"px,"+(cy-ph/2)+"px) rotate("+(tilt*e)+"deg) scale("+s+")";
+      fly.style.transform="translate("+(cx-pw/2)+"px,"+(cy-ph/2)+"px) rotate("+(tilt*e)+"deg) scale("+s+")";var fs=fly.querySelector("svg");if(fs)fs.style.transform="rotate("+(-90*(1-e))+"deg)";
     },function(){
       plug.classList.add("on");fillLetter(plugs.indexOf(plug));fly.style.transition="opacity .2s";fly.style.opacity="0";setTimeout(function(){fly.remove()},230);
       if(plugs.every(function(p){return p.classList.contains("on")})) solved();

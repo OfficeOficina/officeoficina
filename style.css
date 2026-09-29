@@ -17,8 +17,8 @@ a:focus-visible,button:focus-visible,input:focus-visible,textarea:focus-visible{
 .contact button:hover{text-decoration:underline;text-underline-offset:.15em}
 /* home: die-cut card */
 .stage{height:100%;height:100dvh;display:grid;place-items:center;overflow:hidden;position:relative}
-.under{isolation:isolate;position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:max-content;max-width:100vw;align-content:start;
-  display:grid;grid-template-columns:auto auto;column-gap:.38em;
+.under{isolation:isolate;position:absolute;left:0;right:0;top:50%;transform:translateY(-50%);align-content:start;
+  display:grid;grid-template-columns:1fr 1fr;column-gap:.38em;
   font-size:calc(var(--H)*.035);line-height:1.18;letter-spacing:.035em;color:#333;-webkit-text-stroke:.1px currentColor}
 .w{display:block;cursor:grab;touch-action:none;user-select:none;-webkit-user-select:none;position:relative;white-space:nowrap}
 .w.l{justify-self:end;text-align:right}
@@ -377,3 +377,11 @@ a.logolink .m.dragging{cursor:grabbing}
 
 /* index and grid: they take the whole screen - the words and icons go; the logo, the card and its slit stay (logo or Escape to go back) */
 .stage.indexed .under,.stage.gridded .under{opacity:0;visibility:hidden;pointer-events:none}
+
+/* the logo lies on its side at the top, over the slit: O O centred on the middle of the page, the A (pointing up) to the right */
+.logo{left:50%;flex-direction:row;align-items:center;margin-left:calc(var(--d)*-1.136)}
+.dot+.dot{margin-top:0;margin-left:calc(var(--d)*.094)}
+.logo .tri{margin-top:0;margin-left:calc(var(--d)*.12)}
+.logo .tri svg{transform:rotate(-90deg)}
+.slit{top:calc(var(--H)*.015 + var(--H)*.72*.0595 + 12px)}   /* just under the logo */
+@media (max-width:700px){.logo{left:50%;top:4vw}.slit{top:calc(4vw + var(--H)*.72*.0595 + 9px)}}
