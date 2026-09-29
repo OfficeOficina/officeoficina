@@ -370,8 +370,8 @@ a.logolink .m.dragging{cursor:grabbing}
   --dash:repeating-linear-gradient(90deg,#555 0 2px,transparent 2px 5px);--dashv:repeating-linear-gradient(180deg,#555 0 2px,transparent 2px 5px);
   background:var(--dash) 0 100%/100% 1px no-repeat,var(--dashv) 100% 0/1px 100% no-repeat}   /* the outside edge: bottom and right */
 .gsq .sq{position:relative;aspect-ratio:1;min-width:0;overflow:hidden;
-  background:var(--dash) 0 0/100% 1px no-repeat,var(--dashv) 0 0/1px 100% no-repeat}         /* each square: its top and left line */
-.gsq .sq img{position:absolute;inset:12%;width:76%;height:76%;object-fit:contain;mix-blend-mode:multiply}
+  background:var(--dash) 0 0/100% 1px no-repeat,var(--dashv) 0 0/1px 100% no-repeat;background-color:#fff}   /* each square: white, with its top and left line */
+.gsq .sq img{position:absolute;inset:12%;width:76%;height:76%;object-fit:contain}
 .gsq .sq span{position:absolute;left:.6em;bottom:.5em;font-size:.7em;color:#555}
 @media (max-width:700px){.gsq{grid-template-columns:1fr}}
 
