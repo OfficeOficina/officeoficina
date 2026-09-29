@@ -375,6 +375,5 @@ a.logolink .m.dragging{cursor:grabbing}
 .gsq .sq span{position:absolute;left:.6em;bottom:.5em;font-size:.7em;color:#555}
 @media (max-width:700px){.gsq{grid-template-columns:1fr}}
 
-/* index and grid: they take the whole screen - only the logo stays (click it, or Escape, to go back) */
-.stage.indexed .under,.stage.gridded .under,
-.stage.indexed .card,.stage.gridded .card,.stage.indexed .slit,.stage.gridded .slit{opacity:0;visibility:hidden;pointer-events:none}
+/* index and grid: they take the whole screen - the words and icons go; the logo, the card and its slit stay (logo or Escape to go back) */
+.stage.indexed .under,.stage.gridded .under{opacity:0;visibility:hidden;pointer-events:none}
