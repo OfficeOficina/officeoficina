@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Listen — Office Oficina</title>
-<link rel="stylesheet" href="style.css?v=65">
+<link rel="stylesheet" href="style.css?v=64">
 <style>
   /* a record spinning in the middle of the page; the songs listed to its right */
   html,body{height:100%;overflow:hidden}
@@ -213,7 +213,7 @@ var SONGS = [
   pieces.forEach(function(m){
     var d=null;m._x=0;m._y=0;
     function put(extra){m.style.transform="translate("+m._x+"px,"+m._y+"px)"+(extra||"")}
-    m._reset=function(){m._x=0;m._y=0;m.style.transition="";m.style.transform="";var sg=m.querySelector("svg");if(sg){sg.style.transition="";sg.style.transform=""}m.classList.remove("gone")};
+    m._reset=function(){m._x=0;m._y=0;m.style.transition="";m.style.transform="";m.classList.remove("gone")};
     m.addEventListener("pointerdown",function(e){e.preventDefault();if(busy||m.classList.contains("gone"))return;d={px:e.clientX,py:e.clientY,x:m._x,y:m._y,moved:false};m.setPointerCapture(e.pointerId);m.classList.add("dragging");hintOn(m,e.pointerType)});
     m.addEventListener("pointermove",function(e){
       if(!d)return;if(!d.moved){if(Math.hypot(e.clientX-d.px,e.clientY-d.py)<5)return;d.moved=true}
@@ -245,7 +245,7 @@ var SONGS = [
     var rs=ms.map(function(m){return m.getBoundingClientRect()}),
         cx=rs.reduce(function(s,r){return s+r.left+r.width/2},0)/3,cy=rs.reduce(function(s,r){return s+r.top+r.height/2},0)/3;
     var grp=document.createElement("div");grp.className="skgrp";grp.style.left=cx+"px";grp.style.top=cy+"px";fx.appendChild(grp);
-    ms.forEach(function(m,k){var r=rs[k],cl=m.cloneNode(true);cl.className=m.className.replace("dragging","")+" skp";var sg=cl.querySelector("svg");if(sg){sg.style.transform="rotate(-90deg)";sg.style.transition="transform 1.4s cubic-bezier(.6,0,.2,1)";requestAnimationFrame(function(){requestAnimationFrame(function(){sg.style.transform="rotate(0)"})})}
+    ms.forEach(function(m,k){var r=rs[k],cl=m.cloneNode(true);cl.className=m.className.replace("dragging","")+" skp";
       cl.style.cssText="position:absolute;margin:0;left:"+(r.left-cx)+"px;top:"+(r.top-cy)+"px;width:"+r.width+"px;height:"+r.height+"px";
       grp.appendChild(cl);m.style.visibility="hidden"});
     var ds=rs.filter(function(r,k){return ms[k].classList.contains("dot")}),eye=Math.abs((ds[0].top+ds[0].height/2)-(ds[1].top+ds[1].height/2)),
@@ -274,7 +274,7 @@ var SONGS = [
     if(!best)return;var tr=best.getBoundingClientRect(),tc=mid(tr);
     if(bd>Math.max(tr.width*.9,pr.width*.5,14))return;
     best.classList.add("in");best.classList.remove("hint");filled++;
-    m._x+=tc.x-pc.x;m._y+=tc.y-pc.y;m.style.transition="transform .22s ease-out";var sg=m.querySelector("svg");if(sg){sg.style.transition="transform .22s ease-out";sg.style.transform="rotate(0)"}put(" scale("+(tr.width/pr.width)+")");
+    m._x+=tc.x-pc.x;m._y+=tc.y-pc.y;m.style.transition="transform .22s ease-out";put(" scale("+(tr.width/pr.width)+")");
     setTimeout(function(){m.classList.add("gone");m.style.transition="";best.classList.add("flash");setTimeout(function(){best.classList.remove("flash")},400)},220);
     if(filled===marks.length){busy=true;clearTimeout(hintTO);hintOff();setTimeout(dive,700)}
   }
