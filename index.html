@@ -9,7 +9,7 @@
 <meta property="og:description" content="OFFICE COLLABORATIVE is a COLLABORATIVE OFFICE of architecture.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://officeoficina.com">
-<link rel="stylesheet" href="style.css?v=60">
+<link rel="stylesheet" href="style.css?v=61">
 </head>
 <body>
 <main class="stage">
@@ -322,8 +322,7 @@
         c1=parseFloat(cs.gridTemplateColumns),gap=parseFloat(cs.columnGap)||0,
         xL=u.left+c1,xR=xL+gap,m=Math.max(16,innerWidth*.03),                    // xL / xR: the two edges of the gutter between the word columns
         W=Math.max(40,Math.min(xL-m,innerWidth-xR-m)/2),                          // four equal columns
-        ic=document.querySelector(".icrow").getBoundingClientRect(),
-        top=Math.max(56,innerHeight*.07),bottom=ic.top-fs*.9;
+        top=Math.max(56,innerHeight*.07),bottom=innerHeight-Math.max(16,innerHeight*.03);   // the whole screen, top to bottom
     panel.style.setProperty("--w",W+"px");panel.style.setProperty("--g",gap+"px");panel.style.setProperty("--x0",(xL-2*W)+"px");
     panel.style.top=top+"px";panel.style.height=Math.max(140,bottom-top)+"px";
     colsEl.style.height=(Math.max(140,bottom-top)-headEl.offsetHeight)+"px";
@@ -398,9 +397,9 @@
   function gridPlace(){
     var u=underEl.getBoundingClientRect(),cs=getComputedStyle(underEl),fs=parseFloat(cs.fontSize),
         c1=parseFloat(cs.gridTemplateColumns),gap=parseFloat(cs.columnGap)||0,xL=u.left+c1,xR=xL+gap,m=Math.max(16,innerWidth*.03),
-        ic=document.querySelector(".icrow").getBoundingClientRect(),top=Math.max(56,innerHeight*.07),bottom=ic.top-fs*.9,left,width;
-    if(innerWidth<=700){left=m;width=innerWidth-2*m}
-    else{var W=Math.max(40,Math.min(xL-m,innerWidth-xR-m)/2);left=xL-2*W;width=4*W+gap}   // the same width as the index columns
+        lg=document.querySelector(".logo").getBoundingClientRect(),left,width,top,bottom=innerHeight-m;
+    if(innerWidth<=700){left=m;width=innerWidth-2*m;top=lg.bottom+12}                   // phone: under the logo, the full width
+    else{left=Math.max(m,lg.right+m);width=innerWidth-2*left;top=Math.max(56,innerHeight*.07)}   // the whole screen, clear of the logo on both sides
     gridEl.style.left=left+"px";gridEl.style.width=width+"px";gridEl.style.top=top+"px";gridEl.style.height=Math.max(140,bottom-top)+"px";
   }
   function setGrid(on){
