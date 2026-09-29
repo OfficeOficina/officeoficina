@@ -9,7 +9,7 @@
 <meta property="og:description" content="OFFICE COLLABORATIVE is a COLLABORATIVE OFFICE of architecture.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://officeoficina.com">
-<link rel="stylesheet" href="style.css?v=58">
+<link rel="stylesheet" href="style.css?v=60">
 </head>
 <body>
 <main class="stage">
@@ -35,6 +35,7 @@
       </a>
     </span>
     <span class="w nm ix" tabindex="0" role="button" aria-label="Index" aria-controls="index" aria-expanded="false">index</span>
+    <span class="w nm gd" tabindex="0" role="button" aria-label="Grid" aria-controls="gridv" aria-expanded="false">grid</span>
   </div>
 
   <!-- index: opened by "index". The icons go, the words stay until you scroll; then only the text scrolls up and away,
@@ -50,6 +51,9 @@
     </div>
   </section>
   </div>
+  <!-- grid: opened by "grid". Squares with a fine dashed outline, 4 across on a computer, 1 on a phone.
+       The squares are listed in the script (look for GRID). -->
+  <section class="gridv" id="gridv" aria-label="Grid" aria-hidden="true"><div class="gsq" id="gsq"></div></section>
   <div class="sbar" aria-hidden="true"></div>
 
   <!-- write to us: opened by the mail icon. The message takes the OFFICE side, the drawing pad the OFICINA side. -->
@@ -164,7 +168,7 @@
       <svg class="backsvg" viewBox="0 0 525 920">
         <g transform="matrix(-1 0 0 1 525 0)">
           <rect width="525" height="920" fill="#fff" mask="url(#cut)"/>
-          <g transform="translate(265 460) rotate(90)" fill="#000"><path d="M-278.7 -29.37Q-266.38 -29.37 -258.81 -21.06Q-251.24 -12.75 -251.24 0.82Q-251.24 13.46 -258.69 21.84Q-266.14 30.23 -278.62 30.23Q-291.02 30.23 -298.51 21.88Q-306 13.53 -306 0.43Q-306 -12.68 -298.47 -21.02Q-290.95 -29.37 -278.7 -29.37Z"/><path d="M35.44 -29.37Q47.76 -29.37 55.33 -21.06Q62.89 -12.75 62.89 0.82Q62.89 13.46 55.44 21.84Q47.99 30.23 35.51 30.23Q23.11 30.23 15.62 21.88Q8.14 13.53 8.14 0.43Q8.14 -12.68 15.66 -21.02Q23.19 -29.37 35.44 -29.37Z"/><a class="adoor" id="listen" href="work.html" tabindex="-1" aria-label="Enter"><path d="M253.05 28.43L274.19 -28.43L285.86 -28.43L307 28.43Z"/></a></g>
+          <g transform="translate(265 460) rotate(90)" fill="#000"><path d="M-278.7 -29.37Q-266.38 -29.37 -258.81 -21.06Q-251.24 -12.75 -251.24 0.82Q-251.24 13.46 -258.69 21.84Q-266.14 30.23 -278.62 30.23Q-291.02 30.23 -298.51 21.88Q-306 13.53 -306 0.43Q-306 -12.68 -298.47 -21.02Q-290.95 -29.37 -278.7 -29.37Z"/><path d="M35.44 -29.37Q47.76 -29.37 55.33 -21.06Q62.89 -12.75 62.89 0.82Q62.89 13.46 55.44 21.84Q47.99 30.23 35.51 30.23Q23.11 30.23 15.62 21.88Q8.14 13.53 8.14 0.43Q8.14 -12.68 15.66 -21.02Q23.19 -29.37 35.44 -29.37Z"/><path class="doorline" d="M253.05 28.43L274.19 -28.43L285.86 -28.43L307 28.43Z"/><a class="adoor" id="listen" href="work.html" tabindex="-1" aria-label="Enter"><path d="M253.05 28.43L274.19 -28.43L285.86 -28.43L307 28.43Z"/></a></g>
         </g>
       </svg>
     </div>
@@ -216,11 +220,11 @@
     var b=restC(),s=slit.getBoundingClientRect(),cw=card.offsetWidth,ch=card.offsetHeight,sc=Math.min(1,s.width/cw);
     return{sc:sc,ch:ch,x:s.left+s.width/2-b.x,y:s.top+s.height/2+ch*sc/2-b.y};
   }
-  function put(t,cut){card.style.transform="translate("+t.x+"px,"+t.y+"px) rotate("+t.r+"deg) scale("+t.s+")";card.style.clipPath=cut>0?"inset("+cut+"px 0 0 0)":""}
+  function put(t,cut){card.style.transform="perspective(1600px) translate("+t.x+"px,"+t.y+"px) rotate("+t.r+"deg) scale("+t.s+") rotateY("+flip+"deg)";card.style.clipPath=cut>0?"inset("+cut+"px 0 0 0)":""}
   function mix(a,b,e){return{x:a.x+(b.x-a.x)*e,y:a.y+(b.y-a.y)*e,r:a.r+(b.r-a.r)*e,s:a.s+(b.s-a.s)*e}}
   function io(p){return p<.5?4*p*p*p:1-Math.pow(-2*p+2,3)/2}
   function post(){
-    if(busyS||posted)return;busyS=true;posted=true;if(flip){flip=0;card.classList.remove("flipped")}
+    if(busyS||posted)return;busyS=true;posted=true;   // it keeps whichever side is up, and comes back out the same way
     var P=slitPlan(),a0={x:x+sx,y:y+sy,r:tilt+rot+sr,s:1},a1={x:P.x,y:P.y,r:0,s:P.sc};
     tween(420,function(p){put(mix(a0,a1,io(p)),0)},function(){
       tween(520,function(p){var up=P.ch*P.sc*p*p;put({x:a1.x,y:a1.y-up,r:0,s:P.sc},up/P.sc)},function(){
@@ -371,7 +375,7 @@
     e.preventDefault();var dy=e.deltaMode===1?e.deltaY*16:e.deltaY;colAt(e.clientX).scrollTop+=dy;
   },{passive:false});
   function setIndex(on){
-    if(on){if(window.setMail)setMail(false);stageEl.classList.add("indexed");place();ixEl.setAttribute("aria-expanded","true")}
+    if(on){if(window.setMail)setMail(false);setGrid(false);stageEl.classList.add("indexed");place();ixEl.setAttribute("aria-expanded","true")}
     else{
       ixEl.setAttribute("aria-expanded","false");
       stageEl.classList.remove("indexed","projecting");cur=null;
@@ -379,8 +383,37 @@
     }
   }
   window.setIndex=setIndex;
+
+  /* ---- grid: squares with a fine dashed outline, in the place of the words (4 across; 1 on a phone) ----
+     To put a project in a square, fill in its line:  {image:"projects/dublin/1.jpg", title:"Dublin Housing"}
+     An empty {} stays an empty square. Add more {} lines for more squares. */
+  var GRID=[{},{},{},{}, {},{},{},{}, {},{},{},{}];
+  var gridEl=document.getElementById("gridv"),gsq=document.getElementById("gsq"),gdEl=document.querySelector(".gd");
+  function gridBuild(){
+    var n=GRID.length,cols=innerWidth<=700?1:4;while(n%cols)n++;              // always whole rows
+    var h="";for(var k=0;k<n;k++){var g=GRID[k]||{};
+      h+='<div class="sq">'+(g.image?'<img src="'+esc(g.image)+'" alt="'+esc(g.title||"")+'" loading="lazy">':'')+(g.title?'<span>'+esc(g.title)+'</span>':'')+'</div>'}
+    gsq.innerHTML=h;
+  }
+  function gridPlace(){
+    var u=underEl.getBoundingClientRect(),cs=getComputedStyle(underEl),fs=parseFloat(cs.fontSize),
+        c1=parseFloat(cs.gridTemplateColumns),gap=parseFloat(cs.columnGap)||0,xL=u.left+c1,xR=xL+gap,m=Math.max(16,innerWidth*.03),
+        ic=document.querySelector(".icrow").getBoundingClientRect(),top=Math.max(56,innerHeight*.07),bottom=ic.top-fs*.9,left,width;
+    if(innerWidth<=700){left=m;width=innerWidth-2*m}
+    else{var W=Math.max(40,Math.min(xL-m,innerWidth-xR-m)/2);left=xL-2*W;width=4*W+gap}   // the same width as the index columns
+    gridEl.style.left=left+"px";gridEl.style.width=width+"px";gridEl.style.top=top+"px";gridEl.style.height=Math.max(140,bottom-top)+"px";
+  }
+  function setGrid(on){
+    if(on===stageEl.classList.contains("gridded"))return;
+    if(on){if(stageEl.classList.contains("indexed"))setIndex(false);if(window.setMail)setMail(false);gridBuild();gridPlace();gridEl.scrollTop=0}
+    stageEl.classList.toggle("gridded",on);gridEl.setAttribute("aria-hidden",on?"false":"true");gdEl.setAttribute("aria-expanded",on?"true":"false");
+  }
+  window.setGrid=setGrid;
+  addEventListener("wheel",function(e){if(!stageEl.classList.contains("gridded")||(e.target.closest&&e.target.closest(".gridv,.mailbox,.aboutbook")))return;gridEl.scrollTop+=e.deltaMode===1?e.deltaY*16:e.deltaY},{passive:true});   // scrolling anywhere moves the grid
+  addEventListener("resize",function(){if(stageEl.classList.contains("gridded")){gridBuild();gridPlace()}});
+  addEventListener("keydown",function(e){if(e.key==="Escape"&&stageEl.classList.contains("gridded"))setGrid(false)});
   addEventListener("keydown",function(e){if(e.key==="Escape"&&stageEl.classList.contains("indexed")){if(stageEl.classList.contains("projecting"))closeProject();else setIndex(false)}});
-  function act(n){if(n.classList.contains("ix")){if(stageEl.classList.contains("projecting"))closeProject();else setIndex(!stageEl.classList.contains("indexed"))}else openAbout()}
+  function act(n){if(n.classList.contains("gd")){setGrid(!stageEl.classList.contains("gridded"));return}if(n.classList.contains("ix")){if(stageEl.classList.contains("projecting"))closeProject();else setIndex(!stageEl.classList.contains("indexed"))}else openAbout()}
 
   /* ---- the ? and "index": pulse on hover; click or Enter opens them ---- */
   Array.prototype.forEach.call(document.querySelectorAll(".nm"),function(n){
@@ -440,6 +473,7 @@
   function goHome(){
     if(window.setIndex&&document.querySelector(".stage").classList.contains("indexed"))setIndex(false);
     if(window.setMail)setMail(false);
+    if(window.setGrid)setGrid(false);
     if(document.getElementById("about").classList.contains("on"))document.getElementById("closeAbout").click();
   }
 
@@ -648,7 +682,7 @@ var BACKS = ["#000", "#fff"];
   /* open / close: the text fades out, the book fades in, same page (#about) */
   var under=document.querySelector(".under"),book=document.getElementById("about"),q=document.querySelector(".qa");
   function show(on){
-    if(on&&window.setIndex)setIndex(false);if(on&&window.setMail)setMail(false);
+    if(on&&window.setIndex)setIndex(false);if(on&&window.setMail)setMail(false);if(on&&window.setGrid)setGrid(false);
     book.classList.toggle("on",on);under.classList.toggle("away",on);book.setAttribute("aria-hidden",on?"false":"true");
   }
   var pushed=false;
@@ -697,7 +731,7 @@ var BACKS = ["#000", "#fff"];
     }
   }
   function setMail(on){
-    if(on){if(window.setIndex&&stage.classList.contains("indexed"))setIndex(false);stage.classList.add("mailing");place()}
+    if(on){if(window.setIndex&&stage.classList.contains("indexed"))setIndex(false);if(window.setGrid)setGrid(false);stage.classList.add("mailing");place()}
     else stage.classList.remove("mailing");
     box.setAttribute("aria-hidden",on?"false":"true");ic.setAttribute("aria-expanded",on?"true":"false");
   }

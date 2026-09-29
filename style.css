@@ -177,7 +177,7 @@ a:focus-visible,button:focus-visible,input:focus-visible,textarea:focus-visible{
 /* index open: the icons go; the words stay until you scroll. Only this text layer scrolls - the card and logo never move */
 .scroller{position:absolute;inset:0;overflow:hidden;scrollbar-width:none}
 .scroller::-webkit-scrollbar{display:none}
-.stage.indexed .under .w:not(.ix){opacity:0;pointer-events:none}   /* the words give way to the columns */
+.stage.indexed .under .w:not(.ix):not(.gd){opacity:0;pointer-events:none}   /* the words give way to the columns */
 .icrow{transition:opacity .3s ease}
 /* the four columns: same type as the words; the middle two meet at the words' gutter.
    Grid: text | building | (gutter) | furniture | text */
@@ -268,6 +268,7 @@ a:focus-visible,button:focus-visible,input:focus-visible,textarea:focus-visible{
 .card.open .flipb{opacity:1;pointer-events:auto}
 .card .flipb:focus-visible{outline:1px solid #333;outline-offset:3px}
 /* back of the card: the triangle sitting in the A is a door - hover and it opens a little, click and it swings open */
+.cback .backsvg .doorline{fill:none;stroke:#000;stroke-width:1.7;transform-box:fill-box;transform-origin:50% 50%;transform:scale(1.14);stroke-dasharray:4.5 3.5;stroke-linejoin:round;pointer-events:none}   /* dashed outline of the door, the exact same shape */
 .cback .backsvg .adoor{pointer-events:auto;cursor:pointer}
 .cback .backsvg .adoor path{transform-box:fill-box;transform-origin:50% 0;transition:transform .45s cubic-bezier(.3,.1,.2,1)}
 .cback .backsvg .adoor:hover path{transform:scaleY(.72) skewX(-10deg)}
@@ -356,3 +357,20 @@ a.logolink .m.dragging{cursor:grabbing}
 .skgrp .skp{cursor:default}
 .skullsvg{position:absolute;opacity:0;transition:opacity 1.4s ease}
 .skullsvg.on{opacity:1}
+
+/* "grid": sits under "index", centred the same way */
+.w.gd{grid-column:2;justify-self:start;display:inline-block;width:3em;text-align:center;margin-left:calc(-.19em - 1.5em);margin-top:.35em}
+.stage.projecting .under .gd{opacity:0;visibility:hidden;pointer-events:none}
+/* the grid: perfect squares, very fine dashed lines, 4 across (1 on a phone); scrolls if there are more rows */
+.gridv{position:fixed;z-index:1;display:none;overflow-y:auto;overscroll-behavior:contain;scrollbar-width:none}
+.gridv::-webkit-scrollbar{display:none}
+.stage.gridded .gridv{display:block}
+.stage.gridded .under .w:not(.ix):not(.gd){opacity:0;pointer-events:none}
+.gsq{display:grid;grid-template-columns:repeat(4,1fr);
+  --dash:repeating-linear-gradient(90deg,#555 0 2px,transparent 2px 5px);--dashv:repeating-linear-gradient(180deg,#555 0 2px,transparent 2px 5px);
+  background:var(--dash) 0 100%/100% 1px no-repeat,var(--dashv) 100% 0/1px 100% no-repeat}   /* the outside edge: bottom and right */
+.gsq .sq{position:relative;aspect-ratio:1;min-width:0;overflow:hidden;
+  background:var(--dash) 0 0/100% 1px no-repeat,var(--dashv) 0 0/1px 100% no-repeat}         /* each square: its top and left line */
+.gsq .sq img{position:absolute;inset:12%;width:76%;height:76%;object-fit:contain;mix-blend-mode:multiply}
+.gsq .sq span{position:absolute;left:.6em;bottom:.5em;font-size:.7em;color:#555}
+@media (max-width:700px){.gsq{grid-template-columns:1fr}}
