@@ -76,9 +76,14 @@
   .ptw{position:fixed;inset:0;z-index:51;display:flex;align-items:center;justify-content:center;color:#fff;font-size:clamp(1.4rem,3vw,2.4rem);opacity:0;transition:opacity 1.6s ease;pointer-events:none}
   .ptw.on{opacity:1}
   @media (prefers-reduced-motion:reduce){.record .disc{animation-duration:8s}}
+  /* the lounge: just the plan, in the middle of the screen */
+  .lounge .pair,.lounge .side,.lounge .lside{display:none}
+  .plan{display:none}
+  .lounge .plan{display:block;position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);width:min(56vh,84vw,640px);height:auto;
+    user-select:none;-webkit-user-select:none;-webkit-user-drag:none;pointer-events:none}
 </style>
 </head>
-<body>
+<body class="lounge">   <!-- "lounge": you arrive at the plan of the room. Take this class off to bring back the book and the record. -->
 <a class="logo logolink" href="index.html" aria-label="Office Oficina: back to the home page">
   <span class="m dot"></span><span class="m dot"></span>
   <span class="m tri"><svg viewBox="0 0 39 37" preserveAspectRatio="none" aria-hidden="true"><path d="M0 0L39 14.5V22.5L0 37Z"/></svg></span>
@@ -98,6 +103,8 @@
     <div class="sp" id="sp" hidden><div id="spp"></div></div>
   </div>
 </main>
+<!-- the lounge: the plan of the room, in the middle of the screen. (The book and the record are still here, hidden, for later.) -->
+<img class="plan" src="lounge/plan.png" alt="Plan of the listening room: a door, a sofa, a round table, an armchair and a side table" draggable="false">
 
 <script>
 /* ==================================================================
@@ -192,7 +199,7 @@ var SONGS = [
   rec.addEventListener("click",function(){if(justUnlocked)return;if(playing)pause();else start()});
 
   if(list[0].spotify){mark();spPlay(list[0].spotify)}   // Spotify may wait for a first click (on the record or its bar) before it plays
-  else start();   // you came in through ENTER: the record is already turning
+  else if(!document.body.classList.contains("lounge"))start();   // you came in through the door: the record is already turning (not in the lounge for now)
 })();
 </script>
 <script>
@@ -269,6 +276,7 @@ var SONGS = [
 
   /* dropped close enough to its place on the record: it shrinks into it and becomes part of the record's logo */
   function drop(m,put){
+    if(!rec.offsetParent)return;                   // the record is put away (the lounge): nothing to drop into
     var pr=m.getBoundingClientRect(),pc=mid(pr),best=null,bd=1e9;
     open(m).forEach(function(t){var c=mid(t.getBoundingClientRect()),dd=Math.hypot(c.x-pc.x,c.y-pc.y);if(dd<bd){bd=dd;best=t}});
     if(!best)return;var tr=best.getBoundingClientRect(),tc=mid(tr);
