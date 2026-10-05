@@ -9,7 +9,7 @@
 <meta property="og:description" content="OFFICE COLLABORATIVE is a COLLABORATIVE OFFICE of architecture.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://officeoficina.com">
-<link rel="stylesheet" href="style.css?v=64">
+<link rel="stylesheet" href="style.css?v=68">
 </head>
 <body>
 <main class="stage">
@@ -320,9 +320,9 @@
     function place(){                                        // the columns take the place of the words: from the top down to just above the icons
     var u=underEl.getBoundingClientRect(),cs=getComputedStyle(underEl),fs=parseFloat(cs.fontSize),
         c1=parseFloat(cs.gridTemplateColumns),gap=parseFloat(cs.columnGap)||0,
-        xL=u.left+c1,xR=xL+gap,m=Math.max(16,innerWidth*.03),                    // xL / xR: the two edges of the gutter between the word columns
+        xL=u.left+c1,xR=xL+gap,m=Math.max(16,innerWidth*.03,innerWidth>700?document.querySelector(".logo").getBoundingClientRect().right+16:0),   // xL / xR: the gutter; m keeps the columns clear of the logo (both sides alike)
         W=Math.max(40,Math.min(xL-m,innerWidth-xR-m)/2),                          // four equal columns
-        top=Math.max(56,innerHeight*.07),bottom=innerHeight-Math.max(16,innerHeight*.03);   // the whole screen, top to bottom
+        top=Math.max(56,innerHeight*.07,document.getElementById("slit").getBoundingClientRect().bottom+14),bottom=innerHeight-Math.max(16,innerHeight*.03);   // the whole screen, from just under the slit to the bottom
     panel.style.setProperty("--w",W+"px");panel.style.setProperty("--g",gap+"px");panel.style.setProperty("--x0",(xL-2*W)+"px");
     panel.style.top=top+"px";panel.style.height=Math.max(140,bottom-top)+"px";
     colsEl.style.height=(Math.max(140,bottom-top)-headEl.offsetHeight)+"px";
