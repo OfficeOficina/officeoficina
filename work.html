@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Listen — Office Oficina</title>
-<link rel="stylesheet" href="style.css?v=71">
+<link rel="stylesheet" href="style.css?v=72">
 <style>
   /* a record spinning in the middle of the page; the songs listed to its right */
   html,body{height:100%;overflow:hidden}
@@ -216,12 +216,12 @@ var SONGS = [
     m._reset=function(){m._x=0;m._y=0;m.style.transition="";m.style.transform="";m.classList.remove("gone")};
     m.addEventListener("pointerdown",function(e){e.preventDefault();if(busy||m.classList.contains("gone"))return;d={px:e.clientX,py:e.clientY,x:m._x,y:m._y,moved:false};m.setPointerCapture(e.pointerId);m.classList.add("dragging");hintOn(m,e.pointerType)});
     m.addEventListener("pointermove",function(e){
-      if(!d)return;if(!d.moved){if(Math.hypot(e.clientX-d.px,e.clientY-d.py)<5)return;d.moved=true}
+      if(!d)return;if(!d.moved){if(Math.hypot(e.clientX-d.px,e.clientY-d.py)<5)return;d.moved=true;m.classList.remove("mir")}
       var ox=m._x,oy=m._y;m._x=d.x+e.clientX-d.px;m._y=d.y+e.clientY-d.py;put();
       var r=m.getBoundingClientRect();if(r.right<12||r.left>innerWidth-12||r.bottom<12||r.top>innerHeight-12){m._x=ox;m._y=oy;put()}
     });
     function up(){var was=d;d=null;m.classList.remove("dragging");if(!was)return;
-      if(!was.moved){hintOff();location.href=link.getAttribute("href");return}
+      if(!was.moved){hintOff();if(m.classList.contains("tri")&&!m.classList.contains("mir")){m.classList.add("mir");return}location.href=link.getAttribute("href");return}
       hintRelease();drop(m,put);setTimeout(skullCheck,30)}
     m.addEventListener("pointerup",up);m.addEventListener("pointercancel",function(){d=null;m.classList.remove("dragging");hintOff()});
   });

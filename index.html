@@ -9,7 +9,7 @@
 <meta property="og:description" content="OFFICE COLLABORATIVE is a COLLABORATIVE OFFICE of architecture.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://officeoficina.com">
-<link rel="stylesheet" href="style.css?v=71">
+<link rel="stylesheet" href="style.css?v=72">
 </head>
 <body>
 <main class="stage">
@@ -99,6 +99,8 @@
     </div>
   </div>
 
+  <!-- in Work (the index): a little 3 x 3 grid just under the slit opens the grid; click it again for the index -->
+  <button class="gridbtn" id="gridbtn" type="button" aria-label="Grid" aria-pressed="false"><svg viewBox="0 0 22 22" aria-hidden="true"><path d="M.5 .5H21.5V21.5H.5ZM7.5 .5V21.5M14.5 .5V21.5M.5 7.5H21.5M.5 14.5H21.5"/></svg></button>
   <!-- help: the ? top right; the line bottom left says what things do -->
   <button class="helpq" id="helpq" type="button" aria-label="Help: show what everything does" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="11"/><text x="12" y="16.6" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="13.5">?</text></svg></button>
   <p class="helpline" id="helpline" aria-live="polite"></p>
@@ -188,8 +190,9 @@
     x=drag.x+(e.clientX-drag.px); y=drag.y+(e.clientY-drag.py);
     apply();
   });
-  function end(){ var was=drag; drag=null; card.classList.remove("dragging");
+  function end(e){ var was=drag; drag=null; card.classList.remove("dragging");
     if(was&&was.moved&&nearSlit()){post();return}
+    if(was&&!was.moved&&e.type==="pointerup")goHome();   // a click on the card (without dragging it) brings you back to the start
   }
   card.addEventListener("pointerup",end);
   card.addEventListener("pointercancel",end);
@@ -251,7 +254,7 @@
     });
     w.addEventListener("pointermove",function(e){
       if(!d) return;
-      if(!d.moved){ if(Math.hypot(e.clientX-d.px,e.clientY-d.py)<5) return; d.moved=true; }   // a click never nudges the word
+      if(!d.moved){ if(Math.hypot(e.clientX-d.px,e.clientY-d.py)<5) return; d.moved=true; w.classList.remove("mir"); }   // a click never nudges the word
       var ox=wx,oy=wy;
       wx=d.x+(e.clientX-d.px); wy=d.y+(e.clientY-d.py);
       w.style.transform="translate("+wx+"px,"+wy+"px)";
@@ -260,7 +263,7 @@
         wx=ox; wy=oy; w.style.transform="translate("+wx+"px,"+wy+"px)";
       }
     });
-    function up(){ var was=d; d=null; w.classList.remove("dragging"); if(was&&w.classList.contains("m")){ if(!was.moved){hintRelease();goHome();return} dropCheck(w); hintRelease(); setTimeout(skullCheck,30); }
+    function up(){ var was=d; d=null; w.classList.remove("dragging"); if(was&&w.classList.contains("m")){ if(!was.moved){hintRelease();if(w.classList.contains("tri")&&!w.classList.contains("mir")){w.classList.add("mir");return}goHome();return} dropCheck(w); hintRelease(); setTimeout(skullCheck,30); }
       if(was&&!was.moved&&w.dataset.go) nav(w); }   // Work / About / Contact / Instagram
     w.addEventListener("pointerup",up);
     w.addEventListener("pointercancel",up);
@@ -314,7 +317,7 @@
         c1=parseFloat(cs.gridTemplateColumns),gap=parseFloat(cs.columnGap)||0,
         xL=u.left+c1,xR=xL+gap,m=Math.max(16,innerWidth*.03,innerWidth>700?document.querySelector(".logo").getBoundingClientRect().right+16:0),   // xL / xR: the gutter; m keeps the columns clear of the logo (both sides alike)
         W=Math.max(40,Math.min(xL-m,innerWidth-xR-m)/2),                          // four equal columns
-        top=Math.max(56,innerHeight*.07,document.getElementById("slit").getBoundingClientRect().bottom+14),bottom=innerHeight-Math.max(16,innerHeight*.03);   // the whole screen, from just under the slit to the bottom
+        top=Math.max(56,innerHeight*.07,document.getElementById("gridbtn").getBoundingClientRect().bottom+12,innerWidth<=700?document.querySelector(".logo").getBoundingClientRect().bottom+10:0),bottom=innerHeight-Math.max(16,innerHeight*.03);   // the whole screen, from just under the slit to the bottom
     panel.style.setProperty("--w",W+"px");panel.style.setProperty("--g",gap+"px");panel.style.setProperty("--x0",(xL-2*W)+"px");
     panel.style.top=top+"px";panel.style.height=Math.max(140,bottom-top)+"px";
     colsEl.style.height=(Math.max(140,bottom-top)-headEl.offsetHeight)+"px";
@@ -397,9 +400,10 @@
   function setGrid(on){
     if(on===stageEl.classList.contains("gridded"))return;
     if(on){if(stageEl.classList.contains("indexed"))setIndex(false);if(window.setMail)setMail(false);gridBuild();gridPlace();gridEl.scrollTop=0}
-    stageEl.classList.toggle("gridded",on);gridEl.setAttribute("aria-hidden",on?"false":"true");
+    stageEl.classList.toggle("gridded",on);document.getElementById("gridbtn").setAttribute("aria-pressed",on?"true":"false");gridEl.setAttribute("aria-hidden",on?"false":"true");
   }
   window.setGrid=setGrid;
+  document.getElementById("gridbtn").addEventListener("click",function(){if(stageEl.classList.contains("gridded"))setIndex(true);else setGrid(true)});
   addEventListener("wheel",function(e){if(!stageEl.classList.contains("gridded")||(e.target.closest&&e.target.closest(".gridv,.mailbox,.aboutbook")))return;gridEl.scrollTop+=e.deltaMode===1?e.deltaY*16:e.deltaY},{passive:true});   // scrolling anywhere moves the grid
   addEventListener("resize",function(){if(stageEl.classList.contains("gridded")){gridBuild();gridPlace()}});
   addEventListener("keydown",function(e){if(e.key==="Escape"&&stageEl.classList.contains("gridded"))setGrid(false)});
@@ -461,6 +465,7 @@
 
   /* ---- a click on the logo (without dragging it) always brings you back to the home view ---- */
   function goHome(){
+    Array.prototype.forEach.call(document.querySelectorAll(".m.mir"),function(m){m.classList.remove("mir")});   // the A turns back
     if(window.setIndex&&document.querySelector(".stage").classList.contains("indexed"))setIndex(false);
     if(window.setMail)setMail(false);
     if(window.setGrid)setGrid(false);
@@ -899,11 +904,12 @@ var BACKS = ["#000", "#fff"];
   function card(){return document.getElementById("card").classList.contains("open")}
   var TIPS=[                                         // first match wins: the most particular things first
     ["#helpq",function(){return on?"Help: click to turn help off (or press Esc).":"Help: click, then point at anything to see what it does."}],
-    [".logo .m",function(){return card()?"Logo: click to go back to the start. Drag the shapes around; stack the two dots with the triangle to their left for a surprise.":"Logo: drag each shape into the card — the dots into the two O's, the triangle into the A — to unlock the card. Click to go back to the start."}],
+    [".logo .m",function(){return card()?"Logo: click a dot to go back to the start; click the triangle to mirror it, then again to go back. Drag the shapes around; stack the two dots with the triangle to their left for a surprise.":"Logo: drag each shape into the card — the dots into the two O's, the triangle into the A — to unlock the card. Click a dot to go back to the start; click the triangle to mirror it, then again to go back."}],
+    ["#gridbtn",function(){return document.querySelector(".stage").classList.contains("gridded")?"Grid: click to go back to the index.":"Grid: click to see all the projects as a grid of squares."}],
     ["#rot","Turn: drag around the card to rotate it."],
     ["#flipF","Flip: click to turn the card over."],
     ["#listen","Door: click to open it and go in to the record room."],
-    [".card",function(){return card()?"Card: drag to move it. Turn it with the arrow, flip it over, and on the back the A is a door. Drop it in the slot at the top to put it away.":"Card: drag to move it and uncover the words underneath. Fit the logo's three shapes into its O, O and A to unlock it."}],
+    [".card",function(){return card()?"Card: click to go back to the start; drag to move it. Turn it with the arrow, flip it over, and on the back the A is a door. Drop it in the slot at the top to put it away.":"Card: click to go back to the start; drag to move it and uncover the words underneath. Fit the logo's three shapes into its O, O and A to unlock it."}],
     ["#slit",function(){return document.getElementById("card").style.visibility==="hidden"?"Slot: click to get the card back.":"Slot: drop the card in here to put it away. Click to put it away or get it back."}],
     ['[data-go="work"]',"Work: click to open the index of projects. Drag to move the word."],
     ['[data-go="about"]',"About: click to open the flip book about us. Drag to move the word."],
