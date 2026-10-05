@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 465 465">
+  <g fill="#000">
+    <path d="M9 9H456V456H140V439H439V26H26V456H9Z"/>
+    <rect x="9" y="439" width="28" height="17"/>
+    <rect x="37.5" y="335" width="5" height="104"/>
+  </g>
+  <g fill="none" stroke="#000" stroke-width="1.1">
+    <path d="M42.5 335A97 104 0 0 1 140 439"/>
+    <path d="M26 71.5H439"/>
+    <path d="M140 439V405H439"/>
+    <path d="M350 111H439M350 352H439M350 111V352M350 123H439M350 340H439M350 195H439M350 268.5H439M407.5 123V340M419 123V340"/>
+    <circle cx="246.5" cy="242" r="62"/>
+    <path d="M136 82.5L165 123.5L127.5 150L97.5 111Z"/>
+    <circle cx="131" cy="115.5" r="24"/>
+    <path d="M131 116L150 101.5"/>
+    <rect x="65.5" y="145" width="46" height="48" rx="9" transform="rotate(22 88.5 169)"/>
+    <rect x="61" y="131" width="7" height="50" rx="3.5" transform="rotate(27 64.5 156)"/>
+  </g>
+  <circle cx="150" cy="101.5" r="1.4" fill="#000"/>
+</svg>
