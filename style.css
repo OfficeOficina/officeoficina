@@ -430,3 +430,10 @@ html.help,html.help *{cursor:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3
 /* the little grid: a bit lower still, well clear of the slot */
 .gridbtn{top:calc(var(--H)*.015 + 44px)}
 @media (max-width:700px){.gridbtn{top:calc(4vw + 40px)}}
+
+/* the listening room: through the door you arrive at the plan of the room, in the middle of the screen; only the logo stays */
+.loungev{position:fixed;inset:0;z-index:5;background:var(--bg);display:grid;place-items:center;opacity:0;visibility:hidden;transition:opacity .5s ease,visibility 0s .5s}
+.loungev img{display:block;width:min(56vh,84vw,640px);height:auto;user-select:none;-webkit-user-select:none;-webkit-user-drag:none;pointer-events:none}
+.stage.lounging .loungev{opacity:1;visibility:visible;transition:opacity .5s ease}
+.stage.lounging .logo,.stage.lounging~.logo{z-index:6}
+.stage.lounging .helpq{z-index:6}
