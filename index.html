@@ -9,7 +9,7 @@
 <meta property="og:description" content="OFFICE COLLABORATIVE is a COLLABORATIVE OFFICE of architecture.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://officeoficina.com">
-<link rel="stylesheet" href="style.css?v=70">
+<link rel="stylesheet" href="style.css?v=71">
 </head>
 <body>
 <main class="stage">
@@ -23,19 +23,8 @@
     <span class="w l">based</span><span class="w r">in</span>
     <span class="w l">Austin</span><span class="w r">USA</span>
     <span class="w l">Mexico City</span><span class="w r">Mexico</span>
-    <span class="icrow">
-      <a class="ic mailic" href="contact.html" role="button" aria-label="Write to us" aria-controls="mailbox" aria-expanded="false">
-        <svg viewBox="0 0 26 20" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"><rect x="1" y="1" width="24" height="18"/><path d="M1 1l12 10L25 1M1 19l9-9M25 19l-9-9"/></svg>
-      </a>
-      <a class="ic" href="https://www.instagram.com/officeoficina/" rel="noopener" aria-label="Instagram">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="2" width="20" height="20" rx="6"/><circle cx="12" cy="12" r="4.6"/><circle cx="17.6" cy="6.4" r="1" fill="currentColor" stroke="none"/></svg>
-      </a>
-      <a class="ic nm qa" href="#about" role="button" aria-label="About us" aria-controls="about">
-        <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="11" stroke="currentColor" stroke-width="1.2"/><text x="12" y="16.6" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="13.5" fill="currentColor">?</text></svg>
-      </a>
-    </span>
-    <span class="w nm ix" tabindex="0" role="button" aria-label="Index" aria-controls="index" aria-expanded="false">index</span>
-    <span class="w nm gd" tabindex="0" role="button" aria-label="Grid" aria-controls="gridv" aria-expanded="false">grid</span>
+    <span class="w l nav nav1" data-go="work" tabindex="0" role="button" aria-controls="index" aria-expanded="false">Work</span><span class="w r nav nav1" data-go="about" tabindex="0" role="button" aria-controls="about">About</span>
+    <span class="w l nav" data-go="contact" tabindex="0" role="button" aria-controls="mailbox" aria-expanded="false">Contact</span><span class="w r nav" data-go="instagram" tabindex="0" role="link" data-href="https://www.instagram.com/officeoficina/">Instagram</span>
   </div>
 
   <!-- index: opened by "index". The icons go, the words stay until you scroll; then only the text scrolls up and away,
@@ -110,6 +99,9 @@
     </div>
   </div>
 
+  <!-- help: the ? top right; the line bottom left says what things do -->
+  <button class="helpq" id="helpq" type="button" aria-label="Help: show what everything does" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="11"/><text x="12" y="16.6" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="13.5">?</text></svg></button>
+  <p class="helpline" id="helpline" aria-live="polite"></p>
   <!-- the slit, top centre: drop the card into it and it slips away; click it to get the card back -->
   <button class="slit" id="slit" type="button" aria-label="Card slot: drop the card here"></button>
 
@@ -269,7 +261,7 @@
       }
     });
     function up(){ var was=d; d=null; w.classList.remove("dragging"); if(was&&w.classList.contains("m")){ if(!was.moved){hintRelease();goHome();return} dropCheck(w); hintRelease(); setTimeout(skullCheck,30); }
-      if(was&&!was.moved&&w.classList.contains("nm")) act(w); }   // click "index": the index
+      if(was&&!was.moved&&w.dataset.go) nav(w); }   // Work / About / Contact / Instagram
     w.addEventListener("pointerup",up);
     w.addEventListener("pointercancel",up);
   });
@@ -298,7 +290,7 @@
     {title:"Furniture title 06", meta:"Material, year", link:"#", text:"Text about this piece. Two or three sentences on what it is, what it is made of and how it came about."}
   ];
 
-  var stageEl=document.querySelector(".stage"),ixEl=document.querySelector(".ix"),panel=document.getElementById("index"),
+  var stageEl=document.querySelector(".stage"),ixEl=document.querySelector('[data-go="work"]'),panel=document.getElementById("index"),
       scr=document.getElementById("scroller"),underEl=document.querySelector(".under"),sbar=document.querySelector(".sbar"),
       headEl=panel.querySelector(".ixhead"),colsEl=document.getElementById("ixcols"),cols=[].slice.call(colsEl.children),
       sets=[[],[],[],[]],lastCol=null;
@@ -387,7 +379,7 @@
      To put a project in a square, fill in its line:  {image:"projects/dublin/1.jpg", title:"Dublin Housing"}
      An empty {} stays an empty square. Add more {} lines for more squares. */
   var GRID=[{image:"projects/tower/1.png"},{},{},{}, {},{},{},{}, {},{},{},{}];
-  var gridEl=document.getElementById("gridv"),gsq=document.getElementById("gsq"),gdEl=document.querySelector(".gd");
+  var gridEl=document.getElementById("gridv"),gsq=document.getElementById("gsq"),gdEl=null;
   function gridBuild(){
     var n=GRID.length,cols=innerWidth<=700?1:4;while(n%cols)n++;              // always whole rows
     var h="";for(var k=0;k<n;k++){var g=GRID[k]||{};
@@ -405,26 +397,25 @@
   function setGrid(on){
     if(on===stageEl.classList.contains("gridded"))return;
     if(on){if(stageEl.classList.contains("indexed"))setIndex(false);if(window.setMail)setMail(false);gridBuild();gridPlace();gridEl.scrollTop=0}
-    stageEl.classList.toggle("gridded",on);gridEl.setAttribute("aria-hidden",on?"false":"true");gdEl.setAttribute("aria-expanded",on?"true":"false");
+    stageEl.classList.toggle("gridded",on);gridEl.setAttribute("aria-hidden",on?"false":"true");
   }
   window.setGrid=setGrid;
   addEventListener("wheel",function(e){if(!stageEl.classList.contains("gridded")||(e.target.closest&&e.target.closest(".gridv,.mailbox,.aboutbook")))return;gridEl.scrollTop+=e.deltaMode===1?e.deltaY*16:e.deltaY},{passive:true});   // scrolling anywhere moves the grid
   addEventListener("resize",function(){if(stageEl.classList.contains("gridded")){gridBuild();gridPlace()}});
   addEventListener("keydown",function(e){if(e.key==="Escape"&&stageEl.classList.contains("gridded"))setGrid(false)});
   addEventListener("keydown",function(e){if(e.key==="Escape"&&stageEl.classList.contains("indexed")){if(stageEl.classList.contains("projecting"))closeProject();else setIndex(false)}});
-  function act(n){if(n.classList.contains("gd")){setGrid(!stageEl.classList.contains("gridded"));return}if(n.classList.contains("ix")){if(stageEl.classList.contains("projecting"))closeProject();else setIndex(!stageEl.classList.contains("indexed"))}else openAbout()}
-
-  /* ---- the ? and "index": pulse on hover; click or Enter opens them ---- */
-  Array.prototype.forEach.call(document.querySelectorAll(".nm"),function(n){
-    var pair=[n];
-    function on(v){Array.prototype.forEach.call(pair,function(p){p.classList.toggle("pulse",v)})}
-
-    n.addEventListener("pointerleave",function(){on(false)});
-    n.addEventListener("focus",function(){on(true)});
-    n.addEventListener("blur",function(){on(false)});
-    if(n.tagName==="A") n.addEventListener("click",function(e){e.preventDefault();act(n)});
-    else n.addEventListener("keydown",function(e){if(e.key==="Enter"||e.key===" "){e.preventDefault();act(n)}});
+  /* ---- the four words under the address: Work (the index), About (the flip book), Contact (write / draw to us), Instagram ---- */
+  function nav(n){
+    var g=n.dataset.go;
+    if(g==="work"){if(stageEl.classList.contains("projecting"))closeProject();else setIndex(!stageEl.classList.contains("indexed"))}
+    else if(g==="about")openAbout();
+    else if(g==="contact")setMail(!stageEl.classList.contains("mailing"));
+    else if(g==="instagram")window.open(n.dataset.href,"_blank","noopener");
+  }
+  Array.prototype.forEach.call(document.querySelectorAll(".nav"),function(n){
+    n.addEventListener("keydown",function(e){if(e.key==="Enter"||e.key===" "){e.preventDefault();nav(n)}});
   });
+  /* the grid is kept, ready for a way in from the index: setGrid(true) opens it */
 
   /* ---- the skull: put the two dots one above the other with the triangle pointing at the gap between them (a face in
      profile) and the logo turns into a skull - it comes to the middle, turns to look at you, everything goes black,
@@ -679,7 +670,7 @@ var BACKS = ["#000", "#fff"];
   function step(p,d){turnTo(p,cur[p]+d,d)}
 
   /* open / close: the text fades out, the book fades in, same page (#about) */
-  var under=document.querySelector(".under"),book=document.getElementById("about"),q=document.querySelector(".qa");
+  var under=document.querySelector(".under"),book=document.getElementById("about");
   function show(on){
     if(on&&window.setIndex)setIndex(false);if(on&&window.setMail)setMail(false);if(on&&window.setGrid)setGrid(false);
     book.classList.toggle("on",on);under.classList.toggle("away",on);book.setAttribute("aria-hidden",on?"false":"true");
@@ -707,7 +698,7 @@ var BACKS = ["#000", "#fff"];
 /* ---- write to us: the words, icons and "index" give way to two squares - the message on the OFFICE side,
         the drawing on the OFICINA side (on phones: one above the other). Click the logo to go back. ---- */
 (function(){
-  var stage=document.querySelector(".stage"),box=document.getElementById("mailbox"),ic=document.querySelector(".mailic"),
+  var stage=document.querySelector(".stage"),box=document.getElementById("mailbox"),ic=document.querySelector('[data-go="contact"]'),
       under=document.querySelector(".under"),L=box.querySelector(".mailL"),R=box.querySelector(".mailR");
   function place(){
     var vw=innerWidth,vh=innerHeight,S;
@@ -735,7 +726,6 @@ var BACKS = ["#000", "#fff"];
     box.setAttribute("aria-hidden",on?"false":"true");ic.setAttribute("aria-expanded",on?"true":"false");
   }
   window.setMail=setMail;
-  ic.addEventListener("click",function(e){e.preventDefault();e.stopPropagation();setMail(!stage.classList.contains("mailing"))});
   addEventListener("resize",function(){if(stage.classList.contains("mailing"))place()});
   addEventListener("keydown",function(e){if(e.key==="Escape"&&stage.classList.contains("mailing"))setMail(false)});
 })();
@@ -899,6 +889,49 @@ var BACKS = ["#000", "#fff"];
       .catch(function(){nativeSend=true;mailForm.submit()})
       .then(function(){mailSend.disabled=false});
   });
+})();
+</script>
+<script>
+/* ---- help: click the ? (top right) and the pointer turns into a ?; whatever you point at, the line in the bottom-left
+   corner tells you what it does and what to do. Click the ? again, or press Esc, to stop. ---- */
+(function(){
+  var q=document.getElementById("helpq"),line=document.getElementById("helpline"),root=document.documentElement,on=false;
+  function card(){return document.getElementById("card").classList.contains("open")}
+  var TIPS=[                                         // first match wins: the most particular things first
+    ["#helpq",function(){return on?"Help: click to turn help off (or press Esc).":"Help: click, then point at anything to see what it does."}],
+    [".logo .m",function(){return card()?"Logo: click to go back to the start. Drag the shapes around; stack the two dots with the triangle to their left for a surprise.":"Logo: drag each shape into the card — the dots into the two O's, the triangle into the A — to unlock the card. Click to go back to the start."}],
+    ["#rot","Turn: drag around the card to rotate it."],
+    ["#flipF","Flip: click to turn the card over."],
+    ["#listen","Door: click to open it and go in to the record room."],
+    [".card",function(){return card()?"Card: drag to move it. Turn it with the arrow, flip it over, and on the back the A is a door. Drop it in the slot at the top to put it away.":"Card: drag to move it and uncover the words underneath. Fit the logo's three shapes into its O, O and A to unlock it."}],
+    ["#slit",function(){return document.getElementById("card").style.visibility==="hidden"?"Slot: click to get the card back.":"Slot: drop the card in here to put it away. Click to put it away or get it back."}],
+    ['[data-go="work"]',"Work: click to open the index of projects. Drag to move the word."],
+    ['[data-go="about"]',"About: click to open the flip book about us. Drag to move the word."],
+    ['[data-go="contact"]',"Contact: click to write us a message or send us a drawing. Drag to move the word."],
+    ['[data-go="instagram"]',"Instagram: click to open our Instagram in a new tab. Drag to move the word."],
+    [".under .w","Word: drag it anywhere."],
+    [".index .pj img,.index .pj a","Project: click to see its drawings large. Click the image for the next one; Esc or the logo to go back."],
+    [".pview","Project: click the image for the next one. Esc goes back to the index; the logo goes home."],
+    [".ixc,.ixhead","Index: scroll each column on its own; text and drawings keep each other company. Esc or the logo to close."],
+    [".gridv","Grid: scroll to see all the squares. Esc or the logo to close."],
+    [".wheelpop","Colour: pick a colour on the wheel; the bar sets light or dark. Drag the edge to move it."],
+    [".mailR","Drawing pad: draw with the mouse or a finger. The dot picks the colour. Send mails us your drawing."],
+    [".mailL","Message: write your name, email and message, then Send. Esc or the logo to close."],
+    ["#mix","Mix: shuffle the heads, bodies and legs."],
+    [".aboutbook","About: click a strip to flip it — head, body, legs. Esc or the logo to close."]
+  ];
+  function tipFor(el){
+    for(var i=0;i<TIPS.length;i++){var hit=el&&el.closest&&el.closest(TIPS[i][0]);if(hit){var t=TIPS[i][1];return typeof t==="function"?t():t}}
+    return "Help is on: point at anything to see what it does. Click the ? or press Esc to stop.";
+  }
+  function show(t){line.textContent=t;line.classList.toggle("on",!!t)}
+  function set(v){on=v;root.classList.toggle("help",v);q.setAttribute("aria-pressed",v?"true":"false");show(v?tipFor(q):"")}
+  q.addEventListener("click",function(e){e.stopPropagation();set(!on)});
+  q.addEventListener("pointerenter",function(){if(!on)show(tipFor(q))});
+  q.addEventListener("pointerleave",function(){if(!on)show("")});
+  addEventListener("pointermove",function(e){if(on)show(tipFor(e.target))},{passive:true});
+  addEventListener("pointerdown",function(e){if(on&&e.pointerType!=="mouse")show(tipFor(e.target))},{passive:true});   // phones: touch something to read about it
+  addEventListener("keydown",function(e){if(e.key==="Escape"&&on)set(false)});
 })();
 </script>
 </body>
