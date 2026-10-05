@@ -424,3 +424,6 @@ html.help,html.help *{cursor:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3
 /* the logo's A: one click mirrors it (the next click goes home) */
 .m.tri svg{transition:transform .35s cubic-bezier(.3,.1,.2,1)}
 .m.tri.mir svg{transform:scaleX(-1)}
+/* the little grid sits a bit lower, clear of the slot's click area */
+.gridbtn{top:calc(var(--H)*.015 + 30px)}
+@media (max-width:700px){.gridbtn{top:calc(4vw + 28px)}}
