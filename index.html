@@ -9,7 +9,7 @@
 <meta property="og:description" content="OFFICE COLLABORATIVE is a COLLABORATIVE OFFICE of architecture.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://officeoficina.com">
-<link rel="stylesheet" href="style.css?v=77">
+<link rel="stylesheet" href="style.css?v=78">
 </head>
 <body>
 <main class="stage">
@@ -480,6 +480,49 @@
   /* the north arrow: the plan turns into the north wall's elevation, in the same place; click the elevation (or Esc) for the plan again */
   document.getElementById("arrN").addEventListener("click",function(){loungeEl.classList.add("north")});
   loungeEl.querySelector(".lvelev").addEventListener("click",function(){loungeEl.classList.remove("north")});
+  /* ---- the north wall is a record shelf: press on a cubby and pull a record out; it turns flat (isometric) and follows you.
+     Drop it on the record player on the little table next to the chair: it goes on, and you are taken to the record player
+     with that record playing. Let go anywhere else and it slides back. (Cubby n holds song n of the list on work.html.) ---- */
+  (function(){
+    var box=loungeEl.querySelector(".lvbox"),elev=loungeEl.querySelector(".lvelev"),V=[505,567,3766];   // the drawing's viewBox
+    var CUB=[590,1270,1642,2015,2387,2760,3132,3505,3877,4250],BENCH=[2929,3311],   // the shelves (drawing units)
+        PLAYER={x0:1351,x1:1727,y0:3150,y1:3245,cx:1534,cy:3185},drag=null,suppress=false;
+    function toU(x,y){var r=box.getBoundingClientRect(),k=V[2]/r.width;return{x:V[0]+(x-r.left)*k,y:V[1]+(y-r.top)*k}}
+    function toPx(u,v){var r=box.getBoundingClientRect(),k=r.width/V[2];return{x:r.left+(u-V[0])*k,y:r.top+(v-V[1])*k,k:k}}
+    function cubby(u){if(u.y<BENCH[0]||u.y>BENCH[1])return -1;for(var n=0;n<CUB.length-1;n++)if(u.x>=CUB[n]&&u.x<CUB[n+1])return n;return -1}
+    var ring=document.createElement("div");ring.className="vplayer";box.appendChild(ring);
+    function placeRing(){var a=toPx(PLAYER.x0-60,PLAYER.y0-90),b=toPx(PLAYER.x1+60,PLAYER.y1+40),r=box.getBoundingClientRect();
+      ring.style.left=(a.x-r.left)+"px";ring.style.top=(a.y-r.top)+"px";ring.style.width=(b.x-a.x)+"px";ring.style.height=(b.y-a.y)+"px"}
+    elev.addEventListener("pointermove",function(e){if(!drag)elev.style.cursor=cubby(toU(e.clientX,e.clientY))>=0?"grab":""});
+    elev.addEventListener("pointerdown",function(e){
+      var u=toU(e.clientX,e.clientY),n=cubby(u);if(n<0)return;
+      e.preventDefault();e.stopPropagation();suppress=true;
+      var mid=toPx((CUB[n]+CUB[n+1])/2,(BENCH[0]+BENCH[1])/2),size=Math.max(40,(CUB[2]-CUB[1])*.95*mid.k);
+      var v=document.createElement("div");v.className="vinyl";v.style.width=v.style.height=size+"px";v.innerHTML="<i></i>";document.body.appendChild(v);
+      drag={n:n,v:v,home:mid,x:mid.x,y:mid.y,size:size};pos(mid.x,mid.y,true);placeRing();loungeEl.classList.add("pulling");
+      requestAnimationFrame(function(){v.classList.add("out");pos(e.clientX,e.clientY)});
+      elev.setPointerCapture(e.pointerId);
+    });
+    function pos(x,y,instant){if(!drag)return;drag.x=x;drag.y=y;drag.v.style.transform="translate("+(x-drag.size/2)+"px,"+(y-drag.size/2)+"px)"+(instant?" scaleX(.08)":"")}
+    elev.addEventListener("pointermove",function(e){if(!drag)return;pos(e.clientX,e.clientY);var u=toU(e.clientX,e.clientY);
+      ring.classList.toggle("near",u.x>PLAYER.x0-160&&u.x<PLAYER.x1+160&&u.y>PLAYER.y0-260&&u.y<PLAYER.y1+120)});
+    function drop(e){
+      if(!drag)return;var d=drag;drag=null;loungeEl.classList.remove("pulling");ring.classList.remove("near");
+      var u=toU(e.clientX,e.clientY),on=u.x>PLAYER.x0-160&&u.x<PLAYER.x1+160&&u.y>PLAYER.y0-260&&u.y<PLAYER.y1+120;
+      d.v.classList.add("settle");
+      if(on){var t=toPx(PLAYER.cx,PLAYER.cy),s=(PLAYER.x1-PLAYER.x0)*.75*t.k/d.size;           // onto the player
+        d.v.style.transform="translate("+(t.x-d.size/2)+"px,"+(t.y-d.size/2)+"px) scale("+s+")";
+        setTimeout(function(){document.documentElement.classList.add("leaving")},550);
+        setTimeout(function(){location.href="work.html?play="+d.n},1100);
+      }else{d.v.classList.remove("out");d.v.style.transform="translate("+(d.home.x-d.size/2)+"px,"+(d.home.y-d.size/2)+"px) scaleX(.08)";
+        setTimeout(function(){d.v.remove()},450)}
+      setTimeout(function(){suppress=false},50);
+    }
+    elev.addEventListener("pointerup",drop);elev.addEventListener("pointercancel",drop);
+    elev.addEventListener("click",function(e){if(suppress){e.stopImmediatePropagation()}},true);   // pulling a record is not a click back to the plan
+    addEventListener("pageshow",function(){document.documentElement.classList.remove("leaving");[].forEach.call(document.querySelectorAll(".vinyl"),function(v){v.remove()})});
+  })();
+
   function goHome(){
     setLounge(false);
     Array.prototype.forEach.call(document.querySelectorAll(".m.mir"),function(m){m.classList.remove("mir")});   // the A turns back
@@ -924,7 +967,7 @@ var BACKS = ["#000", "#fff"];
     [".logo .m",function(){return card()?"Logo: click a dot to go back to the start; click the triangle to mirror it, then again to go back. Drag the shapes around; stack the two dots with the triangle to their left for a surprise.":"Logo: drag each shape into the card — the dots into the two O's, the triangle into the A — to unlock the card. Click a dot to go back to the start; click the triangle to mirror it, then again to go back."}],
     ["#gridbtn",function(){return document.querySelector(".stage").classList.contains("gridded")?"Grid: click to go back to the index.":"Grid: click to see all the projects as a grid of squares."}],
     ["#arrN","North: click to look at the north wall."],
-    [".lvelev","North wall: click to go back to the plan. The logo takes you to the start."],
+    [".lvelev","North wall: the bench is a record shelf. Drag a record out of a cubby and drop it on the record player on the little table to play it. Click the wall to go back to the plan."],
     [".lvplan","Listening room: click the arrow at the top to look at the north wall. The logo takes you back to the start."],
     ["#rot","Turn: drag around the card to rotate it."],
     ["#flipF","Flip: click to turn the card over."],
