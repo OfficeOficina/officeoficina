@@ -382,3 +382,5 @@ a.logolink .m.dragging{cursor:grabbing}
 /* the slit: a little thinner (the click area around it stays the same size) */
 .slit{height:3px;border-radius:1.5px}
 @media (max-width:700px){.slit{height:2px;border-radius:1px}}
+/* the words: a touch smaller, so all of them hide behind the card */
+.under{font-size:calc(var(--H)*.03)}
