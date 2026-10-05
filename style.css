@@ -437,3 +437,11 @@ html.help,html.help *{cursor:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3
 .stage.lounging .loungev{opacity:1;visibility:visible;transition:opacity .5s ease}
 .stage.lounging .logo,.stage.lounging~.logo{z-index:6}
 .stage.lounging .helpq{z-index:6}
+/* the listening room: the plan and the north wall share one square, so the elevation lands exactly where the plan was */
+.loungev .lvbox{position:relative;width:min(56vh,84vw,640px);aspect-ratio:1}
+.loungev .lvbox svg{position:absolute;inset:0;width:100%;height:100%;transition:opacity .45s ease}
+.loungev .lvelev{opacity:0;pointer-events:none;cursor:pointer}
+.loungev.north .lvelev{opacity:1;pointer-events:auto}
+.loungev.north .lvplan{opacity:0;pointer-events:none}
+.loungev #arrN{cursor:pointer;pointer-events:auto}
+.loungev #arrN:hover path{fill:#555}
