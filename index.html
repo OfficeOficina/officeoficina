@@ -266,7 +266,7 @@
         wx=ox; wy=oy; w.style.transform="translate("+wx+"px,"+wy+"px)";
       }
     });
-    function up(){ var was=d; d=null; w.classList.remove("dragging"); if(was&&w.classList.contains("m")){ if(!was.moved){hintRelease();if(w.classList.contains("tri")&&!w.classList.contains("mir")){w.classList.add("mir");return}goHome();return} dropCheck(w); hintRelease(); setTimeout(skullCheck,30); }
+    function up(){ var was=d; d=null; w.classList.remove("dragging"); if(was&&w.classList.contains("m")){ if(!was.moved){hintRelease();if(w.classList.contains("tri")){if(!w.classList.contains("mir")){w.classList.add("mir");return}w.classList.remove("mir");goBack();return}goHome();return} dropCheck(w); hintRelease(); setTimeout(skullCheck,30); }
       if(was&&!was.moved&&w.dataset.go) nav(w); }   // Work / About / Contact / Instagram
     w.addEventListener("pointerup",up);
     w.addEventListener("pointercancel",up);
@@ -476,6 +476,7 @@
     stage.classList.toggle("lounging",on);loungeEl.setAttribute("aria-hidden",on?"false":"true");
   }
   window.setLounge=setLounge;
+  if(location.hash==="#north")setTimeout(function(){setLounge(true);loungeEl.classList.add("north");history.replaceState(null,"",location.pathname+location.search)},0);   // back from the record player: the record shelf
   addEventListener("keydown",function(e){if(e.key==="Escape"&&stage.classList.contains("lounging")){if(loungeEl.classList.contains("north"))loungeEl.classList.remove("north");else setLounge(false)}});
   /* the north arrow: the plan turns into the north wall's elevation, in the same place; click the elevation (or Esc) for the plan again */
   document.getElementById("arrN").addEventListener("click",function(){loungeEl.classList.add("north")});
@@ -523,6 +524,15 @@
     addEventListener("pageshow",function(){document.documentElement.classList.remove("leaving");[].forEach.call(document.querySelectorAll(".vinyl"),function(v){v.remove()})});
   })();
 
+  /* ---- the mirrored A of the logo: one step back (north wall -> plan -> start; a project -> the index; the grid -> the index; ...) ---- */
+  function goBack(){
+    var st=document.querySelector(".stage"),lv=document.getElementById("loungev");
+    if(st.classList.contains("gridded")){if(window.setIndex)setIndex(true);return}
+    var open=st.classList.contains("lounging")||st.classList.contains("indexed")||st.classList.contains("mailing")||document.getElementById("about").classList.contains("on");
+    if(open){dispatchEvent(new KeyboardEvent("keydown",{key:"Escape"}));return}       // every view already steps back one level on Esc
+    if(document.referrer&&document.referrer.indexOf(location.origin)===0&&history.length>1)history.back();   // at the start: the page you came from
+  }
+  window.goBack=goBack;
   function goHome(){
     setLounge(false);
     Array.prototype.forEach.call(document.querySelectorAll(".m.mir"),function(m){m.classList.remove("mir")});   // the A turns back
@@ -964,7 +974,7 @@ var BACKS = ["#000", "#fff"];
   function card(){return document.getElementById("card").classList.contains("open")}
   var TIPS=[                                         // first match wins: the most particular things first
     ["#helpq",function(){return on?"Help: click to turn help off (or press Esc).":"Help: click, then point at anything to see what it does."}],
-    [".logo .m",function(){return card()?"Logo: click a dot to go back to the start; click the triangle to mirror it, then again to go back. Drag the shapes around; stack the two dots with the triangle to their left for a surprise.":"Logo: drag each shape into the card — the dots into the two O's, the triangle into the A — to unlock the card. Click a dot to go back to the start; click the triangle to mirror it, then again to go back."}],
+    [".logo .m",function(){return card()?"Logo: click a dot to go back to the start; click the triangle to mirror it, then again to go back one step. Drag the shapes around; stack the two dots with the triangle to their left for a surprise.":"Logo: drag each shape into the card — the dots into the two O's, the triangle into the A — to unlock the card. Click a dot to go back to the start; click the triangle to mirror it, then again to go back one step."}],
     ["#gridbtn",function(){return document.querySelector(".stage").classList.contains("gridded")?"Grid: click to go back to the index.":"Grid: click to see all the projects as a grid of squares."}],
     ["#arrN","North: click to look at the north wall."],
     [".lvelev","North wall: the bench is a record shelf. Drag a record out of a cubby and drop it on the record player on the little table to play it. Click the wall to go back to the plan."],

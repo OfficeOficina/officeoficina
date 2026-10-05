@@ -230,7 +230,10 @@ var SONGS = [
       var r=m.getBoundingClientRect();if(r.right<12||r.left>innerWidth-12||r.bottom<12||r.top>innerHeight-12){m._x=ox;m._y=oy;put()}
     });
     function up(){var was=d;d=null;m.classList.remove("dragging");if(!was)return;
-      if(!was.moved){hintOff();if(m.classList.contains("tri")&&!m.classList.contains("mir")){m.classList.add("mir");return}location.href=link.getAttribute("href");return}
+      if(!was.moved){hintOff();if(m.classList.contains("tri")){if(!m.classList.contains("mir")){m.classList.add("mir");return}m.classList.remove("mir");   // the mirrored A: back to where you were
+        if(/[?&]play=/.test(location.search))location.href="index.html#north";                       // came with a record: back to the record shelf
+        else if(document.referrer&&document.referrer.indexOf(location.origin)===0&&history.length>1)history.back();else location.href=link.getAttribute("href");return}
+      location.href=link.getAttribute("href");return}
       hintRelease();drop(m,put);setTimeout(skullCheck,30)}
     m.addEventListener("pointerup",up);m.addEventListener("pointercancel",function(){d=null;m.classList.remove("dragging");hintOff()});
   });
