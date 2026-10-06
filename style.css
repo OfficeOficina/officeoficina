@@ -446,12 +446,12 @@ html.help,html.help *{cursor:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3
 .loungev #arrN{cursor:pointer;pointer-events:auto}
 .loungev #arrN:hover path{fill:#555}
 
-/* records pulled from the shelf: a record seen at an isometric angle (a stand-in until the real record image arrives) */
+/* records pulled from the shelf: edge-on in the cubby, then turning to face you (a stand-in until the real record image arrives) */
 .vinyl{position:fixed;left:0;top:0;z-index:80;pointer-events:none;will-change:transform;transform-origin:50% 50%}
 .vinyl i{display:block;width:100%;height:100%;border-radius:50%;
   background:radial-gradient(circle,#fff 0 15%,#111 15.5% 16.5%,transparent 17%),repeating-radial-gradient(circle,#0c0c0c 0 1.5px,#1e1e1e 2px 2.5px),#111;
-  box-shadow:0 3px 0 #000,0 10px 18px rgba(0,0,0,.25);transform:scaleY(.08);transition:transform .35s cubic-bezier(.3,.1,.2,1)}
-.vinyl.out i{transform:rotate(-30deg) scaleY(.58)}                        /* lying flat, seen from the isometric corner */
+  box-shadow:0 8px 18px rgba(0,0,0,.22);transform:scaleX(.08);transition:transform .35s cubic-bezier(.3,.1,.2,1)}
+.vinyl.out i{transform:none}                                             /* facing you, flat to the screen */
 .vinyl.settle{transition:transform .45s cubic-bezier(.3,.1,.2,1)}
 /* the record player glows softly while you carry a record, and more when you are over it */
 .vplayer{position:absolute;border-radius:10px;pointer-events:none;opacity:0;transition:opacity .2s;background:rgba(0,0,0,.06)}
