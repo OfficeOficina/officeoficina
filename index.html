@@ -9,7 +9,7 @@
 <meta property="og:description" content="OFFICE COLLABORATIVE is a COLLABORATIVE OFFICE of architecture.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://officeoficina.com">
-<link rel="stylesheet" href="style.css?v=79">
+<link rel="stylesheet" href="style.css?v=80">
 </head>
 <body>
 <main class="stage">
@@ -163,6 +163,7 @@
     <div class="cback" aria-hidden="true">
       <!-- the back of the card: the same cut-out letters seen from behind (mirrored), the logo shapes still in them -->
       <svg class="backsvg" viewBox="0 0 525 920">
+        <!-- the same soft shadow as the front (mirrored with the letters, so it falls the same way) --><g transform="matrix(-1 0 0 1 525 0)"><g mask="url(#cutWide)"><rect id="shadowRectB" width="525" height="920" fill="#000" fill-opacity=".11" filter="url(#lift)" transform="translate(3 15)"/></g></g>
         <g transform="matrix(-1 0 0 1 525 0)">
           <rect width="525" height="920" fill="#fff" mask="url(#cut)"/>
           <g transform="translate(265 460) rotate(90)" fill="#000"><path d="M-278.7 -29.37Q-266.38 -29.37 -258.81 -21.06Q-251.24 -12.75 -251.24 0.82Q-251.24 13.46 -258.69 21.84Q-266.14 30.23 -278.62 30.23Q-291.02 30.23 -298.51 21.88Q-306 13.53 -306 0.43Q-306 -12.68 -298.47 -21.02Q-290.95 -29.37 -278.7 -29.37Z"/><path d="M35.44 -29.37Q47.76 -29.37 55.33 -21.06Q62.89 -12.75 62.89 0.82Q62.89 13.46 55.44 21.84Q47.99 30.23 35.51 30.23Q23.11 30.23 15.62 21.88Q8.14 13.53 8.14 0.43Q8.14 -12.68 15.66 -21.02Q23.19 -29.37 35.44 -29.37Z"/><path class="doorline" d="M253.05 28.43L274.19 -28.43L285.86 -28.43L307 28.43Z"/><a class="adoor" id="listen" href="lounge.html" tabindex="-1" aria-label="Enter"><path d="M253.05 28.43L274.19 -28.43L285.86 -28.43L307 28.43Z"/></a></g>
@@ -266,7 +267,7 @@
         wx=ox; wy=oy; w.style.transform="translate("+wx+"px,"+wy+"px)";
       }
     });
-    function up(){ var was=d; d=null; w.classList.remove("dragging"); if(was&&w.classList.contains("m")){ if(!was.moved){hintRelease();if(w.classList.contains("tri")){if(!w.classList.contains("mir")){w.classList.add("mir");return}w.classList.remove("mir");goBack();return}goHome();return} dropCheck(w); hintRelease(); setTimeout(skullCheck,30); }
+    function up(){ var was=d; d=null; w.classList.remove("dragging"); if(was&&w.classList.contains("m")){ if(!was.moved){hintRelease();if(w.classList.contains("tri")){if(!w.classList.contains("mir")){w.classList.add("mir");return}w.classList.remove("mir");goBack();return}var wasLounge=document.querySelector(".stage").classList.contains("lounging");goHome();if(!wasLounge)setTimeout(resetCard,60);return} dropCheck(w); hintRelease(); setTimeout(skullCheck,30); }
       if(was&&!was.moved&&w.dataset.go) nav(w); }   // Work / About / Contact / Instagram
     w.addEventListener("pointerup",up);
     w.addEventListener("pointercancel",up);
@@ -472,7 +473,7 @@
   function setLounge(on){
     if(on){if(window.setIndex&&stage.classList.contains("indexed"))setIndex(false);if(window.setMail)setMail(false);if(window.setGrid)setGrid(false);
       Array.prototype.forEach.call(document.querySelectorAll(".logo .m"),function(m){m.dispatchEvent(new Event("resetpos"))})}   // the logo comes back to its corner: it is the way out
-    if(!on)loungeEl.classList.remove("north");
+    if(!on){loungeEl.classList.remove("north");if(stage.classList.contains("lounging"))setTimeout(function(){window.resetCard&&resetCard()},350)}   // back on the main page: the card resets
     stage.classList.toggle("lounging",on);loungeEl.setAttribute("aria-hidden",on?"false":"true");
   }
   window.setLounge=setLounge;
@@ -574,6 +575,35 @@
       if(plugs.every(function(p){return p.classList.contains("on")})) solved();
     });
   }
+  function resetCard(){
+    var filled=plugs.filter(function(p){return p.classList.contains("on")||p.taken});
+    var pieces=[].slice.call(document.querySelectorAll(".logo .m"));
+    if(!filled.length){pieces.forEach(function(m){m.dispatchEvent(new Event("resetpos"))});return}
+    (function(){var d=pieces.filter(function(m){return m.classList.contains("dot")});    // the shapes that are in the card are not in the corner yet
+      filled.forEach(function(p){var m=p.getAttribute("data-k")==="a"?pieces.filter(function(m){return m.classList.contains("tri")})[0]:d.shift();if(m)m.style.visibility="hidden"})})();
+    function out(){
+      var a0={x:x,y:y,r:rot};                                   // the card glides back to the middle, straight
+      tween(600,function(p){var e=p<.5?4*p*p*p:1-Math.pow(-2*p+2,3)/2;x=a0.x*(1-e);y=a0.y*(1-e);rot=a0.r*(1-e);apply()});
+      var dots=pieces.filter(function(m){return m.classList.contains("dot")}),tri=pieces.filter(function(m){return m.classList.contains("tri")})[0],used=[];
+      plugs.forEach(function(plug,i){
+        if(!(plug.classList.contains("on")||plug.taken))return;
+        var piece=plug.getAttribute("data-k")==="a"?tri:dots.shift();if(!piece)return;used.push(piece);
+        piece.dispatchEvent(new Event("resetpos"));
+        var to=ctr(piece),from=ctr(plug),pw=piece.offsetWidth,ph=piece.offsetHeight,bb=plug.getBBox(),k=card.offsetWidth/525,sc=(bb.height*k)/pw;
+        piece.style.visibility="hidden";
+        var fly=piece.cloneNode(true);fly.className="fly "+(plug.getAttribute("data-k")==="a"?"tri":"dot");fly.style.cssText="width:"+pw+"px;height:"+ph+"px";stage.appendChild(fly);
+        plug.classList.remove("on");plug.taken=false;var l=document.querySelector('.lt[data-p="'+i+'"]');if(l)l.classList.remove("filled");
+        tween(700,function(p){var e=p<.5?4*p*p*p:1-Math.pow(-2*p+2,3)/2,cx=from.x+(to.x-from.x)*e,cy=from.y+(to.y-from.y)*e,s=sc+(1-sc)*e;
+          fly.style.transform="translate("+(cx-pw/2)+"px,"+(cy-ph/2)+"px) rotate("+(tilt*(1-e))+"deg) scale("+s+")"},
+          function(){piece.style.visibility="";fly.remove()});
+      });
+      pieces.forEach(function(m){if(used.indexOf(m)<0)m.dispatchEvent(new Event("resetpos"))});
+      unlocked=false;card.classList.remove("open","flipped");rotEl.tabIndex=-1;fF.tabIndex=-1;lis.tabIndex=-1;
+      card.setAttribute("aria-label","Business card. Drag it, or use the arrow keys, to move it and reveal the text underneath. Fit the three logo shapes into its letters to unlock it.");
+    }
+    if(flip>90&&unlocked){flipTo(0);setTimeout(out,760)}else out();   // turned over? it turns back first
+  }
+  window.resetCard=resetCard;
   function fillLetter(i){var l=document.querySelector('.lt[data-p="'+i+'"]');if(l)l.classList.add("filled")}   // the O / O / A in the text behind the card fills in
   function solved(){
     unlocked=true;card.classList.add("open");rotEl.tabIndex=0;document.getElementById("flipF").tabIndex=0;
@@ -595,11 +625,11 @@
   function hintRelease(){clearTimeout(hintTO);if(hintMouse){hintOff();return}hintTO=setTimeout(hintOff,3000)}   // mouse: only while held. touch: keeps pulsing 3 s after you let go
 
   /* the light stays put on screen: as the card turns, its shadow and the shading inside the letters are turned back the other way */
-  var shRect=document.getElementById("shadowRect"),emb=document.querySelector("#emboss feDropShadow"),lastTh=null;
+  var shRect=document.getElementById("shadowRect"),shRectB=document.getElementById("shadowRectB"),emb=document.querySelector("#emboss feDropShadow"),lastTh=null;
   function light(){
     var th=tilt+rot;if(lastTh!==null&&Math.abs(th-lastTh)<.05)return;lastTh=th;
     var r=th*Math.PI/180,c=Math.cos(r),n=Math.sin(r);
-    if(shRect)shRect.setAttribute("transform","translate("+(c*3+n*15).toFixed(2)+" "+(-n*3+c*15).toFixed(2)+")");
+    var shT="translate("+(c*3+n*15).toFixed(2)+" "+(-n*3+c*15).toFixed(2)+")";if(shRect)shRect.setAttribute("transform",shT);if(shRectB)shRectB.setAttribute("transform",shT);
     if(emb){emb.setAttribute("dx",(c*2-n*3).toFixed(2));emb.setAttribute("dy",(-n*2-c*3).toFixed(2))}
   }
   /* ---- rotate handle: appears once all three shapes are in; drag it around the card to turn it a full 360 ---- */
