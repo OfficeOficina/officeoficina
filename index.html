@@ -561,7 +561,7 @@
     var ring=document.createElement("div");ring.className="vplayer";box.appendChild(ring);
     function placeRing(){var a=toPx(PLAYER.x0-60,PLAYER.y0-90),b=toPx(PLAYER.x1+60,PLAYER.y1+40),r=box.getBoundingClientRect();
       ring.style.left=(a.x-r.left)+"px";ring.style.top=(a.y-r.top)+"px";ring.style.width=(b.x-a.x)+"px";ring.style.height=(b.y-a.y)+"px"}
-    function size(){var r=box.getBoundingClientRect();return Math.round(Math.max(TOUCH?60:40,Math.min(90,r.width*(TOUCH?.19:.14))))}   // the record in your hand: big enough to see
+    function size(){var r=box.getBoundingClientRect();return Math.round(TOUCH?Math.max(70,Math.min(120,r.width*.28)):Math.max(40,Math.min(90,r.width*.14)))}   // the record in your hand: big enough to see
     function put(el,x,y,extra){el._x=x;el._y=y;el.style.transform="translate("+(x-el._s/2)+"px,"+(y-el._s/2)+"px)"+(extra||"")}
     function make(cls,s,img){var e=document.createElement("div");e.className=cls;e._s=s;e.style.width=e.style.height=s+"px";
       e.innerHTML="<i></i>";if(img)e.firstChild.style.backgroundImage="url("+img+")";if(img)e.classList.add("art");document.body.appendChild(e);return e}
@@ -569,7 +569,7 @@
     elev.addEventListener("pointermove",function(e){if(!drag&&!st)elev.style.cursor=cubby(toU(e.clientX,e.clientY))>=0?"grab":""});
     /* 1. the sleeve comes off the shelf */
     elev.addEventListener("pointerdown",function(e){
-      if(st)return;var u=toU(e.clientX,e.clientY),n=cubby(u);if(n<0)return;
+      if(TOUCH||st)return;var u=toU(e.clientX,e.clientY),n=cubby(u);if(n<0)return;
       e.preventDefault();e.stopPropagation();suppress=true;
       var rec=RECORDS[n%RECORDS.length],s=size(),home=toPx((CUB[n]+CUB[n+1])/2,(BENCH[0]+BENCH[1])/2);
       var sl=make("sleeve",s,rec.sleeve);
@@ -607,7 +607,7 @@
 
     /* 3. the record onto the player */
     document.addEventListener("pointerdown",function(e){
-      if(!st||!e.target.closest)return;
+      if(TOUCH||!st||!e.target.closest)return;
       var t0={x0:e.clientX,y0:e.clientY,t0:performance.now()};
       if(st.vinyl&&e.target.closest(".vinyl")){e.preventDefault();drag={el:st.vinyl,kind:"vinyl",dx:e.clientX-st.vinyl._x,dy:e.clientY-st.vinyl._y+lift(e,st.vinyl._s)};Object.assign(drag,t0);st.vinyl.classList.add("held");try{st.vinyl.setPointerCapture(e.pointerId)}catch(_){}}
       else if(e.target.closest(".sleeve")){e.preventDefault();drag={el:st.sleeve,kind:"sleeve2",dx:e.clientX-st.sleeve._x,dy:e.clientY-st.sleeve._y};Object.assign(drag,t0);try{st.sleeve.setPointerCapture(e.pointerId)}catch(_){}}
@@ -625,12 +625,36 @@
       st.vinyl.classList.remove("held");ring.classList.remove("near");
       if(d.moved&&overSleeve(st.vinyl._x,st.vinyl._y)){slideIn();return}        // back into its sleeve
       if(!d.moved||onPlayer(st.vinyl._x,st.vinyl._y)){               // dropped on the player, or just tapped: on it goes                               // on it goes: then to the record player
-        var t=toPx(PLAYER.cx,PLAYER.cy),s=(PLAYER.x1-PLAYER.x0)*.75*t.k/st.vinyl._s;
-        st.vinyl.classList.add("settle");put(st.vinyl,t.x,t.y," scale("+s+")");st.sleeve.classList.add("fade");loungeEl.classList.remove("pulling");
-        var n=st.n;setTimeout(function(){document.documentElement.classList.add("leaving")},550);
-        setTimeout(function(){location.href="work.html?play="+n},1100);
+        play();
       }
     });
+    function play(){                                                   // the record onto the player, then off to listen to it
+      var t=toPx(PLAYER.cx,PLAYER.cy),s=(PLAYER.x1-PLAYER.x0)*.75*t.k/st.vinyl._s;
+      st.vinyl.classList.remove("grab","held");st.vinyl.classList.add("settle");put(st.vinyl,t.x,t.y," scale("+s+")");st.sleeve.classList.add("fade");loungeEl.classList.remove("pulling");
+      var n=st.n;st.playing=true;setTimeout(function(){document.documentElement.classList.add("leaving")},550);
+      setTimeout(function(){location.href="work.html?play="+n},1100);
+    }
+    /* on a phone it is all taps: tap a record on the shelf - its sleeve comes out; tap the sleeve - the record slides out;
+       tap the record - onto the player. (Tap the sleeve again to slide the record back in; tap the wall to put it all away.) */
+    if(TOUCH)document.addEventListener("click",function(e){
+      if(!loungeEl.classList.contains("north")||!e.target.closest)return;
+      var onV=e.target.closest(".vinyl"),onS=e.target.closest(".sleeve"),onE=e.target.closest(".lvelev");
+      if(!onV&&!onS&&!onE)return;
+      var n=cubby(toU(e.clientX,e.clientY));if(!onV&&!onS&&!st&&n<0)return;          // the bare wall, nothing out: back to the plan as before
+      e.preventDefault();e.stopPropagation();e.stopImmediatePropagation();
+      if(st&&st.playing)return;
+      if(onV&&st&&st.vinyl){if(st.vinyl.classList.contains("grab"))play();return}
+      if(onS&&st){if(st.vinyl){if(st.vinyl.classList.contains("grab"))slideIn()}else slideOut();return}
+      if(st){putAway();return}
+      takeOut(n);
+    },true);
+    function takeOut(n){                                                // the sleeve comes off the shelf and stops in front of the wall
+      var rec=RECORDS[n%RECORDS.length],sz=size(),home=toPx((CUB[n]+CUB[n+1])/2,(BENCH[0]+BENCH[1])/2),r=box.getBoundingClientRect();
+      var sl=make("sleeve",sz,rec.sleeve);st={n:n,rec:rec,home:home,sleeve:sl,vinyl:null};
+      put(sl,home.x,home.y," scale("+(home.k*(CUB[1]-CUB[0])*.9/sz)+") scaleX(.08)");sl.classList.add("moving");
+      var x=r.left+r.width/2-sz*.3,y=Math.max(r.top+sz*.6,toPx(0,BENCH[0]-950).y);
+      requestAnimationFrame(function(){requestAnimationFrame(function(){sl.classList.remove("moving");sl.classList.add("out");put(sl,x,y)})});
+    }
     function putAway(){                                                 // the record back in its sleeve, the sleeve back on the shelf
       if(!st)return;var s=st;st=null;loungeEl.classList.remove("pulling");
       function shelf(){s.sleeve.classList.add("settle");s.sleeve.classList.remove("out");put(s.sleeve,s.home.x,s.home.y," scale("+(s.home.k*(CUB[1]-CUB[0])*.9/s.sleeve._s)+") scaleX(.08)");setTimeout(function(){s.sleeve.remove()},480)}
