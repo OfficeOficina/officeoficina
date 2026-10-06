@@ -418,7 +418,7 @@
   function gridOpen(k){
     var g=GRID[k];if(!g||!g.open||gfocus)return;var sqs=[].slice.call(gsq.children),cols=innerWidth<=700?1:4;
     var nb=(cols>1&&k%cols===cols-1)?k-1:k+1;if(!sqs[nb])nb=k-1;var A=rel(sqs[k]),B=rel(sqs[nb]);
-    if(sqs[nb])sqs[nb].classList.add("under");                                    // the whole grid stays; only the next square makes room
+    if(sqs[nb])sqs[nb].classList.add("nbr");                                    // the whole grid stays; only the next square makes room
     var pic=document.createElement("div");pic.className="gpic";pic.innerHTML='<img src="'+esc(g.open.image)+'" alt="'+esc((g.name||"")+" elevation")+'">';at(pic,A);gsq.appendChild(pic);
     var tx=document.createElement("div");tx.className="gtext";tx.innerHTML=g.open.text.map(function(p){return"<p>"+esc(p)+"</p>"}).join("");at(tx,A);gsq.appendChild(tx);
     sqs[k].classList.add("away");gsq.classList.add("focus");gfocus={k:k,nb:nb,pic:pic,tx:tx};
@@ -427,7 +427,7 @@
   function gridClose(){
     if(!gfocus)return;var f=gfocus;gfocus=null;var sqs=[].slice.call(gsq.children);
     f.tx.classList.remove("on");at(f.pic,rel(sqs[f.k]));f.pic.classList.add("back");
-    setTimeout(function(){f.pic.remove();f.tx.remove();if(sqs[f.k])sqs[f.k].classList.remove("away");sqs.forEach(function(q){q.classList.remove("dim","lit","under")});gsq.classList.remove("focus")},600);
+    setTimeout(function(){f.pic.remove();f.tx.remove();if(sqs[f.k])sqs[f.k].classList.remove("away");sqs.forEach(function(q){q.classList.remove("dim","lit","nbr")});gsq.classList.remove("focus")},600);
   }
   window.gridFocused=function(){return !!gfocus};window.gridClose=gridClose;
   gsq.addEventListener("click",function(e){
