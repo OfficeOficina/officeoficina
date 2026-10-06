@@ -492,7 +492,7 @@
       gridClose();return}   // open: a click (not on the text) closes it
     var q=e.target.closest&&e.target.closest(".sq.has");if(q)gridOpen(+q.getAttribute("data-k"));
   });
-  document.getElementById("gridbtn").addEventListener("click",function(){if(stageEl.classList.contains("gridded"))setIndex(true);else setGrid(true)});
+  document.getElementById("gridbtn").addEventListener("click",function(){setGrid(!stageEl.classList.contains("gridded"))});
   addEventListener("wheel",function(e){if(!stageEl.classList.contains("gridded")||(e.target.closest&&e.target.closest(".gridv,.mailbox,.aboutbook")))return;gridEl.scrollTop+=e.deltaMode===1?e.deltaY*16:e.deltaY},{passive:true});   // scrolling anywhere moves the grid
   addEventListener("resize",function(){if(stageEl.classList.contains("gridded")){gridBuild();gridPlace()}});
   addEventListener("keydown",function(e){if(e.key==="Escape"&&stageEl.classList.contains("gridded")){if(gfocus&&gfocus.big){bigFloor(null);showFloor(null)}else if(gfocus)gridClose();else setGrid(false)}});
@@ -500,7 +500,7 @@
   /* ---- the four words under the address: Work (the index), About (the flip book), Contact (write / draw to us), Instagram ---- */
   function nav(n){
     var g=n.dataset.go;
-    if(g==="work"){if(stageEl.classList.contains("projecting"))closeProject();else setIndex(!stageEl.classList.contains("indexed"))}
+    if(g==="work"){if(stageEl.classList.contains("projecting"))closeProject();else setGrid(!stageEl.classList.contains("gridded"))}   // for now Work goes straight to the grid (the index is kept, just not used)
     else if(g==="about")openAbout();
     else if(g==="contact")setMail(!stageEl.classList.contains("mailing"));
     else if(g==="instagram")window.open(n.dataset.href,"_blank","noopener");
@@ -700,7 +700,7 @@
   /* ---- the mirrored A of the logo: one step back (north wall -> plan -> start; a project -> the index; the grid -> the index; ...) ---- */
   function goBack(){
     var st=document.querySelector(".stage"),lv=document.getElementById("loungev");
-    if(st.classList.contains("gridded")){if(window.gridFocused&&gridFocused())gridClose();else if(window.setIndex)setIndex(true);return}
+    if(st.classList.contains("gridded")){if(window.gridFocused&&gridFocused())gridClose();else setGrid(false);return}
     var open=st.classList.contains("lounging")||st.classList.contains("indexed")||st.classList.contains("mailing")||document.getElementById("about").classList.contains("on");
     if(open){dispatchEvent(new KeyboardEvent("keydown",{key:"Escape"}));return}       // every view already steps back one level on Esc
     if(document.referrer&&document.referrer.indexOf(location.origin)===0&&history.length>1)history.back();   // at the start: the page you came from
@@ -1177,7 +1177,7 @@ var BACKS = ["#000", "#fff"];
   var TIPS=[                                         // first match wins: the most particular things first
     ["#helpq",function(){return on?"Help: click to turn help off (or press Esc).":"Help: click, then point at anything to see what it does."}],
     [".logo .m",function(){return card()?"Logo: click a dot to go back to the start; click the triangle to mirror it, then again to go back one step. Drag the shapes around; stack the two dots with the triangle to their left for a surprise.":"Logo: drag each shape into the card — the dots into the two O's, the triangle into the A — to unlock the card. Click a dot to go back to the start; click the triangle to mirror it, then again to go back one step."}],
-    ["#gridbtn",function(){return document.querySelector(".stage").classList.contains("gridded")?"Grid: click to go back to the index.":"Grid: click to see all the projects as a grid of squares."}],
+    ["#gridbtn",function(){return document.querySelector(".stage").classList.contains("gridded")?"Grid: click to go back to the start.":"Grid: click to see all the projects as a grid of squares."}],
     ["#arrN","North: click to look at the north wall."],
     [".lvelev","North wall: the bench is a record shelf. Drag a record out of a cubby and drop it on the record player on the little table to play it. Click the wall to go back to the plan."],
     [".lvplan","Listening room: click the arrow at the top to look at the north wall. The logo takes you back to the start."],
@@ -1186,7 +1186,7 @@ var BACKS = ["#000", "#fff"];
     ["#listen","Door: click to open it and go in to the record room."],
     [".card",function(){return card()?"Card: click to go back to the start; drag to move it. Turn it with the arrow, flip it over, and on the back the A is a door. Drop it in the slot at the top to put it away.":"Card: click to go back to the start; drag to move it and uncover the words underneath. Fit the logo's three shapes into its O, O and A to unlock it."}],
     ["#slit",function(){return document.getElementById("card").style.visibility==="hidden"?"Slot: click to get the card back.":"Slot: drop the card in here to put it away. Click to put it away or get it back."}],
-    ['[data-go="work"]',"Work: click to open the index of projects. Drag to move the word."],
+    ['[data-go="work"]',"Work: click to see all the projects. Drag to move the word."],
     ['[data-go="about"]',"About: click to open the flip book about us. Drag to move the word."],
     ['[data-go="contact"]',"Contact: click to write us a message or send us a drawing. Drag to move the word."],
     ['[data-go="instagram"]',"Instagram: click to open our Instagram in a new tab. Drag to move the word."],
