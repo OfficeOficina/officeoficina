@@ -459,3 +459,18 @@ html.help,html.help *{cursor:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3
 .vplayer.near{background:rgba(0,0,0,.14)}
 @keyframes vpPulse{50%{background:rgba(0,0,0,.02)}}
 html.leaving body{opacity:0;transition:opacity .5s ease}
+
+/* the little grid: a touch higher (still clear of the slot) */
+.gridbtn{top:calc(var(--H)*.015 + 35px)}
+@media (max-width:700px){.gridbtn{top:calc(4vw + 31px)}}
+
+/* phones: the landing fills the screen. The card is as big as fits under the logo (and as wide as the screen allows);
+   the logo and the words grow with it, keeping the same proportions. (--H, used by the index, mail and about, stays as it was.) */
+@media (max-width:700px){
+  :root{--top:calc(4vw + 18px);
+        --h:min(calc((100vh - 4vw - 40px)/1.19),calc(92vw*920/525));}
+  @supports (height:1dvh){:root{--h:min(calc((100dvh - 4vw - 40px)/1.19),calc(92vw*920/525))}}
+  .card{top:calc(var(--top) + var(--h)*.19);margin-top:0}                         /* just under the logo */
+  .under{top:calc(var(--top) + var(--h)*.69);font-size:calc(var(--h)*.031/.72)}   /* the words stay centred behind the card */
+  .slit{width:calc(100vw - 2*(3.2vw + var(--h)*.0595*1.089 + 14px))}             /* clear of the logo and the ? */
+}
