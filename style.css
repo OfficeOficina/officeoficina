@@ -489,3 +489,19 @@ html.leaving body{opacity:0;transition:opacity .5s ease}
 .vinyl.grab{pointer-events:auto;cursor:grab;z-index:80}            /* still tucked behind its sleeve until you pick it up */
 .vinyl.held{cursor:grabbing;z-index:83}
 .vinyl.art i{background:center/cover no-repeat}
+
+/* a project opened in the grid: the other squares go; its drawing slides to the next square; its text takes the first square */
+.gsq{position:relative}
+.gsq .sq{transition:opacity .4s ease}
+.gsq .sq.has{cursor:pointer}
+.gsq.focus .sq.dim{opacity:0;pointer-events:none}
+.gsq .sq.away img{opacity:0;transition:opacity .3s ease}
+.gsq .sq img{transition:opacity .3s ease}
+.gpic{position:absolute;z-index:2;cursor:pointer;transition:left .65s cubic-bezier(.3,.1,.2,1),top .65s cubic-bezier(.3,.1,.2,1)}
+.gpic img{position:absolute;inset:5%;width:90%;height:90%;object-fit:contain}
+.gtext{position:absolute;z-index:1;box-sizing:border-box;padding:1.5em 1.6em 1.2em;overflow-y:auto;scrollbar-width:none;opacity:0;transition:opacity .45s ease .2s;
+  font-size:clamp(10px,.82vw,13px);line-height:1.38;color:#222;letter-spacing:.01em}
+.gtext::-webkit-scrollbar{display:none}
+.gtext.on{opacity:1}
+.gtext p{margin:0 0 .8em}
+@media (max-width:700px){.gtext{font-size:12.5px}}

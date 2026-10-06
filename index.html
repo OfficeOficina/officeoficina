@@ -9,7 +9,7 @@
 <meta property="og:description" content="OFFICE COLLABORATIVE is a COLLABORATIVE OFFICE of architecture.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://officeoficina.com">
-<link rel="stylesheet" href="style.css?v=81">
+<link rel="stylesheet" href="style.css?v=82">
 </head>
 <body>
 <main class="stage">
@@ -383,14 +383,18 @@
   window.setIndex=setIndex;
 
   /* ---- grid: squares with a fine dashed outline, in the place of the words (4 across; 1 on a phone) ----
-     To put a project in a square, fill in its line:  {image:"projects/dublin/1.jpg", title:"Dublin Housing"}
+     To put a project in a square, fill in its line:  {image:"projects/dublin/1.jpg", name:"Dublin Housing"}
+     Give it an "open" part and clicking the square opens the project: everything else goes, the drawing in "open.image"
+     slides into the next square and the text takes the place of the first drawing. Click again (or Esc) to go back.
      An empty {} stays an empty square. Add more {} lines for more squares. */
-  var GRID=[{image:"projects/tower/1.png"},{},{},{}, {},{},{},{}, {},{},{},{}];
+  var GRID=[
+    {image:"projects/tower/1.png", name:"Torre", open:{image:"projects/tower/elevation.webp", text:["Torre is a conceptual residential high rise developed after a trip to Mexico City, where upon returning home we were immediately put into self isolation due to the Covid Pandemic. It is an exploration of the experiences and diverse conditions we admired in Mexico City, a collaborative project focused on the architectural plan. We created a neutral frame, built out from the geometries of an abandoned warehouse block, to fill with these established diverse conditions. We tried as many conditions as we could go through, theorizing that individuals living in this “exquisite corpse” would potentially design and build each floor to whatever situations they needed.", "Starting with a list of architectural situations and 35mm photographs we took on our trip, we experimented and explored these theories through an architectural language. Sometimes one partner would start a plan and the other would finish; sometimes one partner would take up half of a floor and identify where the other could begin with their interpretation of a theory (or a symbiotic theory), implying a reaction to what had already been designed; and sometimes a mixed authorship would evolve from one partner responding to continuous on-screen annotation by the other. Occasionally the plans were playful, other times the plans were serious, speaking to our dynamic reactions to the situation. The result is an exploration of isolated collaboration, a building that is grounded by our experiences in Mexico City, and elevated by our desire to find again the energy of studio through a remote process."]}},
+    {},{},{}, {},{},{},{}, {},{},{},{}];
   var gridEl=document.getElementById("gridv"),gsq=document.getElementById("gsq"),gdEl=null;
-  function gridBuild(){
+  function gridBuild(){if(window.gridClose&&gfocus){gfocus.pic.remove();gfocus.tx.remove();gfocus=null;gsq.classList.remove("focus")}
     var n=GRID.length,cols=innerWidth<=700?1:4;while(n%cols)n++;              // always whole rows
     var h="";for(var k=0;k<n;k++){var g=GRID[k]||{};
-      h+='<div class="sq">'+(g.image?'<img src="'+esc(g.image)+'" alt="'+esc(g.title||"")+'" loading="lazy">':'')+(g.title?'<span>'+esc(g.title)+'</span>':'')+'</div>'}
+      h+='<div class="sq'+(g.open?' has':'')+'" data-k="'+k+'">'+(g.image?'<img src="'+esc(g.image)+'" alt="'+esc(g.name||g.title||"")+'" loading="lazy">':'')+(g.title?'<span>'+esc(g.title)+'</span>':'')+'</div>'}
     gsq.innerHTML=h;
   }
   function gridPlace(){
@@ -407,10 +411,33 @@
     stageEl.classList.toggle("gridded",on);document.getElementById("gridbtn").setAttribute("aria-pressed",on?"true":"false");gridEl.setAttribute("aria-hidden",on?"false":"true");
   }
   window.setGrid=setGrid;
+  /* a project in the grid: click its square - the others go, its drawing slides into the next square and its text takes its place */
+  var gfocus=null;
+  function rel(el){var a=el.getBoundingClientRect(),b=gsq.getBoundingClientRect();return{l:a.left-b.left,t:a.top-b.top,w:a.width,h:a.height}}
+  function at(el,r){el.style.left=r.l+"px";el.style.top=r.t+"px";el.style.width=r.w+"px";el.style.height=r.h+"px"}
+  function gridOpen(k){
+    var g=GRID[k];if(!g||!g.open||gfocus)return;var sqs=[].slice.call(gsq.children),cols=innerWidth<=700?1:4;
+    var nb=(cols>1&&k%cols===cols-1)?k-1:k+1;if(!sqs[nb])nb=k-1;var A=rel(sqs[k]),B=rel(sqs[nb]);
+    sqs.forEach(function(q,i){q.classList.toggle("dim",i!==k&&i!==nb);q.classList.toggle("lit",i===k||i===nb)});
+    var pic=document.createElement("div");pic.className="gpic";pic.innerHTML='<img src="'+esc(g.open.image)+'" alt="'+esc((g.name||"")+" elevation")+'">';at(pic,A);gsq.appendChild(pic);
+    var tx=document.createElement("div");tx.className="gtext";tx.innerHTML=g.open.text.map(function(p){return"<p>"+esc(p)+"</p>"}).join("");at(tx,A);gsq.appendChild(tx);
+    sqs[k].classList.add("away");gsq.classList.add("focus");gfocus={k:k,nb:nb,pic:pic,tx:tx};
+    requestAnimationFrame(function(){requestAnimationFrame(function(){pic.classList.add("go");at(pic,B);tx.classList.add("on")})});
+  }
+  function gridClose(){
+    if(!gfocus)return;var f=gfocus;gfocus=null;var sqs=[].slice.call(gsq.children);
+    f.tx.classList.remove("on");at(f.pic,rel(sqs[f.k]));f.pic.classList.add("back");
+    setTimeout(function(){f.pic.remove();f.tx.remove();if(sqs[f.k])sqs[f.k].classList.remove("away");sqs.forEach(function(q){q.classList.remove("dim","lit")});gsq.classList.remove("focus")},600);
+  }
+  window.gridFocused=function(){return !!gfocus};window.gridClose=gridClose;
+  gsq.addEventListener("click",function(e){
+    if(gfocus){if(!(e.target.closest&&e.target.closest(".gtext")))gridClose();return}   // open: a click (not on the text) closes it
+    var q=e.target.closest&&e.target.closest(".sq.has");if(q)gridOpen(+q.getAttribute("data-k"));
+  });
   document.getElementById("gridbtn").addEventListener("click",function(){if(stageEl.classList.contains("gridded"))setIndex(true);else setGrid(true)});
   addEventListener("wheel",function(e){if(!stageEl.classList.contains("gridded")||(e.target.closest&&e.target.closest(".gridv,.mailbox,.aboutbook")))return;gridEl.scrollTop+=e.deltaMode===1?e.deltaY*16:e.deltaY},{passive:true});   // scrolling anywhere moves the grid
   addEventListener("resize",function(){if(stageEl.classList.contains("gridded")){gridBuild();gridPlace()}});
-  addEventListener("keydown",function(e){if(e.key==="Escape"&&stageEl.classList.contains("gridded"))setGrid(false)});
+  addEventListener("keydown",function(e){if(e.key==="Escape"&&stageEl.classList.contains("gridded")){if(gfocus)gridClose();else setGrid(false)}});
   addEventListener("keydown",function(e){if(e.key==="Escape"&&stageEl.classList.contains("indexed")){if(stageEl.classList.contains("projecting"))closeProject();else setIndex(false)}});
   /* ---- the four words under the address: Work (the index), About (the flip book), Contact (write / draw to us), Instagram ---- */
   function nav(n){
@@ -570,7 +597,7 @@
   /* ---- the mirrored A of the logo: one step back (north wall -> plan -> start; a project -> the index; the grid -> the index; ...) ---- */
   function goBack(){
     var st=document.querySelector(".stage"),lv=document.getElementById("loungev");
-    if(st.classList.contains("gridded")){if(window.setIndex)setIndex(true);return}
+    if(st.classList.contains("gridded")){if(window.gridFocused&&gridFocused())gridClose();else if(window.setIndex)setIndex(true);return}
     var open=st.classList.contains("lounging")||st.classList.contains("indexed")||st.classList.contains("mailing")||document.getElementById("about").classList.contains("on");
     if(open){dispatchEvent(new KeyboardEvent("keydown",{key:"Escape"}));return}       // every view already steps back one level on Esc
     if(document.referrer&&document.referrer.indexOf(location.origin)===0&&history.length>1)history.back();   // at the start: the page you came from
@@ -1064,6 +1091,9 @@ var BACKS = ["#000", "#fff"];
     [".index .pj img,.index .pj a","Project: click to see its drawings large. Click the image for the next one; Esc or the logo to go back."],
     [".pview","Project: click the image for the next one. Esc goes back to the index; the logo goes home."],
     [".ixc,.ixhead","Index: scroll each column on its own; text and drawings keep each other company. Esc or the logo to close."],
+    [".gtext","Torre: the project's text. Click outside it, or press Esc, to go back to the grid."],
+    [".gpic","Click to go back to the grid."],
+    [".gsq .sq.has","Project: click to open it."],
     [".gridv","Grid: scroll to see all the squares. Esc or the logo to close."],
     [".wheelpop","Colour: pick a colour on the wheel; the bar sets light or dark. Drag the edge to move it."],
     [".mailR","Drawing pad: draw with the mouse or a finger. The dot picks the colour. Send mails us your drawing."],
