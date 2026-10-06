@@ -9,7 +9,7 @@
 <meta property="og:description" content="OFFICE COLLABORATIVE is a COLLABORATIVE OFFICE of architecture.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://officeoficina.com">
-<link rel="stylesheet" href="style.css?v=86">
+<link rel="stylesheet" href="style.css?v=87">
 <script src="torre.js?v=1" async></script>
 </head>
 <body>
@@ -429,7 +429,8 @@
     sqs[k].classList.add("away");gsq.classList.add("focus");gfocus={k:k,nb:nb,pic:pic,tx:tx,fl:[],g:g,cur:null};
     if(g.open.floors){gfocus.bands=[];
       var s1=nb>k?nb+1:k+1,s2=s1+1;                                             // the two squares after the drawing: plan, then photo
-      [s1,s2].forEach(function(q,i){if(!sqs[q])return;sqs[q].classList.add("nbr");var d=document.createElement("div");d.className="gfl";at(d,rel(sqs[q]));gsq.appendChild(d);gfocus.fl.push(d)});
+      gfocus.cols=cols;gfocus.sqs=sqs;
+      [s1,s2].forEach(function(q,i){if(!sqs[q])return;sqs[q].classList.add("nbr");var d=document.createElement("div");d.className="gfl";d._home=rel(sqs[q]);at(d,d._home);gsq.appendChild(d);gfocus.fl.push(d)});
       if(g.open.below){var b1=cols>1?nb+cols:s2+1;                              // desktop: the row below, under the drawing and the plan; phone: next in line
         g.open.below.forEach(function(it,i){var q=b1+i;if(!sqs[q])return;sqs[q].classList.add("nbr");var d=document.createElement("div");d.className="gfl keep";at(d,rel(sqs[q]));
           d.innerHTML=(it.list?'<ul>'+it.list.map(function(w){return"<li>"+esc(w)+"</li>"}).join("")+'</ul>':'<img src="'+esc(it.image)+'" alt="'+esc(it.caption||"")+'">')+'<span>'+esc(it.caption||"")+'</span>';
@@ -458,23 +459,36 @@
         d.innerHTML='<img src="'+esc(src)+'" alt="'+esc(cap||"")+'"'+(i?' class="ph"':'')+'><span>'+esc(cap||"")+'</span>';
         requestAnimationFrame(function(){requestAnimationFrame(function(){d.classList.add("on")})})}});
   }
-  gsq.addEventListener("pointermove",function(e){if(!gfocus||e.pointerType!=="mouse")return;var fl=e.target.closest&&e.target.closest(".gpic")?floorAt(e):null;showFloor(fl||null)});   // only while you are on that floor of the drawing
-  gsq.addEventListener("pointerleave",function(e){if(gfocus&&e.pointerType==="mouse")showFloor(null)});
-  gsq.addEventListener("pointerdown",function(e){if(!gfocus||!(e.target.closest&&e.target.closest(".gpic")))return;var fl=floorAt(e);gfocus.tapFloor=!!fl;if(fl)showFloor(fl)});
+  gsq.addEventListener("pointermove",function(e){if(!gfocus||gfocus.big||e.pointerType!=="mouse")return;var fl=e.target.closest&&e.target.closest(".gpic")?floorAt(e):null;showFloor(fl||null)});   // only while you are on that floor of the drawing
+  gsq.addEventListener("pointerleave",function(e){if(gfocus&&!gfocus.big&&e.pointerType==="mouse")showFloor(null)});
+  /* click a floor: its plan and photo grow to four squares each (the row below); click it again, or click them, to go back */
+  function union(a,b){return{l:a.l,t:a.t,w:b.l+b.w-a.l,h:b.t+b.h-a.t}}
+  function bigFloor(fl){
+    var f=gfocus;if(!f)return;var c=f.cols,q=f.sqs,P=f.fl.filter(function(d){return!d.classList.contains("keep")}),K=f.fl.filter(function(d){return d.classList.contains("keep")});
+    if(!fl||c<2||!q[2*c+3]){f.big=null;P.forEach(function(d){d.classList.remove("big");at(d,d._home)});K.forEach(function(d){d.classList.remove("hid")});gsq.classList.remove("bigfloor");return}
+    f.big=null;showFloor(fl);f.big=fl;
+    var R=[union(rel(q[c]),rel(q[2*c+1])),union(rel(q[c+2]),rel(q[2*c+3]))];
+    P.forEach(function(d,i){d.classList.add("big");at(d,R[i])});K.forEach(function(d){d.classList.add("hid")});gsq.classList.add("bigfloor");
+  }
+  gsq.addEventListener("pointerdown",function(e){if(!gfocus||!(e.target.closest&&e.target.closest(".gpic")))return;var fl=floorAt(e);gfocus.tapFloor=fl||null;if(fl&&!gfocus.big)showFloor(fl)});
   function gridClose(){
-    if(!gfocus)return;var f=gfocus;gfocus=null;f.fl.forEach(function(d){d.classList.remove("on");setTimeout(function(){d.remove()},400)});var sqs=[].slice.call(gsq.children);
+    if(!gfocus)return;gsq.classList.remove("bigfloor");var f=gfocus;gfocus=null;f.fl.forEach(function(d){d.classList.remove("on");setTimeout(function(){d.remove()},400)});var sqs=[].slice.call(gsq.children);
     f.tx.classList.remove("on");at(f.pic,rel(sqs[f.k]));f.pic.classList.add("back");
     setTimeout(function(){f.pic.remove();f.tx.remove();if(sqs[f.k])sqs[f.k].classList.remove("away");sqs.forEach(function(q){q.classList.remove("dim","lit","nbr")});gsq.classList.remove("focus")},600);
   }
   window.gridFocused=function(){return !!gfocus};window.gridClose=gridClose;
   gsq.addEventListener("click",function(e){
-    if(gfocus){if(gfocus.tapFloor||e.target.closest&&e.target.closest(".gtext,.gfl")){gfocus.tapFloor=false;return}gridClose();return}   // open: a click (not on the text) closes it
+    if(gfocus){var tf=gfocus.tapFloor;gfocus.tapFloor=null;
+      if(tf){if(gfocus.cols>1)bigFloor(gfocus.big===tf?null:tf);return}                      // a floor: bigger (or back to small)
+      if(e.target.closest&&e.target.closest(".gfl.big")){bigFloor(null);return}               // the big plan or photo: back to small
+      if(e.target.closest&&e.target.closest(".gtext,.gfl"))return;
+      gridClose();return}   // open: a click (not on the text) closes it
     var q=e.target.closest&&e.target.closest(".sq.has");if(q)gridOpen(+q.getAttribute("data-k"));
   });
   document.getElementById("gridbtn").addEventListener("click",function(){if(stageEl.classList.contains("gridded"))setIndex(true);else setGrid(true)});
   addEventListener("wheel",function(e){if(!stageEl.classList.contains("gridded")||(e.target.closest&&e.target.closest(".gridv,.mailbox,.aboutbook")))return;gridEl.scrollTop+=e.deltaMode===1?e.deltaY*16:e.deltaY},{passive:true});   // scrolling anywhere moves the grid
   addEventListener("resize",function(){if(stageEl.classList.contains("gridded")){gridBuild();gridPlace()}});
-  addEventListener("keydown",function(e){if(e.key==="Escape"&&stageEl.classList.contains("gridded")){if(gfocus)gridClose();else setGrid(false)}});
+  addEventListener("keydown",function(e){if(e.key==="Escape"&&stageEl.classList.contains("gridded")){if(gfocus&&gfocus.big){bigFloor(null);showFloor(null)}else if(gfocus)gridClose();else setGrid(false)}});
   addEventListener("keydown",function(e){if(e.key==="Escape"&&stageEl.classList.contains("indexed")){if(stageEl.classList.contains("projecting"))closeProject();else setIndex(false)}});
   /* ---- the four words under the address: Work (the index), About (the flip book), Contact (write / draw to us), Instagram ---- */
   function nav(n){
