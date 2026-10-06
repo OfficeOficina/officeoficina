@@ -505,3 +505,4 @@ html.leaving body{opacity:0;transition:opacity .5s ease}
 .gtext.on{opacity:1}
 .gtext p{margin:0 0 .8em}
 @media (max-width:700px){.gtext{font-size:12.5px}}
+.gsq .sq.under img{opacity:0;transition:opacity .3s ease}   /* a drawing in the next square steps aside for the opened project */
