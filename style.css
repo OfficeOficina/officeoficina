@@ -508,7 +508,7 @@ html.leaving body{opacity:0;transition:opacity .5s ease}
 .gsq .sq.nbr img{opacity:0;transition:opacity .3s ease}   /* a drawing in the next square steps aside for the opened project */
 
 /* Torre: a floor of the elevation, hovered - its plan and photo come up in the next two squares */
-.gband{position:absolute;display:block;background:rgba(0,0,0,.09);opacity:0;pointer-events:none;transition:opacity .2s}
+.gband{position:absolute;display:block;background:rgba(0,0,0,.09);opacity:0;pointer-events:none}
 .gband.on{opacity:1}
 .gpic.onfloor{cursor:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14'%3E%3Ccircle cx='7' cy='7' r='5' fill='%23000'/%3E%3C/svg%3E") 7 7,pointer}   /* a black dot on a floor */
 .gfl{position:absolute;z-index:2;opacity:0;transition:opacity .35s ease}
