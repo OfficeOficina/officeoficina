@@ -9,7 +9,7 @@
 <meta property="og:description" content="OFFICE COLLABORATIVE is a COLLABORATIVE OFFICE of architecture.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://officeoficina.com">
-<link rel="stylesheet" href="style.css?v=82">
+<link rel="stylesheet" href="style.css?v=83">
 </head>
 <body>
 <main class="stage">
@@ -526,12 +526,15 @@
         PLAYER={x0:1351,x1:1727,y0:3150,y1:3245,cx:1534,cy:3185},st=null,drag=null,suppress=false;
     function toU(x,y){var r=box.getBoundingClientRect(),k=V[2]/r.width;return{x:V[0]+(x-r.left)*k,y:V[1]+(y-r.top)*k}}
     function toPx(u,v){var r=box.getBoundingClientRect(),k=r.width/V[2];return{x:r.left+(u-V[0])*k,y:r.top+(v-V[1])*k,k:k}}
-    function cubby(u){if(u.y<BENCH[0]||u.y>BENCH[1])return -1;for(var n=0;n<CUB.length-1;n++)if(u.x>=CUB[n]&&u.x<CUB[n+1])return n;return -1}
-    function onPlayer(x,y){var u=toU(x,y);return u.x>PLAYER.x0-160&&u.x<PLAYER.x1+160&&u.y>PLAYER.y0-260&&u.y<PLAYER.y1+120}
+    function cubby(u){if(u.y<BENCH[0]-(TOUCH?250:0)||u.y>BENCH[1]+(TOUCH?150:0))return -1;for(var n=0;n<CUB.length-1;n++)if(u.x>=CUB[n]&&u.x<CUB[n+1])return n;return -1}
+    var TOUCH=matchMedia("(pointer:coarse)").matches;                         // a phone: bigger targets, taps instead of drags
+    function onPlayer(x,y){var u=toU(x,y),m=TOUCH?3:1;return u.x>PLAYER.x0-160*m&&u.x<PLAYER.x1+160*m&&u.y>PLAYER.y0-260*m&&u.y<PLAYER.y1+120*m}
+    function lift(e,s){return e.pointerType==="mouse"?0:s*.75}                 // on a phone the record rides above your finger, so you can see it
+    function tap(d,e){return Math.hypot(e.clientX-d.x0,e.clientY-d.y0)<12&&performance.now()-d.t0<600}
     var ring=document.createElement("div");ring.className="vplayer";box.appendChild(ring);
     function placeRing(){var a=toPx(PLAYER.x0-60,PLAYER.y0-90),b=toPx(PLAYER.x1+60,PLAYER.y1+40),r=box.getBoundingClientRect();
       ring.style.left=(a.x-r.left)+"px";ring.style.top=(a.y-r.top)+"px";ring.style.width=(b.x-a.x)+"px";ring.style.height=(b.y-a.y)+"px"}
-    function size(){var r=box.getBoundingClientRect();return Math.round(Math.max(40,Math.min(90,r.width*.14)))}   // the record in your hand: big enough to see
+    function size(){var r=box.getBoundingClientRect();return Math.round(Math.max(TOUCH?60:40,Math.min(90,r.width*(TOUCH?.19:.14))))}   // the record in your hand: big enough to see
     function put(el,x,y,extra){el._x=x;el._y=y;el.style.transform="translate("+(x-el._s/2)+"px,"+(y-el._s/2)+"px)"+(extra||"")}
     function make(cls,s,img){var e=document.createElement("div");e.className=cls;e._s=s;e.style.width=e.style.height=s+"px";
       e.innerHTML="<i></i>";if(img)e.firstChild.style.backgroundImage="url("+img+")";if(img)e.classList.add("art");document.body.appendChild(e);return e}
@@ -543,16 +546,20 @@
       e.preventDefault();e.stopPropagation();suppress=true;
       var rec=RECORDS[n%RECORDS.length],s=size(),home=toPx((CUB[n]+CUB[n+1])/2,(BENCH[0]+BENCH[1])/2);
       var sl=make("sleeve",s,rec.sleeve);
-      st={n:n,rec:rec,home:home,sleeve:sl,vinyl:null};drag={el:sl,kind:"sleeve"};
+      st={n:n,rec:rec,home:home,sleeve:sl,vinyl:null};drag={el:sl,kind:"sleeve",x0:e.clientX,y0:e.clientY,t0:performance.now(),lift:lift(e,s)};
       put(sl,home.x,home.y," scale("+(home.k*(CUB[1]-CUB[0])*.9/s)+") scaleX(.08)");sl.classList.add("moving");
-      requestAnimationFrame(function(){sl.classList.add("out");put(sl,e.clientX,e.clientY)});
+      var lf=drag.lift;requestAnimationFrame(function(){sl.classList.add("out");if(drag&&drag.el===sl)put(sl,e.clientX,e.clientY-lf)});
       elev.setPointerCapture(e.pointerId);
     });
-    elev.addEventListener("pointermove",function(e){if(drag&&drag.kind==="sleeve"){drag.el.classList.remove("moving");put(drag.el,e.clientX,e.clientY)}});
+    elev.addEventListener("pointermove",function(e){if(drag&&drag.kind==="sleeve"){drag.el.classList.remove("moving");put(drag.el,e.clientX,e.clientY-drag.lift)}});
     function sleeveUp(e){
-      if(!drag||drag.kind!=="sleeve")return;drag=null;setTimeout(function(){suppress=false},50);
+      if(!drag||drag.kind!=="sleeve")return;var d=drag;drag=null;setTimeout(function(){suppress=false},50);
       var sl=st.sleeve;
-      if(cubby(toU(e.clientX,e.clientY))>=0||toU(e.clientX,e.clientY).y>BENCH[0]-200&&toU(e.clientX,e.clientY).y<BENCH[1]){putAway();return}   // back on the shelf
+      if(tap(d,e)){                                                    // just a tap: the sleeve comes out by itself, the record slides out
+        var r=box.getBoundingClientRect(),s2=sl._s,x=Math.max(r.left+s2*.6,Math.min(r.right-s2*1.2,st.home.x)),y=toPx(0,BENCH[0]-700).y;
+        sl.classList.remove("moving");put(sl,x,y);setTimeout(function(){if(st&&st.sleeve===sl&&!st.vinyl)slideOut()},380);return}
+      var p=toU(sl._x,sl._y);
+      if(cubby(p)>=0||p.y>BENCH[0]-200&&p.y<BENCH[1]||toU(e.clientX,e.clientY).y>BENCH[0]-200&&toU(e.clientX,e.clientY).y<BENCH[1]){putAway();return}   // back on the shelf
       slideOut();
     }
     /* 2. the record slides out of its sleeve */
@@ -574,20 +581,23 @@
     /* 3. the record onto the player */
     document.addEventListener("pointerdown",function(e){
       if(!st||!e.target.closest)return;
-      if(st.vinyl&&e.target.closest(".vinyl")){e.preventDefault();drag={el:st.vinyl,kind:"vinyl",dx:e.clientX-st.vinyl._x,dy:e.clientY-st.vinyl._y};st.vinyl.classList.add("held");try{st.vinyl.setPointerCapture(e.pointerId)}catch(_){}}
-      else if(e.target.closest(".sleeve")){e.preventDefault();drag={el:st.sleeve,kind:"sleeve2",dx:e.clientX-st.sleeve._x,dy:e.clientY-st.sleeve._y};try{st.sleeve.setPointerCapture(e.pointerId)}catch(_){}}
+      var t0={x0:e.clientX,y0:e.clientY,t0:performance.now()};
+      if(st.vinyl&&e.target.closest(".vinyl")){e.preventDefault();drag={el:st.vinyl,kind:"vinyl",dx:e.clientX-st.vinyl._x,dy:e.clientY-st.vinyl._y+lift(e,st.vinyl._s)};Object.assign(drag,t0);st.vinyl.classList.add("held");try{st.vinyl.setPointerCapture(e.pointerId)}catch(_){}}
+      else if(e.target.closest(".sleeve")){e.preventDefault();drag={el:st.sleeve,kind:"sleeve2",dx:e.clientX-st.sleeve._x,dy:e.clientY-st.sleeve._y};Object.assign(drag,t0);try{st.sleeve.setPointerCapture(e.pointerId)}catch(_){}}
     },true);
     document.addEventListener("pointermove",function(e){
-      if(!drag||drag.kind==="sleeve")return;put(drag.el,e.clientX-drag.dx,e.clientY-drag.dy);
-      if(drag.kind==="vinyl")ring.classList.toggle("near",onPlayer(e.clientX,e.clientY));
+      if(!drag||drag.kind==="sleeve")return;if(tap(drag,e)&&!drag.moved)return;drag.moved=true;
+      if(drag.kind==="vinyl")drag.el.classList.remove("settle");put(drag.el,e.clientX-drag.dx,e.clientY-drag.dy);
+      if(drag.kind==="vinyl")ring.classList.toggle("near",onPlayer(drag.el._x,drag.el._y));
     });
     document.addEventListener("pointerup",function(e){
       if(!drag||drag.kind==="sleeve")return;var d=drag;drag=null;
-      if(d.kind==="sleeve2"){if(toU(e.clientX,e.clientY).y>BENCH[0]-200&&toU(e.clientX,e.clientY).y<BENCH[1]+100)putAway();   // the sleeve back on the shelf
+      if(d.kind==="sleeve2"){if(!d.moved){if(st.vinyl)slideIn();else slideOut();return}   // tap the sleeve: the record in or out
+        if(toU(st.sleeve._x,st.sleeve._y).y>BENCH[0]-200&&toU(st.sleeve._x,st.sleeve._y).y<BENCH[1]+100)putAway();   // the sleeve back on the shelf
         else if(!st.vinyl)slideOut();return}                                                                          // ...or the record out again
       st.vinyl.classList.remove("held");ring.classList.remove("near");
-      if(overSleeve(st.vinyl._x,st.vinyl._y)){slideIn();return}        // back into its sleeve
-      if(onPlayer(e.clientX,e.clientY)){                               // on it goes: then to the record player
+      if(d.moved&&overSleeve(st.vinyl._x,st.vinyl._y)){slideIn();return}        // back into its sleeve
+      if(!d.moved||onPlayer(st.vinyl._x,st.vinyl._y)){               // dropped on the player, or just tapped: on it goes                               // on it goes: then to the record player
         var t=toPx(PLAYER.cx,PLAYER.cy),s=(PLAYER.x1-PLAYER.x0)*.75*t.k/st.vinyl._s;
         st.vinyl.classList.add("settle");put(st.vinyl,t.x,t.y," scale("+s+")");st.sleeve.classList.add("fade");loungeEl.classList.remove("pulling");
         var n=st.n;setTimeout(function(){document.documentElement.classList.add("leaving")},550);
