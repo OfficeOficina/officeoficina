@@ -9,7 +9,7 @@
 <meta property="og:description" content="OFFICE COLLABORATIVE is a COLLABORATIVE OFFICE of architecture.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://officeoficina.com">
-<link rel="stylesheet" href="style.css?v=90">
+<link rel="stylesheet" href="style.css?v=91">
 <script src="torre.js?v=1" async></script>
 </head>
 <body>
@@ -601,6 +601,22 @@
       ring.style.left=(a.x-r.left)+"px";ring.style.top=(a.y-r.top)+"px";ring.style.width=(b.x-a.x)+"px";ring.style.height=(b.y-a.y)+"px"}
     function size(){var r=box.getBoundingClientRect();return Math.round(TOUCH?Math.max(70,Math.min(120,r.width*.28)):Math.max(40,Math.min(90,r.width*.14)))}   // the record in your hand: big enough to see
     function put(el,x,y,extra){el._x=x;el._y=y;el.style.transform="translate("+(x-el._s/2)+"px,"+(y-el._s/2)+"px)"+(extra||"")}
+    /* in your hand: the record glides after the pointer (eased every frame, no CSS lag) and leans a little as it moves */
+    function follow(el,x,y){
+      el._tx=x;el._ty=y;if(el._raf)return;el.classList.add("dragging");var last=performance.now();
+      if(el._rot==null)el._rot=0;if(el._sc==null)el._sc=1;if(el._sq==null)el._sq=1;
+      el._raf=requestAnimationFrame(function f(t){
+        var dt=Math.min(3,Math.max(.25,(t-last)/16.67));last=t;var k=1-Math.pow(1-.38,dt),px=el._x;
+        el._x+=(el._tx-el._x)*k;el._y+=(el._ty-el._y)*k;el._sc+=(1-el._sc)*k*.8;el._sq+=(1-el._sq)*k*.8;
+        var lean=Math.max(-9,Math.min(9,(el._x-px)/dt*.5));el._rot+=(lean-el._rot)*Math.min(1,.22*dt);
+        el.style.transform="translate("+(el._x-el._s/2)+"px,"+(el._y-el._s/2)+"px) rotate("+el._rot.toFixed(2)+"deg) scale("+el._sc.toFixed(4)+") scaleX("+el._sq.toFixed(4)+")";
+        el._raf=requestAnimationFrame(f);
+      });
+    }
+    function release(el){                                             // let go: it stops where it is, and straightens up
+      if(!el)return;if(el._raf){cancelAnimationFrame(el._raf);el._raf=0}
+      el._rot=0;el._sc=1;el._sq=1;el.classList.remove("dragging");put(el,el._x,el._y);
+    }
     function make(cls,s,img){var e=document.createElement("div");e.className=cls;e._s=s;e.style.width=e.style.height=s+"px";
       e.innerHTML="<i></i>";if(img)e.firstChild.style.backgroundImage="url("+img+")";if(img)e.classList.add("art");document.body.appendChild(e);return e}
 
@@ -613,12 +629,12 @@
       var sl=make("sleeve",s,rec.sleeve);
       st={n:n,rec:rec,home:home,sleeve:sl,vinyl:null};drag={el:sl,kind:"sleeve",x0:e.clientX,y0:e.clientY,t0:performance.now(),lift:lift(e,s)};
       put(sl,home.x,home.y," scale("+(home.k*(CUB[1]-CUB[0])*.9/s)+") scaleX(.08)");sl.classList.add("moving");
-      var lf=drag.lift;requestAnimationFrame(function(){sl.classList.add("out");if(drag&&drag.el===sl)put(sl,e.clientX,e.clientY-lf)});
+      sl._sc=home.k*(CUB[1]-CUB[0])*.9/s;sl._sq=.08;sl._rot=0;sl.classList.add("out");follow(sl,e.clientX,e.clientY-drag.lift);
       elev.setPointerCapture(e.pointerId);
     });
-    elev.addEventListener("pointermove",function(e){if(drag&&drag.kind==="sleeve"){drag.el.classList.remove("moving");put(drag.el,e.clientX,e.clientY-drag.lift)}});
+    elev.addEventListener("pointermove",function(e){if(drag&&drag.kind==="sleeve"){drag.el.classList.remove("moving");follow(drag.el,e.clientX,e.clientY-drag.lift)}});
     function sleeveUp(e){
-      if(!drag||drag.kind!=="sleeve")return;var d=drag;drag=null;setTimeout(function(){suppress=false},50);
+      if(!drag||drag.kind!=="sleeve")return;var d=drag;drag=null;release(d.el);setTimeout(function(){suppress=false},50);
       var sl=st.sleeve;
       if(tap(d,e)){                                                    // just a tap: the sleeve comes out by itself, the record slides out
         var r=box.getBoundingClientRect(),s2=sl._s,x=Math.max(r.left+s2*.6,Math.min(r.right-s2*1.2,st.home.x)),y=toPx(0,BENCH[0]-700).y;
@@ -652,11 +668,11 @@
     },true);
     document.addEventListener("pointermove",function(e){
       if(!drag||drag.kind==="sleeve")return;if(tap(drag,e)&&!drag.moved)return;drag.moved=true;
-      if(drag.kind==="vinyl")drag.el.classList.remove("settle");put(drag.el,e.clientX-drag.dx,e.clientY-drag.dy);
+      if(drag.kind==="vinyl")drag.el.classList.remove("settle");follow(drag.el,e.clientX-drag.dx,e.clientY-drag.dy);
       if(drag.kind==="vinyl")ring.classList.toggle("near",onPlayer(drag.el._x,drag.el._y));
     });
     document.addEventListener("pointerup",function(e){
-      if(!drag||drag.kind==="sleeve")return;var d=drag;drag=null;
+      if(!drag||drag.kind==="sleeve")return;var d=drag;drag=null;release(d.el);
       if(d.kind==="sleeve2"){if(!d.moved){if(st.vinyl)slideIn();else slideOut();return}   // tap the sleeve: the record in or out
         if(toU(st.sleeve._x,st.sleeve._y).y>BENCH[0]-200&&toU(st.sleeve._x,st.sleeve._y).y<BENCH[1]+100)putAway();   // the sleeve back on the shelf
         else if(!st.vinyl)slideOut();return}                                                                          // ...or the record out again

@@ -534,3 +534,6 @@ html.leaving body{opacity:0;transition:opacity .5s ease}
 /* the slit is in the lounge too, and the card comes out over whatever is open */
 .stage.lounging .slit{z-index:7}
 .stage.lounging .card{z-index:6}
+.sleeve.dragging,.vinyl.dragging{transition:none!important}
+.vinyl.grab{transition:transform .3s cubic-bezier(.3,.1,.2,1)}
+.vinyl.grab.dragging,.vinyl.held{transition:none}
