@@ -506,3 +506,12 @@ html.leaving body{opacity:0;transition:opacity .5s ease}
 .gtext p{margin:0 0 .8em}
 @media (max-width:700px){.gtext{font-size:12.5px}}
 .gsq .sq.nbr img{opacity:0;transition:opacity .3s ease}   /* a drawing in the next square steps aside for the opened project */
+
+/* Torre: a floor of the elevation, hovered - its plan and photo come up in the next two squares */
+.gband{position:absolute;display:block;background:rgba(0,0,0,.09);opacity:0;pointer-events:none;transition:opacity .2s}
+.gband.on{opacity:1}
+.gpic.onfloor{cursor:default}
+.gfl{position:absolute;z-index:2;opacity:0;transition:opacity .35s ease}
+.gfl.on{opacity:1}
+.gfl img{position:absolute;left:12%;top:10%;width:76%;height:76%;object-fit:contain}
+.gfl span{position:absolute;left:0;right:0;bottom:4%;text-align:center;font-size:clamp(9px,.75vw,12px);color:#000}

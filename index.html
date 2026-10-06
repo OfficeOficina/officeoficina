@@ -9,7 +9,7 @@
 <meta property="og:description" content="OFFICE COLLABORATIVE is a COLLABORATIVE OFFICE of architecture.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://officeoficina.com">
-<link rel="stylesheet" href="style.css?v=83">
+<link rel="stylesheet" href="style.css?v=84">
 </head>
 <body>
 <main class="stage">
@@ -388,10 +388,12 @@
      slides into the next square and the text takes the place of the first drawing. Click again (or Esc) to go back.
      An empty {} stays an empty square. Add more {} lines for more squares. */
   var GRID=[
-    {image:"projects/tower/1.png", name:"Torre", open:{image:"projects/tower/elevation.webp", text:["Torre is a conceptual residential high rise developed after a trip to Mexico City, where upon returning home we were immediately put into self isolation due to the Covid Pandemic. It is an exploration of the experiences and diverse conditions we admired in Mexico City, a collaborative project focused on the architectural plan. We created a neutral frame, built out from the geometries of an abandoned warehouse block, to fill with these established diverse conditions. We tried as many conditions as we could go through, theorizing that individuals living in this “exquisite corpse” would potentially design and build each floor to whatever situations they needed.", "Starting with a list of architectural situations and 35mm photographs we took on our trip, we experimented and explored these theories through an architectural language. Sometimes one partner would start a plan and the other would finish; sometimes one partner would take up half of a floor and identify where the other could begin with their interpretation of a theory (or a symbiotic theory), implying a reaction to what had already been designed; and sometimes a mixed authorship would evolve from one partner responding to continuous on-screen annotation by the other. Occasionally the plans were playful, other times the plans were serious, speaking to our dynamic reactions to the situation. The result is an exploration of isolated collaboration, a building that is grounded by our experiences in Mexico City, and elevated by our desire to find again the energy of studio through a remote process."]}},
+    {image:"projects/tower/1.png", name:"Torre", open:{image:"projects/tower/elevation.webp", ratio:700/1877,
+      floors:[{name:"ground floor", y0:1797/1877, y1:1870/1877, plan:"projects/tower/plan-ground.webp", photo:"projects/tower/photo-ground.webp", caption:"new imposed on existing"}],   // hover a floor in the elevation: its plan and photo come up in the next two squares
+      text:["Torre is a conceptual residential high rise developed after a trip to Mexico City, where upon returning home we were immediately put into self isolation due to the Covid Pandemic. It is an exploration of the experiences and diverse conditions we admired in Mexico City, a collaborative project focused on the architectural plan. We created a neutral frame, built out from the geometries of an abandoned warehouse block, to fill with these established diverse conditions. We tried as many conditions as we could go through, theorizing that individuals living in this “exquisite corpse” would potentially design and build each floor to whatever situations they needed.", "Starting with a list of architectural situations and 35mm photographs we took on our trip, we experimented and explored these theories through an architectural language. Sometimes one partner would start a plan and the other would finish; sometimes one partner would take up half of a floor and identify where the other could begin with their interpretation of a theory (or a symbiotic theory), implying a reaction to what had already been designed; and sometimes a mixed authorship would evolve from one partner responding to continuous on-screen annotation by the other. Occasionally the plans were playful, other times the plans were serious, speaking to our dynamic reactions to the situation. The result is an exploration of isolated collaboration, a building that is grounded by our experiences in Mexico City, and elevated by our desire to find again the energy of studio through a remote process."]}},
     {},{},{}, {},{},{},{}, {},{},{},{}];
   var gridEl=document.getElementById("gridv"),gsq=document.getElementById("gsq"),gdEl=null;
-  function gridBuild(){if(window.gridClose&&gfocus){gfocus.pic.remove();gfocus.tx.remove();gfocus=null;gsq.classList.remove("focus")}
+  function gridBuild(){if(window.gridClose&&gfocus){gfocus.pic.remove();gfocus.tx.remove();gfocus.fl.forEach(function(e){e.remove()});gfocus=null;gsq.classList.remove("focus")}
     var n=GRID.length,cols=innerWidth<=700?1:4;while(n%cols)n++;              // always whole rows
     var h="";for(var k=0;k<n;k++){var g=GRID[k]||{};
       h+='<div class="sq'+(g.open?' has':'')+'" data-k="'+k+'">'+(g.image?'<img src="'+esc(g.image)+'" alt="'+esc(g.name||g.title||"")+'" loading="lazy">':'')+(g.title?'<span>'+esc(g.title)+'</span>':'')+'</div>'}
@@ -421,17 +423,42 @@
     if(sqs[nb])sqs[nb].classList.add("nbr");                                    // the whole grid stays; only the next square makes room
     var pic=document.createElement("div");pic.className="gpic";pic.innerHTML='<img src="'+esc(g.open.image)+'" alt="'+esc((g.name||"")+" elevation")+'">';at(pic,A);gsq.appendChild(pic);
     var tx=document.createElement("div");tx.className="gtext";tx.innerHTML=g.open.text.map(function(p){return"<p>"+esc(p)+"</p>"}).join("");at(tx,A);gsq.appendChild(tx);
-    sqs[k].classList.add("away");gsq.classList.add("focus");gfocus={k:k,nb:nb,pic:pic,tx:tx};
+    sqs[k].classList.add("away");gsq.classList.add("focus");gfocus={k:k,nb:nb,pic:pic,tx:tx,fl:[],g:g,cur:null};
+    if(g.open.floors){var band=document.createElement("i");band.className="gband";pic.appendChild(band);gfocus.band=band;
+      var s1=nb>k?nb+1:k+1,s2=s1+1;                                             // the two squares after the drawing: plan, then photo
+      [s1,s2].forEach(function(q,i){if(!sqs[q])return;sqs[q].classList.add("nbr");var d=document.createElement("div");d.className="gfl";at(d,rel(sqs[q]));gsq.appendChild(d);gfocus.fl.push(d)});}
     requestAnimationFrame(function(){requestAnimationFrame(function(){pic.classList.add("go");at(pic,B);tx.classList.add("on")})});
   }
+  /* a floor of the elevation under the pointer (or null) */
+  function floorAt(e){
+    var f=gfocus;if(!f||!f.g.open.floors)return undefined;var im=f.pic.querySelector("img"),r=im.getBoundingClientRect(),q=f.g.open.ratio||1,
+        h=Math.min(r.height,r.width/q),w=h*q,l=r.left+(r.width-w)/2,t=r.top+(r.height-h)/2,fx=(e.clientX-l)/w,fy=(e.clientY-t)/h;
+    if(fx<0||fx>1||fy<0||fy>1)return undefined;                                 // off the drawing: leave things as they are
+    var pad=Math.max(.006,10/h);
+    for(var i=0;i<f.g.open.floors.length;i++){var fl=f.g.open.floors[i];if(fy>fl.y0-pad&&fy<fl.y1+pad)return fl}
+    return null;
+  }
+  function showFloor(fl){
+    var f=gfocus;if(!f||f.cur===fl)return;f.cur=fl;
+    if(f.band){if(fl){var im=f.pic.querySelector("img"),r=im.getBoundingClientRect(),pr=f.pic.getBoundingClientRect(),q=f.g.open.ratio||1,
+        h=Math.min(r.height,r.width/q),w=h*q,l=r.left+(r.width-w)/2-pr.left,t=r.top+(r.height-h)/2-pr.top;
+        f.band.style.left=l+"px";f.band.style.width=w+"px";f.band.style.top=(t+fl.y0*h)+"px";f.band.style.height=((fl.y1-fl.y0)*h)+"px"}
+      f.band.classList.toggle("on",!!fl);f.pic.classList.toggle("onfloor",!!fl)}
+    f.fl.forEach(function(d,i){d.classList.remove("on");
+      if(fl){var src=i?fl.photo:fl.plan,cap=i?fl.caption:fl.name;
+        d.innerHTML='<img src="'+esc(src)+'" alt="'+esc(cap||"")+'"'+(i?' class="ph"':'')+'><span>'+esc(cap||"")+'</span>';
+        requestAnimationFrame(function(){requestAnimationFrame(function(){d.classList.add("on")})})}});
+  }
+  gsq.addEventListener("pointermove",function(e){if(!gfocus||!(e.target.closest&&e.target.closest(".gpic")))return;var fl=floorAt(e);if(fl!==undefined)showFloor(fl)});
+  gsq.addEventListener("pointerdown",function(e){if(!gfocus||!(e.target.closest&&e.target.closest(".gpic")))return;var fl=floorAt(e);gfocus.tapFloor=!!fl;if(fl)showFloor(fl)});
   function gridClose(){
-    if(!gfocus)return;var f=gfocus;gfocus=null;var sqs=[].slice.call(gsq.children);
+    if(!gfocus)return;var f=gfocus;gfocus=null;f.fl.forEach(function(d){d.classList.remove("on");setTimeout(function(){d.remove()},400)});var sqs=[].slice.call(gsq.children);
     f.tx.classList.remove("on");at(f.pic,rel(sqs[f.k]));f.pic.classList.add("back");
     setTimeout(function(){f.pic.remove();f.tx.remove();if(sqs[f.k])sqs[f.k].classList.remove("away");sqs.forEach(function(q){q.classList.remove("dim","lit","nbr")});gsq.classList.remove("focus")},600);
   }
   window.gridFocused=function(){return !!gfocus};window.gridClose=gridClose;
   gsq.addEventListener("click",function(e){
-    if(gfocus){if(!(e.target.closest&&e.target.closest(".gtext")))gridClose();return}   // open: a click (not on the text) closes it
+    if(gfocus){if(gfocus.tapFloor||e.target.closest&&e.target.closest(".gtext,.gfl")){gfocus.tapFloor=false;return}gridClose();return}   // open: a click (not on the text) closes it
     var q=e.target.closest&&e.target.closest(".sq.has");if(q)gridOpen(+q.getAttribute("data-k"));
   });
   document.getElementById("gridbtn").addEventListener("click",function(){if(stageEl.classList.contains("gridded"))setIndex(true);else setGrid(true)});
@@ -1113,7 +1140,8 @@ var BACKS = ["#000", "#fff"];
     [".pview","Project: click the image for the next one. Esc goes back to the index; the logo goes home."],
     [".ixc,.ixhead","Index: scroll each column on its own; text and drawings keep each other company. Esc or the logo to close."],
     [".gtext","Torre: the project's text. Click outside it, or press Esc, to go back to the grid."],
-    [".gpic","Click to go back to the grid."],
+    [".gpic","Hover over the ground floor to see its plan and a photo. Click to go back to the grid."],
+    [".gfl","The ground floor: plan and photo. Click outside them to go back to the grid."],
     [".gsq .sq.has","Project: click to open it."],
     [".gridv","Grid: scroll to see all the squares. Esc or the logo to close."],
     [".wheelpop","Colour: pick a colour on the wheel; the bar sets light or dark. Drag the edge to move it."],
