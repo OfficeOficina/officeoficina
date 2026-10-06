@@ -531,3 +531,6 @@ html.leaving body{opacity:0;transition:opacity .5s ease}
 .gfl.keep.hid{opacity:0;pointer-events:none}
 .gtext{cursor:pointer}
 .gpic{cursor:default}
+/* the slit is in the lounge too, and the card comes out over whatever is open */
+.stage.lounging .slit{z-index:7}
+.stage.lounging .card{z-index:6}

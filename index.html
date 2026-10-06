@@ -9,7 +9,7 @@
 <meta property="og:description" content="OFFICE COLLABORATIVE is a COLLABORATIVE OFFICE of architecture.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://officeoficina.com">
-<link rel="stylesheet" href="style.css?v=89">
+<link rel="stylesheet" href="style.css?v=90">
 <script src="torre.js?v=1" async></script>
 </head>
 <body>
@@ -246,6 +246,10 @@
     });
   }
   slit.addEventListener("click",function(){if(posted)retrieve();else post()});
+  /* going anywhere (the lounge, Work, About, Contact) the card slips into the slit by itself; click the slit and it comes out again, click the card to go back to the start */
+  window.stowCard=function(){if(!posted&&!busyS)setTimeout(function(){if(!posted&&!busyS)post()},60)};
+  window.unstowCard=function(){if(posted)retrieve()};
+  window.cardPosted=function(){return posted};
 
   /* ---- every word ---- */
   var top=1;
@@ -415,7 +419,7 @@
   }
   function setGrid(on){
     if(on===stageEl.classList.contains("gridded"))return;
-    if(on){if(stageEl.classList.contains("indexed"))setIndex(false);if(window.setMail)setMail(false);gridBuild();gridPlace();gridEl.scrollTop=0}
+    if(on){if(window.stowCard)stowCard();if(stageEl.classList.contains("indexed"))setIndex(false);if(window.setMail)setMail(false);gridBuild();gridPlace();gridEl.scrollTop=0}
     stageEl.classList.toggle("gridded",on);document.getElementById("gridbtn").setAttribute("aria-pressed",on?"true":"false");gridEl.setAttribute("aria-hidden",on?"false":"true");
   }
   window.setGrid=setGrid;
@@ -556,7 +560,7 @@
   /* ---- the listening room (the plan), on this page ---- */
   var loungeEl=document.getElementById("loungev");
   function setLounge(on){
-    if(on){if(window.setIndex&&stage.classList.contains("indexed"))setIndex(false);if(window.setMail)setMail(false);if(window.setGrid)setGrid(false);
+    if(on){if(window.stowCard)stowCard();if(window.setIndex&&stage.classList.contains("indexed"))setIndex(false);if(window.setMail)setMail(false);if(window.setGrid)setGrid(false);
       Array.prototype.forEach.call(document.querySelectorAll(".logo .m"),function(m){m.dispatchEvent(new Event("resetpos"))})}   // the logo comes back to its corner: it is the way out
     if(!on){if(window.putRecordAway)putRecordAway();loungeEl.classList.remove("north");if(stage.classList.contains("lounging"))setTimeout(function(){window.resetCard&&resetCard()},350)}   // back on the main page: the card resets
     stage.classList.toggle("lounging",on);loungeEl.setAttribute("aria-hidden",on?"false":"true");
@@ -707,6 +711,7 @@
   }
   window.goBack=goBack;
   function goHome(){
+    if(window.cardPosted&&cardPosted())setTimeout(function(){window.unstowCard()},420);   // back at the start: the card comes back out of the slit
     setLounge(false);
     Array.prototype.forEach.call(document.querySelectorAll(".m.mir"),function(m){m.classList.remove("mir")});   // the A turns back
     if(window.setIndex&&document.querySelector(".stage").classList.contains("indexed"))setIndex(false);
@@ -748,6 +753,11 @@
     });
   }
   function resetCard(){
+    if(window.cardPosted&&cardPosted()){                       // the card is in the slit: put it straight, unseen, ready to come back out
+      flip=0;rot=0;x=0;y=0;unlocked=false;card.classList.remove("open","flipped","flipping");card.querySelector(".cback").setAttribute("aria-hidden","true");
+      plugs.forEach(function(p){p.classList.remove("on");p.taken=false});[].forEach.call(document.querySelectorAll(".lt.filled"),function(l){l.classList.remove("filled")});
+      [].forEach.call(document.querySelectorAll(".logo .m"),function(m){m.style.visibility="";m.dispatchEvent(new Event("resetpos"))});
+      rotEl.tabIndex=-1;fF.tabIndex=-1;lis.tabIndex=-1;return}
     var filled=plugs.filter(function(p){return p.classList.contains("on")||p.taken});
     var pieces=[].slice.call(document.querySelectorAll(".logo .m"));
     if(!filled.length){pieces.forEach(function(m){m.dispatchEvent(new Event("resetpos"))});return}
@@ -949,7 +959,7 @@ var BACKS = ["#000", "#fff"];
   /* open / close: the text fades out, the book fades in, same page (#about) */
   var under=document.querySelector(".under"),book=document.getElementById("about");
   function show(on){
-    if(on&&window.setIndex)setIndex(false);if(on&&window.setMail)setMail(false);if(on&&window.setGrid)setGrid(false);
+    if(on&&window.stowCard)stowCard();if(on&&window.setIndex)setIndex(false);if(on&&window.setMail)setMail(false);if(on&&window.setGrid)setGrid(false);
     book.classList.toggle("on",on);under.classList.toggle("away",on);book.setAttribute("aria-hidden",on?"false":"true");
   }
   var pushed=false;
@@ -998,7 +1008,7 @@ var BACKS = ["#000", "#fff"];
     }
   }
   function setMail(on){
-    if(on){if(window.setIndex&&stage.classList.contains("indexed"))setIndex(false);if(window.setGrid)setGrid(false);stage.classList.add("mailing");place()}
+    if(on){if(window.stowCard)stowCard();if(window.setIndex&&stage.classList.contains("indexed"))setIndex(false);if(window.setGrid)setGrid(false);stage.classList.add("mailing");place()}
     else stage.classList.remove("mailing");
     box.setAttribute("aria-hidden",on?"false":"true");ic.setAttribute("aria-expanded",on?"true":"false");
   }
