@@ -474,3 +474,18 @@ html.leaving body{opacity:0;transition:opacity .5s ease}
   .under{top:calc(var(--top) + var(--h)*.69);font-size:calc(var(--h)*.031/.72)}   /* the words stay centred behind the card */
   .slit{width:calc(100vw - 2*(3.2vw + var(--h)*.0595*1.089 + 14px))}             /* clear of the logo and the ? */
 }
+
+/* the record sleeve (cover facing you) and the record sliding out of it */
+.sleeve{position:fixed;left:0;top:0;z-index:81;pointer-events:none;will-change:transform;transition:transform .4s cubic-bezier(.3,.1,.2,1),opacity .4s}
+.sleeve.moving{transition:none}
+.sleeve i{display:block;width:100%;height:100%;background:#ece9e2 center/cover no-repeat;box-shadow:0 10px 24px rgba(0,0,0,.22),inset 0 0 0 1px rgba(0,0,0,.08);
+  transform:scaleX(.08);transition:transform .35s cubic-bezier(.3,.1,.2,1)}
+.sleeve:not(.art) i{background-image:radial-gradient(circle,#2a2a2a 0 13%,transparent 13.5%)}   /* a plain paper sleeve with its round window */
+.sleeve.out i{transform:none}
+.sleeve.out{pointer-events:auto;cursor:grab}
+.sleeve.fade{opacity:0}
+.vinyl{z-index:80}
+.vinyl.inside{z-index:80}
+.vinyl.grab{pointer-events:auto;cursor:grab;z-index:80}            /* still tucked behind its sleeve until you pick it up */
+.vinyl.held{cursor:grabbing;z-index:83}
+.vinyl.art i{background:center/cover no-repeat}
