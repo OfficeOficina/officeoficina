@@ -9,7 +9,7 @@
 <meta property="og:description" content="OFFICE COLLABORATIVE is a COLLABORATIVE OFFICE of architecture.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://officeoficina.com">
-<link rel="stylesheet" href="style.css?v=88">
+<link rel="stylesheet" href="style.css?v=89">
 <script src="torre.js?v=1" async></script>
 </head>
 <body>
@@ -488,8 +488,8 @@
     if(gfocus){var tf=gfocus.tapFloor;gfocus.tapFloor=null;
       if(tf){if(gfocus.cols>1)bigFloor(gfocus.big===tf?null:tf);return}                      // a floor: bigger (or back to small)
       if(e.target.closest&&e.target.closest(".gfl.big")){bigFloor(null);return}               // the big plan or photo: back to small
-      if(e.target.closest&&e.target.closest(".gtext,.gfl"))return;
-      gridClose();return}   // open: a click (not on the text) closes it
+      if(e.target.closest&&e.target.closest(".gpic,.gfl"))return;                             // the elevation and the plans stay put
+      gridClose();return}                                                                      // the text (or anywhere else): back to all the projects   // open: a click (not on the text) closes it
     var q=e.target.closest&&e.target.closest(".sq.has");if(q)gridOpen(+q.getAttribute("data-k"));
   });
   document.getElementById("gridbtn").addEventListener("click",function(){setGrid(!stageEl.classList.contains("gridded"))});
@@ -1194,8 +1194,8 @@ var BACKS = ["#000", "#fff"];
     [".index .pj img,.index .pj a","Project: click to see its drawings large. Click the image for the next one; Esc or the logo to go back."],
     [".pview","Project: click the image for the next one. Esc goes back to the index; the logo goes home."],
     [".ixc,.ixhead","Index: scroll each column on its own; text and drawings keep each other company. Esc or the logo to close."],
-    [".gtext","Torre: the project's text. Click outside it, or press Esc, to go back to the grid."],
-    [".gpic","Hover over a floor to see its plan and a photo. Click to go back to the grid."],
+    [".gtext","Torre: the project's text. Click it, or press Esc, to go back to all the projects."],
+    [".gpic","Hover over a floor to see its plan and a photo. Click it to make them big."],
     [".gfl","That floor: its plan and a photo. Click outside them to go back to the grid."],
     [".gsq .sq.has","Project: click to open it."],
     [".gridv","Grid: scroll to see all the squares. Esc or the logo to close."],

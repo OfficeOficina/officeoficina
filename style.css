@@ -529,3 +529,5 @@ html.leaving body{opacity:0;transition:opacity .5s ease}
 .gfl.big+.gfl.big{box-shadow:inset 0 0 0 1px #555}
 .gfl.big span{font-size:clamp(10px,.85vw,13px)}
 .gfl.keep.hid{opacity:0;pointer-events:none}
+.gtext{cursor:pointer}
+.gpic{cursor:default}
