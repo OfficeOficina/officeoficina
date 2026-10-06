@@ -189,7 +189,9 @@ var SONGS = [
   function start(){
     var s=list[i],dk=rec.querySelector(".disc");dk.style.background=s.art?"url("+s.art+") center/cover":"";rec.classList.toggle("hasart",!!s.art);rec.style.background=s.art?"transparent":"";stopAll();playing=true;room.classList.add("playing");rec.setAttribute("aria-label","Pause");mark();
     if(s.spotify){room.classList.remove("playing");spPlay(s.spotify)}   // the record starts turning when Spotify actually plays
-    else if(s.src){audio=new Audio(s.src);audio.addEventListener("ended",next);audio.play().catch(waitForTap)}
+    else if(s.src){audio=new Audio(s.src);var tried=false,me=audio;audio.addEventListener("ended",next);
+      audio.addEventListener("error",function(){if(tried||audio!==me)return;tried=true;audio.src=s.src.split("/").pop();audio.play().catch(waitForTap)});   // not in music/? try next to this page
+      audio.play().catch(function(e){if(e&&e.name==="NotAllowedError")waitForTap()})}
     else{playDemo(s);if(ctx.state!=="running")waitForTap()}
   }
   function pause(){stopAll();playing=false;room.classList.remove("playing");rec.setAttribute("aria-label","Play")}
