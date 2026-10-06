@@ -504,7 +504,7 @@
     var ring=document.createElement("div");ring.className="vplayer";box.appendChild(ring);
     function placeRing(){var a=toPx(PLAYER.x0-60,PLAYER.y0-90),b=toPx(PLAYER.x1+60,PLAYER.y1+40),r=box.getBoundingClientRect();
       ring.style.left=(a.x-r.left)+"px";ring.style.top=(a.y-r.top)+"px";ring.style.width=(b.x-a.x)+"px";ring.style.height=(b.y-a.y)+"px"}
-    function size(){var r=box.getBoundingClientRect();return Math.round(Math.max(90,Math.min(220,r.width*.36)))}   // the record in your hand: big enough to see
+    function size(){var r=box.getBoundingClientRect();return Math.round(Math.max(60,Math.min(140,r.width*.22)))}   // the record in your hand: big enough to see
     function put(el,x,y,extra){el._x=x;el._y=y;el.style.transform="translate("+(x-el._s/2)+"px,"+(y-el._s/2)+"px)"+(extra||"")}
     function make(cls,s,img){var e=document.createElement("div");e.className=cls;e._s=s;e.style.width=e.style.height=s+"px";
       e.innerHTML="<i></i>";if(img)e.firstChild.style.backgroundImage="url("+img+")";if(img)e.classList.add("art");document.body.appendChild(e);return e}
