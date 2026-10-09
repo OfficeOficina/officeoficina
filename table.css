@@ -1,0 +1,7 @@
+/* the table in the grid: its drawing, where you can move the coloured blocks */
+.gpic.tscene svg{position:absolute;inset:0;width:100%;height:100%;display:block;touch-action:none;overflow:visible}
+.gpic.tscene .tpc{cursor:grab}
+.gpic.tscene svg.dragging,.gpic.tscene svg.dragging .tpc{cursor:grabbing}
+.gpic.tscene .tln,.gpic.tscene .ttop{stroke:#333;stroke-width:.6px;vector-effect:non-scaling-stroke;stroke-linejoin:round}
+.gpic.tscene .tsh.seat{fill:#000;fill-opacity:.12;filter:url(#tblur)}
+.gpic.tscene .lunder .ttop{filter:brightness(.9)}   /* under the table: a little in its shade */
