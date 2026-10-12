@@ -17,3 +17,4 @@
 .gpic.tscene .thit{fill:transparent;cursor:pointer}
 .gpic.tscene .trender{opacity:0;transition:opacity .45s ease}
 .gpic.tscene svg.rendered .trender{opacity:1;pointer-events:auto;cursor:pointer}
+.gpic.tscene .runder,.gpic.tscene .rnet{filter:brightness(.84)}   /* under the top: in its shade */
