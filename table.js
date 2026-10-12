@@ -72,7 +72,8 @@
       '<radialGradient id="tdg"><stop offset="0" stop-color="#fff"/><stop offset=".55" stop-color="#fff"/><stop offset="1" stop-color="#000"/></radialGradient></defs>'+
       '<g class="ldefs"></g><g class="lunder"></g><image class="tnet" href="'+TABLE.net+'" width="1000" height="1000" pointer-events="none"/>'+
       '<g class="ldent"></g><g class="lnet"></g><image href="'+TABLE.tab+'" width="1000" height="1000" pointer-events="none"/><polygon class="thit" points="'+pstr(TABLE.top,0,0)+'"/><g class="lfloor"></g><g class="ltop"></g>'+
-      '<g class="trender" pointer-events="none"><image href="'+TABLE.render+'" x="-61" y="-40" width="1100" height="1100" pointer-events="none"/><g class="runder"></g>'+
+      '<clipPath id="trclip"><rect x="-55" y="-34" width="1088" height="1088"/></clipPath>'+   // the render stops just short of the square's lines
+      '<g class="trender" pointer-events="none" clip-path="url(#trclip)"><image href="'+TABLE.render+'" x="-61" y="-40" width="1100" height="1100" pointer-events="none"/><g class="runder"></g>'+
       '<image href="'+TABLE.R.net+'" x="-61" y="-40" width="1100" height="1100" pointer-events="none"/><g class="rnet"></g><image href="'+TABLE.R.tab+'" x="-61" y="-40" width="1100" height="1100" pointer-events="none"/>'+
       '<g class="rfloor"></g><g class="rtop"></g></g>';
     var defs=svg.querySelector("defs"),L={under:svg.querySelector(".lunder"),dent:svg.querySelector(".ldent"),net:svg.querySelector(".lnet"),floor:svg.querySelector(".lfloor"),top:svg.querySelector(".ltop")};
