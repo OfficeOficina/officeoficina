@@ -44,3 +44,7 @@
 .gsq .sq.galnbr img,.gsq .sq.galnbr .gcap{opacity:0}
 /* coffee that landed on a thing */
 .gpic.tscene .ospot{fill:#3a2010;stroke:#5a3418;stroke-width:.7px;vector-effect:non-scaling-stroke;mix-blend-mode:multiply;pointer-events:none}
+/* the cards: one at a time, scroll over the square for the next */
+.tgal.tcards{pointer-events:auto;cursor:ns-resize;touch-action:none}
+.tgal.tcards img{left:34.6%;top:11.8%;width:31%;height:74%;object-fit:fill}   /* exactly the size of the table in the top view above */
+.tgal.tcards span{position:absolute;right:.7em;bottom:.5em;font:11px Arial,Helvetica,sans-serif;color:#888}
