@@ -11,8 +11,8 @@
 <meta property="og:url" content="https://officeoficina.com">
 <link rel="stylesheet" href="style.css?v=91">
 <script src="torre.js?v=1" async></script>
-<script src="table.js?v=11" async></script>
-<link rel="stylesheet" href="table.css?v=8">
+<script src="table.js?v=12" async></script>
+<link rel="stylesheet" href="table.css?v=9">
 </head>
 <body>
 <main class="stage">
@@ -420,6 +420,7 @@
         lg=document.querySelector(".logo").getBoundingClientRect(),left,width,top,bottom=innerHeight-m;
     if(innerWidth<=700){left=m;width=innerWidth-2*m;top=lg.bottom+12}                   // phone: under the logo, the full width
     else{left=Math.max(m,lg.right+m);width=innerWidth-2*left;top=Math.max(56,innerHeight*.07)}   // the whole screen, clear of the logo on both sides
+    var gb=document.getElementById("gridbtn");if(gb){var gr=gb.getBoundingClientRect();if(gr.height)top=Math.max(top,gr.bottom+12)}   // the grid starts below the little grid button
     gridEl.style.left=left+"px";gridEl.style.width=width+"px";gridEl.style.top=top+"px";gridEl.style.height=Math.max(140,bottom-top)+"px";
   }
   function setGrid(on){
@@ -1231,7 +1232,8 @@ var BACKS = ["#000", "#fff"];
     [".ixc,.ixhead","Index: scroll each column on its own; text and drawings keep each other company. Esc or the logo to close."],
     [".gtext.ttext","Table: the project's text. Click it, or press Esc, to go back to all the projects."],
     [".gpic.tscene .ticon","Thing: drag it onto the table. Drag it off the table to put it back with the others."],
-    [".gpic.tscene .tobj","Thing: drag it anywhere on the table; drag it off the table to put it back."],
+    [".gpic.tscene .tobj","Thing: drag it anywhere on the table; drag it off the table to put it back. Click the magazine to read it in the lounge."],
+    [".magread","Magazine: click the right page to turn on, the left to turn back. The \u00d7 or Esc puts it down."],
     [".gpic.tscene .tpc","Block: drag it out of its hole and put it on the top, on the net, on the floor or under the table. Drop it near its hole to put it back."],
     [".gpic.tscene","Table: drag the coloured blocks out of the top and put them anywhere. Click the table to see it rendered (you can move the blocks there too); click beside them to go back."],
     [".gtext","Torre: the project's text. Click it, or press Esc, to go back to all the projects."],

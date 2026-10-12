@@ -24,3 +24,26 @@
 /* things to put on the table (render only): small along the bottom; drag one onto the table */
 .gpic.tscene svg.rendered .ticon,.gpic.tscene svg.rendered .tobj{cursor:grab}
 .gpic.tscene svg.rendered.dragging .tobj{cursor:grabbing}
+
+/* the magazine, read in the lounge: a two-page spread in the middle, the record that is playing under it */
+.magread{position:fixed;inset:0;z-index:8;display:grid;place-items:center;align-content:center;gap:14px;background:rgba(250,250,250,.86);opacity:0;transition:opacity .4s ease;
+  font-family:Arial,Helvetica,sans-serif;color:#000}
+.magread.on{opacity:1}
+.mspread{display:grid;grid-template-columns:repeat(2,min(34vw,46vh*.72,330px));box-shadow:0 14px 40px rgba(0,0,0,.18)}
+.mspread.first{grid-template-columns:min(34vw,46vh*.72,330px);transform:translateX(50%)}
+.mspread.first .mpg.empty{display:none}
+.mpg{position:relative;aspect-ratio:.72;background:#fff;padding:9% 9% 12%;box-sizing:border-box;overflow:hidden;cursor:pointer;font-size:clamp(10px,1.1vw,13px);line-height:1.45}
+.mpg+.mpg{border-left:1px solid #e4e4e4}
+.mpg b{display:block;font-weight:400;font-size:1.5em;margin-bottom:.8em}
+.mpg p{margin:0;color:#333}
+.mpg i{position:absolute;bottom:5%;left:0;right:0;text-align:center;font-style:normal;font-size:.8em;color:#888}
+.mpg img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.mpg.cover{background:#000;color:#fff}.mpg.cover p{color:#bbb}.mpg.cover b{font-size:2.2em;margin-top:30%}
+.mpg.empty{background:transparent;cursor:default}
+.mfoot{display:flex;align-items:center;gap:18px;font-size:13px}
+.mfoot .mx{font:inherit;font-size:20px;line-height:1;background:none;border:0;padding:0 4px;cursor:pointer;color:#000}
+@media (max-width:700px){.mspread{grid-template-columns:repeat(2,44vw)}.mspread.first{grid-template-columns:60vw;transform:none}}
+
+/* the little grid under the slit (the way to the work): a bit smaller */
+.gridbtn{width:15px;height:15px}
+@media (max-width:700px){.gridbtn{width:14px;height:14px}}
