@@ -42,3 +42,5 @@
 .tgal.on{opacity:1}
 .tgal img{position:absolute;inset:6%;width:88%;height:88%;object-fit:contain}
 .gsq .sq.galnbr img,.gsq .sq.galnbr .gcap{opacity:0}
+/* coffee that landed on a thing */
+.gpic.tscene .ospot{fill:#3a2010;stroke:#5a3418;stroke-width:.7px;vector-effect:non-scaling-stroke;mix-blend-mode:multiply;pointer-events:none}
