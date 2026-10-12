@@ -5,3 +5,15 @@
 .gpic.tscene .tln,.gpic.tscene .ttop{stroke:#333;stroke-width:.6px;vector-effect:non-scaling-stroke;stroke-linejoin:round}
 .gpic.tscene .tsh.seat{fill:#000;fill-opacity:.12;filter:url(#tblur)}
 .gpic.tscene .lunder .ttop{filter:brightness(.9)}   /* under the table: a little in its shade */
+
+/* under each drawing in the grid: its title, and under that the place and year */
+.gsq .sq .gcap{position:absolute;left:0;right:0;bottom:3.5%;text-align:center;font:14pt/1.25 Arial,Helvetica,sans-serif;color:#000;letter-spacing:0;transition:opacity .3s ease;pointer-events:none}
+.gsq .sq .gcap b{display:block;font-weight:400}
+.gsq .sq.away .gcap,.gsq .sq.nbr .gcap{opacity:0}   /* a project opened: its text takes this square */
+@media (max-width:700px){.gsq .sq .gcap{font-size:12pt}}
+.gsq .sq:has(.gcap) img{top:7%;height:71%}   /* the drawing moves up a little to make room for its title */
+
+/* click the table: the rendered table fades in over the drawing; click it to go back */
+.gpic.tscene .thit{fill:transparent;cursor:pointer}
+.gpic.tscene .trender{opacity:0;transition:opacity .45s ease}
+.gpic.tscene svg.rendered .trender{opacity:1;pointer-events:auto;cursor:pointer}
