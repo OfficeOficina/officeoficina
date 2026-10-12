@@ -21,10 +21,6 @@
 .gpic.tscene svg.rendered .trender .thitp{cursor:grab}
 .gpic.tscene svg.rendered.dragging .trender,.gpic.tscene svg.rendered.dragging .trender .thitp{cursor:grabbing}
 
-/* things to put on the table: black and white icons along the bottom; drag one onto the table */
-.gpic.tscene .ticon{cursor:grab}
-.gpic.tscene .ticon path{fill:none;stroke:#000;stroke-width:1.1px;vector-effect:non-scaling-stroke;stroke-linecap:round;stroke-linejoin:round}
-.gpic.tscene .ticon.used{opacity:.22;cursor:default}
-.gpic.tscene .ticon:not(.used):hover path{stroke-width:1.6px}
-.gpic.tscene .tobj{cursor:grab}
-.gpic.tscene svg.dragging .tobj{cursor:grabbing}
+/* things to put on the table (render only): small along the bottom; drag one onto the table */
+.gpic.tscene svg.rendered .ticon,.gpic.tscene svg.rendered .tobj{cursor:grab}
+.gpic.tscene svg.rendered.dragging .tobj{cursor:grabbing}
