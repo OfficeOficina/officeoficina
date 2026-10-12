@@ -37,7 +37,8 @@
 /* pictures stay sharp when the page is zoomed */
 .gpic.tscene image{image-rendering:auto}
 
-/* the other renders of the table, in the squares after it */
-.tgal{position:absolute;z-index:2;background:var(--bg);opacity:0;transition:opacity .45s ease;pointer-events:none}
+/* the other renders, in the squares after the table, while its render is showing */
+.tgal{position:absolute;z-index:2;background:none!important;opacity:0;transition:opacity .45s ease;pointer-events:none}
 .tgal.on{opacity:1}
-.tgal img{position:absolute;inset:4%;width:92%;height:92%;object-fit:contain}
+.tgal img{position:absolute;inset:6%;width:88%;height:88%;object-fit:contain}
+.gsq .sq.galnbr img,.gsq .sq.galnbr .gcap{opacity:0}
