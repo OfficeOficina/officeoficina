@@ -1226,11 +1226,8 @@ window.TABLE_CARDS=[
     function things(g,gn){Object.keys(ost).filter(function(k){return ost[k].on||dragO===k}).sort(function(a,b){return ost[a].y-ost[b].y}).forEach(function(k){
         var o=ost[k],O=TABLE.OBJ[k],lift=dragO===k?(k==="cloth"?2:10):0,grp=el("g",{"class":"tobj","data-o":k},o.where==="net"&&dragO!==k?gn:g),dy=o.where==="net"&&dragO!==k?(o.sag||0):0;
         var inHole=o.where==="net"&&dragO!==k&&o.hole,img={href:inHole&&O.sprH||O.spr,x:O.x+o.x-O.ax,y:O.y+o.y-O.ay-lift+dy,width:O.w,height:O.h};
-        if(inHole){var HP=TABLE.pieces[o.hole].p,cid="th_"+k;holeClip(cid,pstr(HP,0,0));grp.setAttribute("clip-path","url(#"+cid+")");   // below the top: only what shows through the hole
-          var line=o.y+dy-DROP,hb=box(HP),col=hull(HP.concat(HP.map(function(q){return[q[0],q[1]-600]}))).map(function(q){return[q[0],Math.min(q[1],line)]});   // above the top: only straight up out of the hole
-          if(1){   // the part above the table line stands up out of the hole, in front of the far rim
-          var up=el("g",{"class":"tobj","data-o":k},g),cu="tu_"+k;holeClip(cu,"-300,-300 1300,-300 1300,"+line.toFixed(1)+" -300,"+line.toFixed(1));up.setAttribute("clip-path","url(#"+cu+")");el("image",img,up);   // only tall things (the flowers) stand up out of the hole
-          spots(k,up,o.x,o.y+dy)}}
+        if(inHole){g.appendChild(grp);grp.removeAttribute("clip-path");      // in a hole: drawn whole, sunk a little into it, never cut off by the rim
+          var HP=TABLE.pieces[o.hole].p,hb=box(HP);el("ellipse",{cx:o.x,cy:o.y+dy-3,rx:(TABLE.OBJ[k].bw||40)*.55,ry:(TABLE.OBJ[k].bw||40)*.22,fill:"#000","fill-opacity":.18,filter:"url(#tblur)"},grp)}
         el("image",img,grp);spots(k,grp,o.x,o.y-lift+dy);
         if(k==="coffee")slosh(grp,o.x,o.y-lift)});
       tray()}
@@ -1284,7 +1281,7 @@ window.TABLE_CARDS=[
         var W=2*Math.PI/420,Z=.11;                                       // how fast the coffee rocks, and how quickly it calms
         cup.w+=(-W*W*cup.th-2*Z*W*cup.w)*dt;cup.th+=cup.w*dt;cup.wy+=(-W*W*cup.ty-2*Z*W*cup.wy)*dt;cup.ty+=cup.wy*dt;
         if((Math.abs(cup.th)>1||Math.abs(cup.ty)>1.15)&&now-cup.spilt>350){cup.spilt=now;var m=Math.hypot(cup.th,cup.ty),o=ostC();
-          if(o&&inPoly([o.x,o.y],TABLE.top)&&o.where!=="net")spill(cup.th/m,cup.ty/m*.6,Math.min(1.5,m*.8));                       // over the side it goes
+          if(o&&inPoly([o.x,o.y],TABLE.top)&&o.where!=="net"&&!onPiece(o.x,o.y))spill(cup.th/m,cup.ty/m*.6,Math.min(1.5,m*.8));                       // over the side it goes
           cup.th*=.55;cup.ty*=.55;cup.w*=.4;cup.wy*=.4}
         if(svg.classList.contains("rendered"))rRender();
         if(od&&od.k==="coffee"||Math.abs(cup.th)+Math.abs(cup.w)*200+Math.abs(cup.ty)>.004)requestAnimationFrame(f);else{cup.th=cup.ty=cup.w=cup.wy=0;cup.run=false;draw()}})(last)}
@@ -1298,7 +1295,7 @@ window.TABLE_CARDS=[
       function where(x,y){for(var p in TABLE.pieces)if(st[p].where!=="seated"&&inPoly([x,y],TABLE.pieces[p].p))return"hole";   // into a hole it is lost
         var hit=null;Object.keys(ost).forEach(function(k){if(k==="coffee"||!ost[k].on||ost[k].where==="net")return;var O=TABLE.OBJ[k],q=ost[k];
           var L=q.x+O.x-O.ax,T=q.y+O.y-O.ay;if(x>L+O.w*.15&&x<L+O.w*.85&&y>T+O.h*.1&&y<T+O.h*.92)hit=k});
-        if(hit)return hit;return inPoly([x,y],TABLE.top)?"table":null}
+        if(hit)return hit;if(onPiece(x,y))return null;return inPoly([x,y],TABLE.top)?"table":null}
       function shape(x,y,r){var n=11,p=[];for(var i=0;i<n;i++){var a=i/n*Math.PI*2,q=r*rnd(.75,1.15);p.push([x+Math.cos(a)*q,y+Math.sin(a)*q*.58])}
         function mid(a,b){return((a[0]+b[0])/2).toFixed(1)+","+((a[1]+b[1])/2).toFixed(1)}
         return"M"+mid(p[n-1],p[0])+p.map(function(q,i){return" Q"+q[0].toFixed(1)+","+q[1].toFixed(1)+" "+mid(q,p[(i+1)%n])}).join("")+"Z"}
@@ -1319,7 +1316,10 @@ window.TABLE_CARDS=[
         if(u<1.05)requestAnimationFrame(f);else{fx.remove();setTimeout(function(){grp.classList.remove("wet")},400)}})(t0);
       stains.push(grp)}
     /* lift the cup off the table and it leaves a ring where it stood - a different one every time - which dries like the spills */
-    function ring(x,y){var g=svg.querySelector(".rstain");if(!g||!inPoly([x,y],TABLE.top))return;for(var p in TABLE.pieces)if(st[p].where!=="seated"&&inPoly([x,y],TABLE.pieces[p].p))return;
+    /* the blue, red and green pieces: coffee on them leaves no mark */
+    function onPiece(x,y){for(var p in TABLE.pieces){var q=st[p];if(q.where==="under"||q.where==="net"||q.where==="floor")continue;var up=q.where==="seated"?0:TABLE.T;
+        if(inPoly([x-q.dx,y-q.dy+up],TABLE.pieces[p].p))return true}return false}
+    function ring(x,y){if(onPiece(x,y))return;var g=svg.querySelector(".rstain");if(!g||!inPoly([x,y],TABLE.top))return;for(var p in TABLE.pieces)if(st[p].where!=="seated"&&inPoly([x,y],TABLE.pieces[p].p))return;
       var R=function(a,b){return a+Math.random()*(b-a)},cx=x+R(-1.5,1.5),cy=y-5.5+R(-1,1),rx=R(19,23),k=.56,grp=el("g",{"class":"stain ring wet"},g),type=Math.floor(Math.random()*5);
       function arc(r,a0,a1,w,jit){var n=Math.max(8,Math.round((a1-a0)/.18)),d="";for(var i=0;i<=n;i++){var a=a0+(a1-a0)*i/n,q=r*(1+R(-jit,jit));d+=(i?" L":"M")+(cx+Math.cos(a)*q).toFixed(1)+","+(cy+Math.sin(a)*q*k).toFixed(1)}
         el("path",{d:d,style:"stroke-width:"+w.toFixed(2)+"px"},grp)}
@@ -1339,11 +1339,11 @@ window.TABLE_CARDS=[
         if(Math.abs(u)<44&&Math.abs(v)<30){var a=+(p.getAttribute("data-a")||1)-dist*.012;
           if(a<=.03){var g=p.parentNode;p.remove();if(g&&!g.childNodes.length)g.remove()}else{p.setAttribute("data-a",a.toFixed(3));p.style.opacity=a}}})}
     /* a thing small enough for an empty hole falls through it, lands on the net below, and the net gives under it */
-    var DROP=16;   // seen through the hole, just below the top
+    var DROP=8;    // sunk a little into the hole
     function holeAt(x,y,k){var bw=TABLE.OBJ[k].bw||999;for(var p in TABLE.pieces){if(st[p].where==="seated")continue;var P=TABLE.pieces[p].p,b=box(P),w=(b[2]-b[0])*(p==="triangle"?.75:.9);
         if(inPoly([x,y],P)&&bw<w)return p}return null}
     function fall(o){var k=Object.keys(ost).filter(function(q){return ost[q]===o})[0],b=box(TABLE.pieces[o.hole0].p),bw=TABLE.OBJ[k].bw||40,
-        x0=o.x,y0=o.y,x1=(b[0]+b[2])/2,y1=(b[1]+b[3])/2+bw*.29,t0=performance.now();      // it drops straight down the middle of the hole
+        x0=o.x,y0=o.y,x1=(b[0]+b[2])/2,y1=(b[1]+b[3])/2+bw*.12,t0=performance.now();      // it drops straight down the middle of the hole
       (function f(now){var t=Math.min(1,(now-t0)/260),e=t*t;o.x=x0+(x1-x0)*Math.min(1,t*2);o.y=y0+(y1-y0)*Math.min(1,t*2)+DROP*e;draw();
         if(t<1){requestAnimationFrame(f);return}o.where="net";o.on=true;o.x=x1;o.y=y1+DROP;o.hole=o.hole0;
         var t1=performance.now(),S=TABLE.SAG;(function g(n2){if(o.where!=="net")return;var u=n2-t1;o.sag=S*(1-Math.exp(-u/170)*Math.cos(u/75));draw();if(u<1200)requestAnimationFrame(g);else{o.sag=S;draw()}})(t1)})(t0)}
