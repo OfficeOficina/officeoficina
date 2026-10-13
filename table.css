@@ -48,3 +48,5 @@
 .tgal.tcards{pointer-events:auto;cursor:ns-resize;touch-action:none}
 .tgal.tcards img{left:34.6%;top:11.8%;width:31%;height:74%;object-fit:fill}   /* exactly the size of the table in the top view above */
 .tgal.tcards span{position:absolute;right:.7em;bottom:.5em;font:11px Arial,Helvetica,sans-serif;color:#888}
+/* the close-up: right to the edge of its square, so the table runs on out of it */
+.tgal.bleed img{left:1px;top:1px;width:calc(100% - 2px);height:calc(100% - 2px)}
