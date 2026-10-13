@@ -53,3 +53,15 @@
 /* coffee rings where the cup stood: wet and dark, then dry to a faint ring */
 .gpic.tscene .stain.ring path{fill:none!important;stroke:#4a2812;stroke-opacity:.22;stroke-linecap:round;stroke-linejoin:round;vector-effect:non-scaling-stroke;transition:stroke-opacity 9s ease-out}
 .gpic.tscene .stain.ring.wet path{stroke-opacity:.75;transition:none}
+/* the magazine, opened on the table (hold it): its pages, turned by dragging */
+.gpic.tscene .mread{position:absolute;inset:0;z-index:5;display:grid;place-items:center;background:rgba(250,250,250,.55);opacity:0;transition:opacity .3s ease;touch-action:none}
+.gpic.tscene .mread.on{opacity:1}
+.mread .mbook{position:relative;width:88%;aspect-ratio:1870/1210;perspective:2200px;box-shadow:0 18px 40px rgba(0,0,0,.22);cursor:grab;user-select:none;-webkit-user-select:none}
+.mread .mbook .pl,.mread .mbook .pr{position:absolute;top:0;bottom:0;width:50%;background:#fff center/contain no-repeat}
+.mread .mbook .pl{left:0}.mread .mbook .pr{right:0}
+.mread .mbook .pl.blank,.mread .mbook .pr.blank{background:transparent}
+.mread .mbook:has(.pl.blank){box-shadow:none}
+.mread .mbook .leaf{position:absolute;top:0;bottom:0;left:50%;width:50%;transform-origin:0 50%;transform-style:preserve-3d;z-index:2}
+.mread .mbook .leaf i{position:absolute;inset:0;background:#fff center/contain no-repeat;backface-visibility:hidden;-webkit-backface-visibility:hidden}
+.mread .mbook .leaf i.bk{transform:rotateY(180deg)}
+.mread .mx{position:absolute;top:2%;right:3%;font:20px/1 Arial,Helvetica,sans-serif;background:none;border:0;color:#000;cursor:pointer;padding:4px 8px}
