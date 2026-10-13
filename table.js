@@ -1343,12 +1343,15 @@ window.TABLE_CARDS=[
           if(a<=.03){var g=p.parentNode;p.remove();if(g&&!g.childNodes.length)g.remove()}else{p.setAttribute("data-a",a.toFixed(3));p.style.opacity=a}}})}
     /* a thing small enough for an empty hole falls through it, lands on the net below, and the net gives under it */
     var DROP=24;   // how far down into the hole it sinks
-    function holeAt(x,y,k){var bw=(TABLE.OBJ[k].bw||999)*.45;for(var p in TABLE.pieces){if(st[p].where==="seated")continue;var P=TABLE.pieces[p].p,ok=true;
-        for(var i=0;i<12&&ok;i++){var a=i/12*Math.PI*2;if(!inPoly([x+Math.cos(a)*bw,y-2+Math.sin(a)*bw*.55],P))ok=false}   // its whole foot fits inside the hole
-        if(ok)return p}return null}
-    function fall(o){var y0=o.y,t0=performance.now();
-      (function f(now){var t=Math.min(1,(now-t0)/280);o.y=y0+DROP*t*t;draw();
-        if(t<1){requestAnimationFrame(f);return}o.where="net";o.on=true;o.y=y0+DROP;o.hole=o.hole0;
+    var SNAP=22;   // how close is close enough: within this distance of fitting, it settles into the hole
+    function fits(x,y,bw,P){for(var i=0;i<12;i++){var a=i/12*Math.PI*2;if(!inPoly([x+Math.cos(a)*bw,y-2+Math.sin(a)*bw*.55],P))return false}return true}
+    function holeAt(x,y,k){var bw=(TABLE.OBJ[k].bw||999)*.45;for(var p in TABLE.pieces){if(st[p].where==="seated")continue;var P=TABLE.pieces[p].p,c=cen(P),
+          dx=c[0]-x,dy=(c[1]+2)-y,d=Math.hypot(dx,dy)||1;
+        for(var s=0;s<=Math.min(SNAP,d);s+=2){var tx=x+dx/d*s,ty=y+dy/d*s;if(fits(tx,ty,bw,P))return{p:p,x:tx,y:ty}}}   // the nearest spot it fits, a nudge toward the middle
+      return null}
+    function fall(o){var x0=o.x,y0=o.y,x1=o.tx,y1=o.ty,t0=performance.now();
+      (function f(now){var t=Math.min(1,(now-t0)/300),m=Math.min(1,t*2.5),e=t*t;o.x=x0+(x1-x0)*m;o.y=y0+(y1-y0)*m+DROP*e;draw();
+        if(t<1){requestAnimationFrame(f);return}o.where="net";o.on=true;o.x=x1;o.y=y1+DROP;o.hole=o.hole0;
         var t1=performance.now(),S=TABLE.SAG;(function g(n2){if(o.where!=="net")return;var u=n2-t1;o.sag=S*(1-Math.exp(-u/170)*Math.cos(u/75));draw();if(u<1200)requestAnimationFrame(g);else{o.sag=S;draw()}})(t1)})(t0)}
     /* clicks that take you somewhere */
     var GO={magazine:function(){if(window.readMagazine)readMagazine()},
@@ -1407,7 +1410,7 @@ window.TABLE_CARDS=[
         if(GO[od.k]&&od.was&&e&&Math.hypot(e.clientX-od.cx,e.clientY-od.cy)<5){var k=od.k;od=null;dragO=null;svg.classList.remove("dragging");draw();GO[k]();return}   // a click on the magazine or the funnel: off it takes you
       o.on=inPoly([o.x,o.y],TABLE.top)||o.where==="net"&&od.fromNet;o.where=o.on&&od.fromNet&&!inPoly([o.x,o.y],TABLE.top)?"net":"top";
       var h=holeAt(o.x,o.y,od.k);od=null;dragO=null;moved=Date.now();svg.classList.remove("dragging");
-      if(h){o.hole0=h;fall(o)}else{if(o.where!=="net")o.sag=0;draw()}return}   // on the table it stays; anywhere else it goes back to its icon
+      if(h){o.hole0=h.p;o.tx=h.x;o.ty=h.y;fall(o)}else{if(o.where!=="net")o.sag=0;draw()}return}   // on the table it stays; anywhere else it goes back to its icon
       if(!d)return;moved=Date.now();var k=d.k;settle(k);d=null;dragK=null;svg.classList.remove("dragging");draw();if(st[k].where==="net")give(k)}
     svg.addEventListener("pointerup",up);svg.addEventListener("pointercancel",up);
     svg.addEventListener("click",function(e){if(e.target.closest&&e.target.closest(".tpc,.tobj,.ticon,.ttray")){e.stopPropagation();return}
