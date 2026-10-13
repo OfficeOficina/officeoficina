@@ -1226,8 +1226,11 @@ window.TABLE_CARDS=[
     function things(g,gn){Object.keys(ost).filter(function(k){return ost[k].on||dragO===k}).sort(function(a,b){return ost[a].y-ost[b].y}).forEach(function(k){
         var o=ost[k],O=TABLE.OBJ[k],lift=dragO===k?(k==="cloth"?2:10):0,grp=el("g",{"class":"tobj","data-o":k},o.where==="net"&&dragO!==k?gn:g),dy=o.where==="net"&&dragO!==k?(o.sag||0):0;
         var inHole=o.where==="net"&&dragO!==k&&o.hole,img={href:inHole&&O.sprH||O.spr,x:O.x+o.x-O.ax,y:O.y+o.y-O.ay-lift+dy,width:O.w,height:O.h};
-        if(inHole){g.appendChild(grp);grp.removeAttribute("clip-path");      // in a hole: drawn whole, sunk a little into it, never cut off by the rim
-          var HP=TABLE.pieces[o.hole].p,hb=box(HP);el("ellipse",{cx:o.x,cy:o.y+dy-3,rx:(TABLE.OBJ[k].bw||40)*.55,ry:(TABLE.OBJ[k].bw||40)*.22,fill:"#000","fill-opacity":.18,filter:"url(#tblur)"},grp)}
+        if(inHole){var HP=TABLE.pieces[o.hole].p,line=(o.y+dy-DROP).toFixed(1),cid="th_"+k,cu="tu_"+k;
+          holeClip(cid,pstr(HP,0,0));grp.setAttribute("clip-path","url(#"+cid+")");                                   // below the tabletop: only seen through the hole
+          el("ellipse",{cx:o.x,cy:o.y+dy-2,rx:(TABLE.OBJ[k].bw||40)*.5,ry:(TABLE.OBJ[k].bw||40)*.2,fill:"#000","fill-opacity":.22,filter:"url(#tblur)"},grp);
+          var up=el("g",{"class":"tobj","data-o":k},g);holeClip(cu,"-300,-300 1300,-300 1300,"+line+" -300,"+line);up.setAttribute("clip-path","url(#"+cu+")");el("image",img,up);   // above it: in full
+          spots(k,up,o.x,o.y+dy)}
         el("image",img,grp);spots(k,grp,o.x,o.y-lift+dy);
         if(k==="coffee")slosh(grp,o.x,o.y-lift)});
       tray()}
@@ -1339,13 +1342,13 @@ window.TABLE_CARDS=[
         if(Math.abs(u)<44&&Math.abs(v)<30){var a=+(p.getAttribute("data-a")||1)-dist*.012;
           if(a<=.03){var g=p.parentNode;p.remove();if(g&&!g.childNodes.length)g.remove()}else{p.setAttribute("data-a",a.toFixed(3));p.style.opacity=a}}})}
     /* a thing small enough for an empty hole falls through it, lands on the net below, and the net gives under it */
-    var DROP=8;    // sunk a little into the hole
-    function holeAt(x,y,k){var bw=TABLE.OBJ[k].bw||999;for(var p in TABLE.pieces){if(st[p].where==="seated")continue;var P=TABLE.pieces[p].p,b=box(P),w=(b[2]-b[0])*(p==="triangle"?.75:.9);
-        if(inPoly([x,y],P)&&bw<w)return p}return null}
-    function fall(o){var k=Object.keys(ost).filter(function(q){return ost[q]===o})[0],b=box(TABLE.pieces[o.hole0].p),bw=TABLE.OBJ[k].bw||40,
-        x0=o.x,y0=o.y,x1=(b[0]+b[2])/2,y1=(b[1]+b[3])/2+bw*.12,t0=performance.now();      // it drops straight down the middle of the hole
-      (function f(now){var t=Math.min(1,(now-t0)/260),e=t*t;o.x=x0+(x1-x0)*Math.min(1,t*2);o.y=y0+(y1-y0)*Math.min(1,t*2)+DROP*e;draw();
-        if(t<1){requestAnimationFrame(f);return}o.where="net";o.on=true;o.x=x1;o.y=y1+DROP;o.hole=o.hole0;
+    var DROP=24;   // how far down into the hole it sinks
+    function holeAt(x,y,k){var bw=(TABLE.OBJ[k].bw||999)*.45;for(var p in TABLE.pieces){if(st[p].where==="seated")continue;var P=TABLE.pieces[p].p,ok=true;
+        for(var i=0;i<12&&ok;i++){var a=i/12*Math.PI*2;if(!inPoly([x+Math.cos(a)*bw,y-2+Math.sin(a)*bw*.55],P))ok=false}   // its whole foot fits inside the hole
+        if(ok)return p}return null}
+    function fall(o){var y0=o.y,t0=performance.now();
+      (function f(now){var t=Math.min(1,(now-t0)/280);o.y=y0+DROP*t*t;draw();
+        if(t<1){requestAnimationFrame(f);return}o.where="net";o.on=true;o.y=y0+DROP;o.hole=o.hole0;
         var t1=performance.now(),S=TABLE.SAG;(function g(n2){if(o.where!=="net")return;var u=n2-t1;o.sag=S*(1-Math.exp(-u/170)*Math.cos(u/75));draw();if(u<1200)requestAnimationFrame(g);else{o.sag=S;draw()}})(t1)})(t0)}
     /* clicks that take you somewhere */
     var GO={magazine:function(){if(window.readMagazine)readMagazine()},
