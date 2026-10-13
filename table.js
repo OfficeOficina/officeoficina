@@ -1309,6 +1309,18 @@ window.TABLE_CARDS=[
           else{var q=ost[w];(q.spots=q.spots||[]).push({d:dd,x:q.x,y:q.y,t:performance.now()});draw()}});      // landed on a thing: it stays on it
         if(u<1.05)requestAnimationFrame(f);else{fx.remove();setTimeout(function(){grp.classList.remove("wet")},400)}})(t0);
       stains.push(grp)}
+    /* lift the cup off the table and it leaves a ring where it stood - a different one every time - which dries like the spills */
+    function ring(x,y){var g=svg.querySelector(".rstain");if(!g||!inPoly([x,y],TABLE.top))return;for(var p in TABLE.pieces)if(st[p].where!=="seated"&&inPoly([x,y],TABLE.pieces[p].p))return;
+      var R=function(a,b){return a+Math.random()*(b-a)},cx=x+R(-1.5,1.5),cy=y-5.5+R(-1,1),rx=R(19,23),k=.56,grp=el("g",{"class":"stain ring wet"},g),type=Math.floor(Math.random()*5);
+      function arc(r,a0,a1,w,jit){var n=Math.max(8,Math.round((a1-a0)/.18)),d="";for(var i=0;i<=n;i++){var a=a0+(a1-a0)*i/n,q=r*(1+R(-jit,jit));d+=(i?" L":"M")+(cx+Math.cos(a)*q).toFixed(1)+","+(cy+Math.sin(a)*q*k).toFixed(1)}
+        el("path",{d:d,style:"stroke-width:"+w.toFixed(2)+"px"},grp)}
+      var T=Math.PI*2,a0=R(0,T);
+      if(type===0)arc(rx,0,T,R(1.6,2.4),.02);                                              // a clean full ring
+      else if(type===1){arc(rx,0,T,R(1.2,1.8),.03);arc(rx*R(.82,.88),a0,a0+R(2,3.5),R(.8,1.2),.03)}   // a ring with a fainter one inside
+      else if(type===2)arc(rx,a0,a0+R(3.6,5.2),R(2,3),.04);                                // a broken ring, where the cup lifted unevenly
+      else if(type===3){arc(rx,0,T,R(1.4,2),.03);var b=a0;el("path",{d:"M"+(cx+Math.cos(b)*rx).toFixed(1)+","+(cy+Math.sin(b)*rx*k).toFixed(1)+" q"+(Math.cos(b)*6).toFixed(1)+","+(Math.sin(b)*4+3).toFixed(1)+" "+(Math.cos(b)*9).toFixed(1)+","+(Math.sin(b)*5+6).toFixed(1),style:"stroke-width:2.4px"},grp)}   // with a drip run off it
+      else{arc(rx,0,T,R(1,1.5),.05);arc(rx*1.02,a0,a0+R(1,2),R(2.6,3.4),.02)}             // thin, with one heavy edge where it pooled
+      setTimeout(function(){grp.classList.remove("wet")},80)}
     /* the cloth: rub it over a spill and the spill comes off, a little with every stroke */
     function wipe(x0,y0,x1,y1){var dist=Math.hypot(x1-x0,y1-y0);if(!dist)return;var o=ost.cloth;o.wipe=Math.sin(performance.now()/60);
       Object.keys(ost).forEach(function(k){var q=ost[k];if(!q.spots||k==="cloth")return;q.spots=q.spots.filter(function(sp){
@@ -1329,7 +1341,7 @@ window.TABLE_CARDS=[
             funnel:function(){document.documentElement.classList.add("leaving");setTimeout(function(){location.href="https://www.albucker.com/objects/44cf072610o"},450)}};
     svg.addEventListener("pointerdown",function(e){var q=e.target.closest&&e.target.closest(".tobj,.ticon");if(q){e.preventDefault();e.stopPropagation();   // a thing: from the table or from its icon
         var k=q.getAttribute("data-o"),p=pt(e),o=ost[k];if(q.classList.contains("ticon")){o.x=p.x;o.y=p.y+(k==="cloth"?0:TABLE.OBJ[k].h*.3)}
-        od={k:k,dx:o.x-p.x,dy:o.y-p.y,cx:e.clientX,cy:e.clientY,was:o.on,fromNet:o.where==="net"};o.where="top";o.sag=0;if(k==="coffee"){cup.last=null;cup.v=[0,0]}dragO=k;svg.setPointerCapture(e.pointerId);svg.classList.add("dragging");draw();return}
+        od={k:k,dx:o.x-p.x,dy:o.y-p.y,cx:e.clientX,cy:e.clientY,was:o.on,fromNet:o.where==="net"};o.where="top";o.sag=0;if(k==="coffee"){cup.last=null;cup.v=[0,0];if(o.on&&o.where!=="net"&&!q.classList.contains("ticon"))ring(o.x,o.y)}dragO=k;svg.setPointerCapture(e.pointerId);svg.classList.add("dragging");draw();return}
       var g=e.target.closest&&e.target.closest(".tpc");if(!g)return;e.preventDefault();e.stopPropagation();
       var k=g.getAttribute("data-k"),p=pt(e);dragK=k;st[k].sag=0;d={k:k,x:p.x,y:p.y,dx:st[k].dx,dy:st[k].dy};svg.setPointerCapture(e.pointerId);svg.classList.add("dragging");draw()});
     svg.addEventListener("pointermove",function(e){if(od){var p=pt(e),o=ost[od.k],tx=Math.max(-40,Math.min(1020,p.x+od.dx)),ty=Math.max(-20,Math.min(1050,p.y+od.dy));

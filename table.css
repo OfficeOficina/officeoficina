@@ -50,3 +50,6 @@
 .tgal.tcards span{position:absolute;right:.7em;bottom:.5em;font:11px Arial,Helvetica,sans-serif;color:#888}
 /* the close-up: right to the edge of its square, so the table runs on out of it */
 .tgal.bleed img{left:1px;top:1px;width:calc(100% - 2px);height:calc(100% - 2px)}
+/* coffee rings where the cup stood: wet and dark, then dry to a faint ring */
+.gpic.tscene .stain.ring path{fill:none!important;stroke:#4a2812;stroke-opacity:.22;stroke-linecap:round;stroke-linejoin:round;vector-effect:non-scaling-stroke;transition:stroke-opacity 9s ease-out}
+.gpic.tscene .stain.ring.wet path{stroke-opacity:.75;transition:none}
