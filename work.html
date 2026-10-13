@@ -238,6 +238,7 @@ var SONGS = [
     });
     function up(){var was=d;d=null;m.classList.remove("dragging");if(!was)return;
       if(!was.moved){hintOff();if(m.classList.contains("tri")){if(!m.classList.contains("mir")){m.classList.add("mir");return}m.classList.remove("mir");   // the mirrored A: back to where you were
+        if(/[?&]from=table/.test(location.search)){location.href="index.html#table";return}   // came from the magazine on the table: back to the table
         if(/[?&]play=/.test(location.search))location.href="index.html#north";                       // came with a record: back to the record shelf
         else if(document.referrer&&document.referrer.indexOf(location.origin)===0&&history.length>1)history.back();else location.href=link.getAttribute("href");return}
       location.href=link.getAttribute("href");return}

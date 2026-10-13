@@ -1415,5 +1415,10 @@ window.TABLE_CARDS=[
 
   /* ---- the magazine: click it on the table and you go to the reading room (work.html), the book open and a record playing ---- */
   window.readMagazine=function(){var n=Math.floor(Math.random()*6);document.documentElement.classList.add("leaving");
-    setTimeout(function(){location.href="work.html?play="+n},500)};
+    setTimeout(function(){location.href="work.html?play="+n+"&from=table"},500)};
+  /* back from the reading room (the logo there): straight back to the table, as rendered */
+  if(location.hash==="#table")(function again(t){if(!window.setGrid||!window.tableScene){if(t<60)setTimeout(function(){again(t+1)},100);return}
+    history.replaceState(null,"",location.pathname+location.search);setGrid(true);
+    setTimeout(function(){var q=document.querySelector('#gsq .sq[data-k="1"]');if(q)q.click();
+      setTimeout(function(){var h=document.querySelector(".gpic.tscene .thit");if(h)h.dispatchEvent(new MouseEvent("click",{bubbles:true}))},500)},150)})(0);
 })();
