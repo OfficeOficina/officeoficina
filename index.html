@@ -13,6 +13,12 @@
 <script src="torre.js?v=1" async></script>
 <script src="table.js?v=38" async></script>
 <link rel="stylesheet" href="table.css?v=20">
+<style>
+  /* Roll Chair opened: the drawing stays exactly as it is in its square - same size, same place, its name still under it */
+  .gpic.rchair img{inset:auto;left:12%;top:7%;width:76%;height:71%}
+  .gpic.rchair{transition:none}
+  .gsq .sq.away.rchair .gcap{opacity:1}
+</style>
 </head>
 <body>
 <main class="stage">
@@ -442,7 +448,7 @@
     var stay=g.open.stay;if(stay){nb=k?0:1;B=A}                                    // a drawing that stays put: its text goes in the first square
     if(sqs[nb])sqs[nb].classList.add("nbr");                                    // the whole grid stays; only the next square makes room
     var pic=document.createElement("div");pic.className="gpic";if(g.open.scene){pic.classList.add("tscene");if(window.tableScene)tableScene(pic)}else pic.innerHTML='<img src="'+esc(g.open.image)+'" alt="'+esc((g.name||"")+" elevation")+'">';at(pic,A);gsq.appendChild(pic);
-    var tx=document.createElement("div");tx.className="gtext";tx.innerHTML=g.open.text.map(function(p){return"<p>"+esc(p)+"</p>"}).join("");if(g.open.scene)tx.classList.add("ttext");at(tx,stay?rel(sqs[nb]):A);gsq.appendChild(tx);if(g.open.cls){pic.classList.add(g.open.cls);tx.classList.add(g.open.cls)}
+    var tx=document.createElement("div");tx.className="gtext";tx.innerHTML=g.open.text.map(function(p){return"<p>"+esc(p)+"</p>"}).join("");if(g.open.scene)tx.classList.add("ttext");at(tx,stay?rel(sqs[nb]):A);gsq.appendChild(tx);if(g.open.cls){pic.classList.add(g.open.cls);tx.classList.add(g.open.cls);sqs[k].classList.add(g.open.cls)}
     sqs[k].classList.add("away");gsq.classList.add("focus");
     gfocus={k:k,nb:nb,pic:pic,tx:tx,fl:[],g:g,cur:null};
     if(g.open.clear)sqs.forEach(function(q,i){if(i!==k)q.classList.add("nbr")});   // clear: all the other drawings go; the grid stays
