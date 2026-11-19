@@ -14,10 +14,9 @@
 <script src="table.js?v=38" async></script>
 <link rel="stylesheet" href="table.css?v=20">
 <style>
-  /* Roll Chair opened: the drawing stays exactly as it is in its square - same size, same place, its name still under it */
+  /* Roll Chair opened: the drawing stays exactly as it is in its square - same size, same place; its name goes */
   .gpic.rchair img{inset:auto;left:12%;top:7%;width:76%;height:71%}
   .gpic.rchair{transition:none}
-  .gsq .sq.away.rchair .gcap{opacity:1}
 </style>
 </head>
 <body>
@@ -414,7 +413,7 @@
       text:["Table. Lorem ipsum dolor sit amet, consectetur adipiscing elit. A long, low table with a steel net slung beneath its top. A circle, a square and a triangle are cut out of the top and kept, each exactly as thick as the table.",
             "Lift them out and the top becomes a sieve; set them on the net, on the floor or back on the top. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."]}},
     {image:RCHAIR, name:"Roll Chair", sub:"Philadelphia, 2026", open:{image:RCHAIR, cls:"rchair", stay:true, clear:true,   // stay: the drawing stays in its square, its text takes the first; clear: every other project goes
-      text:["Roll Chair. Text to come: what it is, what it is made of and how it came about."]}},
+      text:["Text to come: what it is, what it is made of and how it came about."]}},
     {},{}, {},{},{},{}, {},{},{},{}];
   var gridEl=document.getElementById("gridv"),gsq=document.getElementById("gsq"),gdEl=null;
   function gridBuild(){if(window.gridClose&&gfocus){gfocus.pic.remove();gfocus.tx.remove();gfocus.fl.forEach(function(e){e.remove()});gfocus=null;gsq.classList.remove("focus")}
