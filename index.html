@@ -20,9 +20,8 @@
   .gpic.rchair img{inset:auto;left:12%;top:7%;width:76%;height:71%}
   .gpic.rchair.go img{left:8%;top:8%;width:84%;height:84%;transition:all .65s cubic-bezier(.3,.1,.2,1)}
   .gpic.rchair.back img{left:12%;top:7%;width:76%;height:71%}
-  .gpic.rchair img.rnd,.gpic.rchair.go img.rnd,.gpic.rchair.back img.rnd{left:1px;top:1px;width:calc(100% - 2px);height:calc(100% - 1px);object-fit:fill;opacity:0;transition:opacity .45s ease}   /* the render fills the big square, its chair exactly on the drawing */
+  .gpic.rchair img.rnd,.gpic.rchair.go img.rnd,.gpic.rchair.back img.rnd{left:1px;top:1px;width:calc(100% - 2px);height:calc(100% - 1px);object-fit:fill;opacity:0;transition:opacity .6s ease;will-change:opacity}   /* the render fills the big square, its chair exactly on the drawing */
   .gpic.rchair.go{cursor:pointer}
-  .gpic.rchair.rendered img{opacity:0}
   .gpic.rchair.rendered img.rnd{opacity:1}
 </style>
 </head>
@@ -457,6 +456,7 @@
     if(sqs[nb])sqs[nb].classList.add("nbr");                                    // the whole grid stays; only the next square makes room
     var pic=document.createElement("div");pic.className="gpic"+(g.open.cls?" "+g.open.cls:"");   // its own class from the start, so its render never shows while it grows
     if(g.open.scene){pic.classList.add("tscene");if(window.tableScene)tableScene(pic)}else pic.innerHTML='<img src="'+esc(g.open.image)+'" alt="'+esc((g.name||"")+" elevation")+'">'+(g.open.render?'<img class="rnd" src="'+esc(g.open.render)+'" alt="'+esc((g.name||"")+" rendered")+'">':'');at(pic,A);gsq.appendChild(pic);
+    var R=pic.querySelector(".rnd");if(R&&R.decode)R.decode().catch(function(){});   // get the render ready now, so the first click fades in smoothly
     var tx=document.createElement("div");tx.className="gtext";tx.innerHTML=g.open.text.map(function(p){return"<p>"+esc(p)+"</p>"}).join("");if(g.open.scene)tx.classList.add("ttext");at(tx,stay?rel(sqs[nb]):A);gsq.appendChild(tx);if(g.open.cls){tx.classList.add(g.open.cls);sqs[k].classList.add(g.open.cls)}
     sqs[k].classList.add("away");gsq.classList.add("focus");
     gfocus={k:k,nb:nb,pic:pic,tx:tx,fl:[],g:g,cur:null};
