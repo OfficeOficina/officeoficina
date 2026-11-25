@@ -1354,6 +1354,7 @@ var RC_G={"N": 1000, "c0": [362.675, 161.72], "a": [0.867, -0.499], "n": [0.506,
       x.drawImage(m.roll,0,0);x.globalAlpha=1;x.setTransform(1,0,0,1,0,0)}
     if(fade<1&&base){v.drawImage(base,0,0,N,N);v.globalAlpha=fade;v.drawImage(comp,0,0);v.globalAlpha=1}else v.drawImage(comp,0,0);
   }
+  function fadeOut(cv,done){var t0=performance.now();(function f(){fade=1-Math.min(1,(performance.now()-t0)/500);fade=fade*fade*(3-2*fade);draw(cv);if(fade>0)requestAnimationFrame(f);else{fade=1;done()}})()}   // the roll goes again
   function fadeIn(cv){fade=0;var t0=performance.now();(function f(){fade=Math.min(1,(performance.now()-t0)/500);fade=fade*fade*(3-2*fade);draw(cv);if(fade<1)requestAnimationFrame(f)})()}   // the roll arrives
   function nearestT(p){var best=0,bd=1e18;for(var s=0;s<=400;s++){var tt=s/400,c=centre(tt),d=(c[0]-p[0])*(c[0]-p[0])+(c[1]-p[1])*(c[1]-p[1]);if(d<bd){bd=d;best=tt}}return best}
   function onRoll(p){var c=centre(t),k=kf(t),dx=p[0]-c[0],dy=p[1]-c[1],along=dx*G.a[0]+dy*G.a[1],across=dx*G.n[0]+dy*G.n[1];
@@ -1378,7 +1379,9 @@ var RC_G={"N": 1000, "c0": [362.675, 161.72], "a": [0.867, -0.499], "n": [0.506,
       var set=document.createElement("div");set.className="gfl gswset";at(set,rel(q));var gr=document.createElement("div");gr.className="gsg";set.appendChild(gr);
       RC_MATS.forEach(function(M,i){var b=document.createElement("button");b.type="button";b.className="gsw"+(i===cur?" sel":"");
         b.innerHTML='<i style="background-image:url('+M.swatch+')"></i>';b.setAttribute("aria-label",M.name);   // no words: just the material
-        b.addEventListener("click",function(){var first=cur<0;cur=i;[].forEach.call(gr.children,function(x){x.classList.toggle("sel",x===b)});
+        b.addEventListener("click",function(){
+          if(cur===i){b.classList.remove("sel");fadeOut(cv,function(){cur=-1;t=0;draw(cv)});return}   // click the chosen one again: back to the bare chair
+          var first=cur<0;cur=i;[].forEach.call(gr.children,function(x){x.classList.toggle("sel",x===b)});
           mat(i).then(function(){pic.classList.add("rendered");if(first)fadeIn(cv);else draw(cv)})});
         gr.appendChild(b)});
       f.fl.push(set);pic.parentNode.appendChild(set);setTimeout(function(){set.classList.add("on")},250)}
