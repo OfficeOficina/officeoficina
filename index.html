@@ -1377,7 +1377,7 @@ var RC_G={"N": 1000, "c0": [362.675, 161.72], "a": [0.867, -0.499], "n": [0.506,
     var q=sqs[cols>1?1:3];if(q){q.classList.add("nbr");
       var set=document.createElement("div");set.className="gfl gswset";at(set,rel(q));var gr=document.createElement("div");gr.className="gsg";set.appendChild(gr);
       RC_MATS.forEach(function(M,i){var b=document.createElement("button");b.type="button";b.className="gsw"+(i===cur?" sel":"");
-        b.innerHTML='<i style="background-image:url('+M.swatch+')"></i><span>'+M.name.replace(/[<&]/g,"")+'</span>';
+        b.innerHTML='<i style="background-image:url('+M.swatch+')"></i>';b.setAttribute("aria-label",M.name);   // no words: just the material
         b.addEventListener("click",function(){var first=cur<0;cur=i;[].forEach.call(gr.children,function(x){x.classList.toggle("sel",x===b)});
           mat(i).then(function(){pic.classList.add("rendered");if(first)fadeIn(cv);else draw(cv)})});
         gr.appendChild(b)});
