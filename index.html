@@ -11,11 +11,12 @@
 <meta property="og:url" content="https://officeoficina.com">
 <link rel="stylesheet" href="style.css?v=91">
 <script src="torre.js?v=1" async></script>
-<script src="table.js?v=38" async></script>
+<script src="table.js?v=40" async></script>
 <link rel="stylesheet" href="table.css?v=20">
 <style>
   /* Roll Chair opened: the drawing grows from its square into the top-right four squares, which become one square */
   .gpic.rchair{transition:left .65s cubic-bezier(.3,.1,.2,1),top .65s cubic-bezier(.3,.1,.2,1),width .65s cubic-bezier(.3,.1,.2,1),height .65s cubic-bezier(.3,.1,.2,1)}
+  .gpic.tscene::before{content:"";position:absolute;inset:1px 1px 0 1px;background:var(--bg);pointer-events:none}   /* Table for Sofia: its four squares read as one, no lines through the table */
   .gpic.rchair::before{content:"";position:absolute;inset:1px 1px 0 1px;background:var(--bg)}   /* covers the lines inside the four squares; keeps the outside edge */
   .gpic.rchair img{inset:auto;left:12%;top:7%;width:76%;height:71%}
   .gpic.rchair.go img{left:8%;top:8%;width:84%;height:84%;transition:all .65s cubic-bezier(.3,.1,.2,1)}

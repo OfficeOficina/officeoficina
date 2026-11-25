@@ -1244,11 +1244,15 @@ window.TABLE_CARDS=[
       [].slice.call(gs.querySelectorAll(".sq.galnbr")).forEach(function(q){q.classList.remove("galnbr")});if(!on)return;
       var sqs=[].slice.call(gs.querySelectorAll(":scope>.sq")),r=boxEl.getBoundingClientRect(),k=-1;gallery.n=(gallery.n||0)+1;var run=gallery.n;
       sqs.forEach(function(q,i){var b=q.getBoundingClientRect();if(Math.abs(b.left-r.left)<3&&Math.abs(b.top-r.top)<3)k=i});if(k<0)return;
-      TABLE.GAL.forEach(function(src,i){var q=sqs[k+1+i];if(!q)return;q.classList.add("galnbr");var d=document.createElement("div");d.className="tgal"+(i===3?" bleed":"");   // the close-up runs to the edge of its square
+      var tx=[].slice.call(gs.querySelectorAll(".gtext")).map(function(e){return e.getBoundingClientRect()});
+      function over(b,o){return b.left<o.right-3&&b.right>o.left+3&&b.top<o.bottom-3&&b.bottom>o.top+3}
+      var free=sqs.filter(function(q){var b=q.getBoundingClientRect();return!over(b,r)&&!tx.some(function(o){return over(b,o)})});   // every square in order, except the table's and the text's
+      TABLE.GAL.forEach(function(src,i){var q=free[i];if(!q)return;q.classList.add("galnbr");var d=document.createElement("div");d.className="tgal"+(i===3?" bleed":"");   // the close-up runs to the edge of its square
         d.style.cssText="left:"+q.offsetLeft+"px;top:"+q.offsetTop+"px;width:"+q.offsetWidth+"px;height:"+q.offsetHeight+"px";d.innerHTML='<img src="'+src+'" alt="">';gs.appendChild(d);
         setTimeout(function(){if(run===gallery.n)d.classList.add("on")},120+i*170)});
       /* then the cards: one square, one card at a time; scroll over it (or swipe) for the next */
-      var C=window.TABLE_CARDS,q=sqs[k+1+TABLE.GAL.length];if(!C||!C.length||!q)return;q.classList.add("galnbr");
+      return;   // no cards square
+      var C=window.TABLE_CARDS,q=free[TABLE.GAL.length];if(!C||!C.length||!q)return;q.classList.add("galnbr");
       var d=document.createElement("div");d.className="tgal tcards";d.style.cssText="left:"+q.offsetLeft+"px;top:"+q.offsetTop+"px;width:"+q.offsetWidth+"px;height:"+q.offsetHeight+"px";
       var n=gallery.card||0;d.innerHTML='<img src="'+C[n]+'" alt="Card '+(n+1)+'"><span>'+(n+1)+' / '+C.length+'</span>';gs.appendChild(d);
       var img=d.querySelector("img"),lab=d.querySelector("span"),acc=0,ty=null;
