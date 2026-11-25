@@ -33,6 +33,10 @@
   .gswset .gsw.sel i{outline-color:#000}
   .gswset .gsw:hover i{outline-color:#999}.gswset .gsw.sel:hover i{outline-color:#000}
   .gswset .gsw span{position:static;font:9pt/1.2 Arial,Helvetica,sans-serif;color:#000;text-align:center;white-space:nowrap}
+  /* the landing page: each project a big tile, the size of four squares, two to a row (one on a phone); scroll for more */
+  .gsq.tiles{grid-template-columns:repeat(2,1fr)}
+  @media (max-width:700px){.gsq.tiles{grid-template-columns:1fr}}
+  .gsq.tiles .sq .gcap{font-size:16pt}
 </style>
 </head>
 <body>
@@ -433,10 +437,17 @@
     {},{}, {},{},{},{}, {},{},{},{}];
   var gridEl=document.getElementById("gridv"),gsq=document.getElementById("gsq"),gdEl=null;
   function gridBuild(){if(window.gridClose&&gfocus){gfocus.pic.remove();gfocus.tx.remove();gfocus.fl.forEach(function(e){e.remove()});gfocus=null;gsq.classList.remove("focus")}
-    var n=GRID.length,cols=innerWidth<=700?1:4;while(n%cols)n++;              // always whole rows
-    var h="";for(var k=0;k<n;k++){var g=GRID[k]||{};
+    var cols=innerWidth<=700?1:4,tc=cols>1?2:1,np=0;GRID.forEach(function(g,i){if(g&&g.open)np=i+1});
+    var nt=Math.max(np,cols>1?8:np);while(nt%tc)nt++;                          // the landing page: one big tile (four squares) per project, two to a row
+    gsq.classList.add("tiles");gsq._tiles=nt;
+    var h="";for(var k=0;k<nt;k++){var g=GRID[k]||{};
       h+='<div class="sq'+(g.open?' has':'')+'" data-k="'+k+'">'+(g.image?'<img src="'+esc(g.image)+'" alt="'+esc(g.name||g.title||"")+'" loading="lazy">':'')+(g.title?'<span>'+esc(g.title)+'</span>':'')+(g.sub||g.name?'<span class="gcap"><b>'+esc(g.name||"")+'</b>'+(g.sub?esc(g.sub):"&nbsp;")+'</span>':'')+'</div>'}   // title and place, year under the drawing
     gsq.innerHTML=h;
+  }
+  function gridSmall(){                                                          // a project open: the grid of small squares, four to a row, empty
+    var cols=innerWidth<=700?1:4,n=cols>1?cols*Math.max(3,(gsq._tiles||8)):Math.max(gsq._tiles||4,4),h="";
+    for(var k=0;k<n;k++)h+='<div class="sq" data-k="'+k+'"></div>';
+    gsq.classList.remove("tiles");gsq.innerHTML=h;
   }
   function gridPlace(){
     var u=underEl.getBoundingClientRect(),cs=getComputedStyle(underEl),fs=parseFloat(cs.fontSize),
@@ -458,17 +469,18 @@
   function rel(el){var a=el.getBoundingClientRect(),b=gsq.getBoundingClientRect();return{l:a.left-b.left,t:a.top-b.top,w:a.width,h:a.height}}
   function at(el,r){el.style.left=r.l+"px";el.style.top=r.t+"px";el.style.width=r.w+"px";el.style.height=r.h+"px"}
   function gridOpen(k){
-    var g=GRID[k];if(!g||!g.open||gfocus)return;var sqs=[].slice.call(gsq.children),cols=innerWidth<=700?1:4;
-    var nb=(cols>1&&k%cols===cols-1)?k-1:k+1;if(!sqs[nb])nb=k-1;var A=rel(sqs[k]),B=rel(sqs[nb]);
+    var g=GRID[k];if(!g||!g.open||gfocus)return;var cols=innerWidth<=700?1:4,tile=gsq.children[k],A=rel(tile),scroll=gridEl.scrollTop;
+    gridSmall();var sqs=[].slice.call(gsq.children);if(scroll)gridEl.scrollTo({top:0,behavior:"smooth"});   // the project opens at the top
+    var nb=(cols>1&&k%cols===cols-1)?k-1:k+1;if(!sqs[nb])nb=k-1;var B=rel(sqs[nb]);
     var stay=g.open.stay;if(stay){nb=k?0:1;B=A}                                    // a drawing that stays put: its text goes in the first square
     if(g.open.big&&cols>1&&sqs[2*cols-1])B=union(rel(sqs[cols-2]),rel(sqs[2*cols-1]));   // big: the drawing grows into the top-right four squares, as one
     if(sqs[nb])sqs[nb].classList.add("nbr");                                    // the whole grid stays; only the next square makes room
     var pic=document.createElement("div");pic.className="gpic"+(g.open.cls?" "+g.open.cls:"");   // its own class from the start, so its render never shows while it grows
     if(g.open.scene){pic.classList.add("tscene");if(window.tableScene)tableScene(pic)}else pic.innerHTML='<img src="'+esc(g.open.image)+'" alt="'+esc((g.name||"")+" elevation")+'">'+(g.open.roll?'<canvas class="rnd" aria-label="'+esc((g.name||"")+" rendered")+'"></canvas>':g.open.render?'<img class="rnd" src="'+esc(g.open.render)+'" alt="'+esc((g.name||"")+" rendered")+'">':'');at(pic,A);gsq.appendChild(pic);
     var R=pic.querySelector("img.rnd");if(R&&R.decode)R.decode().catch(function(){});   // get the render ready now, so the first click fades in smoothly
-    var tx=document.createElement("div");tx.className="gtext";tx.innerHTML=g.open.text.map(function(p){return"<p>"+esc(p)+"</p>"}).join("");if(g.open.scene)tx.classList.add("ttext");at(tx,stay?rel(sqs[nb]):A);gsq.appendChild(tx);if(g.open.cls){tx.classList.add(g.open.cls);sqs[k].classList.add(g.open.cls)}
+    var tx=document.createElement("div");tx.className="gtext";tx.innerHTML=g.open.text.map(function(p){return"<p>"+esc(p)+"</p>"}).join("");if(g.open.scene)tx.classList.add("ttext");at(tx,stay?rel(sqs[nb]):rel(sqs[k]));gsq.appendChild(tx);if(g.open.cls){tx.classList.add(g.open.cls);sqs[k].classList.add(g.open.cls)}
     sqs[k].classList.add("away");gsq.classList.add("focus");
-    gfocus={k:k,nb:nb,pic:pic,tx:tx,fl:[],g:g,cur:null};
+    gfocus={k:k,nb:nb,pic:pic,tx:tx,fl:[],g:g,cur:null,A0:A,scroll:scroll};
     if(g.open.clear)sqs.forEach(function(q,i){if(i!==k)q.classList.add("nbr")});   // clear: all the other drawings go; the grid stays
     if(g.open.roll&&window.rollChair)rollChair(gfocus,sqs,cols,rel,at);              // the leather roll and its material swatches
     if(g.open.floors){gfocus.bands=[];
@@ -521,8 +533,8 @@
   gsq.addEventListener("pointerdown",function(e){if(!gfocus)return;var fl=floorFrom(e);gfocus.tapFloor=fl||null;if(fl&&!gfocus.big)showFloor(fl)});
   function gridClose(){
     if(!gfocus)return;gsq.classList.remove("bigfloor");var f=gfocus;gfocus=null;f.fl.forEach(function(d){d.classList.remove("on");setTimeout(function(){d.remove()},400)});var sqs=[].slice.call(gsq.children);
-    f.tx.classList.remove("on");at(f.pic,rel(sqs[f.k]));f.pic.classList.add("back");
-    setTimeout(function(){f.pic.remove();f.tx.remove();if(sqs[f.k])sqs[f.k].classList.remove("away");sqs.forEach(function(q){q.classList.remove("dim","lit","nbr")});gsq.classList.remove("focus")},600);
+    f.tx.classList.remove("on");at(f.pic,f.A0||rel(sqs[f.k]));f.pic.classList.add("back");if(f.scroll)gridEl.scrollTo({top:f.scroll,behavior:"smooth"});
+    setTimeout(function(){f.pic.remove();f.tx.remove();gsq.classList.remove("focus");gridBuild();if(f.scroll)gridEl.scrollTop=f.scroll},600);   // back into its tile, then all the projects again
   }
   window.gridFocused=function(){return !!gfocus};window.gridClose=gridClose;
   gsq.addEventListener("click",function(e){
