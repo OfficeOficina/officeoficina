@@ -65,3 +65,7 @@
 .mread .mbook .leaf i{position:absolute;inset:0;background:#fff center/contain no-repeat;backface-visibility:hidden;-webkit-backface-visibility:hidden}
 .mread .mbook .leaf i.bk{transform:rotateY(180deg)}
 .mread .mx{position:absolute;top:2%;right:3%;font:20px/1 Arial,Helvetica,sans-serif;background:none;border:0;color:#000;cursor:pointer;padding:4px 8px}
+
+.tgal .tthings{position:absolute;inset:6%;pointer-events:none;overflow:hidden}   /* the things on the table, over each render: the same box as its picture */
+.tgal.bleed .tthings{inset:1px}
+.tgal .tthings img{position:absolute;inset:auto;object-fit:fill}

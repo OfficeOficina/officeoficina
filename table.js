@@ -1233,12 +1233,27 @@ window.TABLE_CARDS=[
           spots(k,up,o.x,o.y+dy)}
         el("image",img,grp);spots(k,grp,o.x,o.y-lift+dy);
         if(k==="coffee")slosh(grp,o.x,o.y-lift)});
-      tray()}
+      tray();galThings()}
     function tray(){var T=svg.querySelector(".ttray");T.innerHTML="";var ks=Object.keys(TABLE.OBJ),n=ks.length,gap=Math.min(150,840/(n-1)),x0=489-gap*(n-1)/2,B=Math.min(86,gap*.62);
       ks.forEach(function(k,i){if(ost[k].on||dragO===k)return;var O=TABLE.OBJ[k],sc=Math.min(B/O.w,B/O.h,1),w=O.w*sc,h=O.h*sc,cx=x0+gap*i;
         var g=el("g",{"class":"ticon","data-o":k},T);
         el("rect",{x:cx-B/2-6,y:1000-B-6,width:B+12,height:B+12,fill:"transparent"},g);
         el("image",{href:O.spr,x:cx-w/2,y:1000-h,width:w,height:h},g)})}
+    /* the things on the table, in the three-quarter render too: each render knows where the table top is in it (u along the table, v across,
+       measured from the drawing's corners), so a thing stands on the same spot in every view. z 0: on the top; 1: on the net, seen through a hole */
+    var GV=[null,null,null,null,                                                                  // the end, from above, the long side, close in: as rendered
+      function(u,v,z){if(z)return null;var H=[[837.12,-86,167.79],[-42.6,74.85,411.88],[-.0872,-.1002,1]];   // three-quarters, in perspective
+        function pr(a,b){var w=H[2][0]*a+H[2][1]*b+1;return[(H[0][0]*a+H[0][1]*b+H[0][2])/w,(H[1][0]*a+H[1][1]*b+H[1][2])/w]}
+        var p=pr(u,v),q=pr(u+.01,v);return[p[0],p[1],Math.hypot(q[0]-p[0],q[1]-p[1])/7.51]}];
+    var TC=TABLE.top,TU=[TC[1][0]-TC[0][0],TC[1][1]-TC[0][1]],TV=[TC[3][0]-TC[0][0],TC[3][1]-TC[0][1]],TD=TU[0]*TV[1]-TU[1]*TV[0];
+    function uvOf(x,y){x-=TC[0][0];y-=TC[0][1];return[(x*TV[1]-y*TV[0])/TD,(TU[0]*y-TU[1]*x)/TD]}
+    function galThings(){var gs=document.getElementById("gsq");if(!gs)return;
+      [].slice.call(gs.querySelectorAll(".tgal[data-v]")).forEach(function(d){var L=d.querySelector(".tthings");if(!L)return;var f=GV[+d.getAttribute("data-v")],h="";if(!f){if(L._h){L._h="";L.innerHTML=""}return}
+        Object.keys(ost).filter(function(k){return ost[k].on&&dragO!==k}).sort(function(a,b){return ost[a].y-ost[b].y}).forEach(function(k){
+          var o=ost[k],O=TABLE.OBJ[k],net=o.where==="net",uv=uvOf(o.x,o.y-(net?DROP:0)),P=f&&f(uv[0],uv[1],net?1:0);if(!P)return;
+          var w=O.w*P[2],ht=O.h*P[2],l=P[0]-(O.ax-O.x)*P[2],t=P[1]-(O.ay-O.y)*P[2];
+          h+='<img src="'+O.spr+'" alt="" style="left:'+(l/12)+'%;top:'+(t/12)+'%;width:'+(w/12)+'%;height:'+(ht/12)+'%">'});
+        if(L._h!==h){L._h=h;L.innerHTML=h}})}
     /* the other renders of the table: in the squares after it, only while the render is showing */
     function gallery(on){var gs=document.getElementById("gsq");if(!gs)return;[].slice.call(gs.querySelectorAll(".tgal")).forEach(function(e){e.classList.remove("on");setTimeout(function(){e.remove()},400)});
       [].slice.call(gs.querySelectorAll(".sq.galnbr")).forEach(function(q){q.classList.remove("galnbr")});if(!on)return;
@@ -1248,9 +1263,10 @@ window.TABLE_CARDS=[
       function over(b,o){return b.left<o.right-3&&b.right>o.left+3&&b.top<o.bottom-3&&b.bottom>o.top+3}
       var free=sqs.filter(function(q){var b=q.getBoundingClientRect();return!over(b,r)&&!tx.some(function(o){return over(b,o)})});   // every square in order, except the table's and the text's
       TABLE.GAL.forEach(function(src,i){var q=free[i];if(!q)return;q.classList.add("galnbr");var d=document.createElement("div");d.className="tgal"+(i===3?" bleed":"");   // the close-up runs to the edge of its square
-        d.style.cssText="left:"+q.offsetLeft+"px;top:"+q.offsetTop+"px;width:"+q.offsetWidth+"px;height:"+q.offsetHeight+"px";d.innerHTML='<img src="'+src+'" alt="">';gs.appendChild(d);
+        d.style.cssText="left:"+q.offsetLeft+"px;top:"+q.offsetTop+"px;width:"+q.offsetWidth+"px;height:"+q.offsetHeight+"px";d.innerHTML='<img src="'+src+'" alt=""><div class="tthings"></div>';d.setAttribute("data-v",i);gs.appendChild(d);
         setTimeout(function(){if(run===gallery.n)d.classList.add("on")},120+i*170)});
       /* then the cards: one square, one card at a time; scroll over it (or swipe) for the next */
+      galThings();
       return;   // no cards square
       var C=window.TABLE_CARDS,q=free[TABLE.GAL.length];if(!C||!C.length||!q)return;q.classList.add("galnbr");
       var d=document.createElement("div");d.className="tgal tcards";d.style.cssText="left:"+q.offsetLeft+"px;top:"+q.offsetTop+"px;width:"+q.offsetWidth+"px;height:"+q.offsetHeight+"px";
