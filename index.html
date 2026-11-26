@@ -26,11 +26,13 @@
   .gpic.rchair.rendered .rnd{opacity:1}
   .gpic.rchair.rendered canvas.rnd{touch-action:none}
   .gpic.rchair.rolling,.gpic.rchair.rolling canvas.rnd{cursor:grabbing!important}
-  /* the material swatches: small chips in a vertical line, in the square to the left of the chair */
+  /* the material swatches: the square beside the chair, split into four */
   .gfl.gswset{container-type:size}
-  .gswset .gsg{display:flex;flex-direction:column;align-items:flex-start;gap:6cqw;margin:10cqw 10cqw 0}   /* the swatches in a vertical line */
-  .gswset .gsw{all:unset;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:.45em;min-width:0}
-  .gswset .gsw i{display:block;width:15cqw;aspect-ratio:1;background-size:cover;background-position:center;outline:1px solid transparent;outline-offset:4px;transition:outline-color .2s ease}
+  .gswset .gsg{position:absolute;inset:1px 0 0 1px;display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr}   /* the square split into four, a swatch in each */
+  .gswset .gsw:nth-child(odd){border-right:1px solid #555}
+  .gswset .gsw:nth-child(-n+2){border-bottom:1px solid #555}
+  .gswset .gsw{all:unset;cursor:pointer;display:flex;align-items:center;justify-content:center;min-width:0;min-height:0}
+  .gswset .gsw i{display:block;width:34cqw;aspect-ratio:1;background-size:cover;background-position:center;outline:1px solid transparent;outline-offset:4px;transition:outline-color .2s ease}
   .gswset .gsw.sel i{outline-color:#000}
   .gswset .gsw:hover i{outline-color:#999}.gswset .gsw.sel:hover i{outline-color:#000}
   .gswset .gsw span{position:static;font:9pt/1.2 Arial,Helvetica,sans-serif;color:#000;text-align:center;white-space:nowrap}
