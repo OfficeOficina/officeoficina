@@ -521,8 +521,8 @@ html.leaving body{opacity:0;transition:opacity .5s ease}
 .gfl li[data-floor]{cursor:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14'%3E%3Ccircle cx='7' cy='7' r='5' fill='%23000'/%3E%3C/svg%3E") 7 7,pointer}
 .gfl li{width:max-content;margin:0 auto;padding:0 .3em}
 .gfl li[data-floor]:hover{background:rgba(0,0,0,.09)}
-/* in a project the grid lines go solid */
-.gsq.focus{--dash:linear-gradient(#555,#555);--dashv:linear-gradient(#555,#555)}
+/* in a project the grid stays dashed; only the squares in use get solid lines (their own top and left, and the line just past their right and bottom) */
+.gsq.focus .gtext,.gsq.focus .gfl,.gsq.focus .tgal,.gsq.focus .gpic{box-shadow:inset 1px 1px 0 #555,1px 1px 0 #555}
 /* a floor clicked: plan and photo four squares each */
 .gfl{transition:opacity .35s ease,left .5s cubic-bezier(.3,.1,.2,1),top .5s cubic-bezier(.3,.1,.2,1),width .5s cubic-bezier(.3,.1,.2,1),height .5s cubic-bezier(.3,.1,.2,1)}
 .gfl.big{z-index:4;background:var(--bg);cursor:pointer;box-shadow:inset 1px 1px 0 #555,inset 0 -1px 0 #555}
